@@ -85,13 +85,13 @@ Este índice refleja en qué fase se encuentra el equipo y qué hitos restan por
 
 | Etapa | Sub-etapa / Hito | Responsable / Herramienta | Entregable Clave | Estado |
 | :---: | :--- | :--- | :--- | :---: |
-| **1** | **Project Setup** | Equipo completo | `how-we-work.md`, `project-setup.md`, `project-setup-summary.md` | **EN PROCESO (Completando Setup)** |
-| 1 | Ratificación de Setup | Reunión grupal | Aprobación de stack y proceso en reunión | 🟡 Pendiente |
-| **2** | **Design — Arquitectura** | Skill `grill-with-docs` | Documento general de arquitectura y decisiones de diseño | ⚪ No iniciada |
-| 2 | **Design — Especificaciones** | Skill `to-spec` | Specs detalladas e Historias de Usuario con *seams* | ⚪ No iniciada |
-| 2 | **Design — Tickets & Backlog** | Skill `to-tickets` | Épicas en `docs/tickets/<epica>/` y `docs/backlog.md` | ⚪ No iniciada |
-| 2 | Ratificación de Diseño | Reunión grupal | `docs/design-summary.md` aprobado por el equipo | ⚪ No iniciada |
-| **3** | **Implementation** | Ramas `ticket/<NN>-<slug>` | Código y tests unitarios desarrollados vía TDD estricto | ⚪ No iniciada |
+| **1** | **Project Setup** | Equipo completo | `how-we-work.md`, `project-setup.md`, `project-setup-summary.md` | ✅ Completada |
+| 1 | Ratificación de Setup | Reunión grupal | Aprobación de stack y proceso en reunión | ✅ Completada |
+| **2** | **Design — Arquitectura** | Skill `grill-with-docs` | [`docs/architecture.md`](architecture.md), [`docs/glossary.md`](glossary.md) y `docs/adr/ADR-001..012` | ✅ Completada |
+| 2 | **Design — Especificaciones** | Skill `to-spec` | [`docs/spec.md`](spec.md) con Historias de Usuario y *seams* | ✅ Completada |
+| 2 | **Design — Tickets & Backlog** | Skill `to-tickets` | 6 Épicas en `docs/tickets/` y [`docs/backlog.md`](backlog.md) (24 tickets) | ✅ Completada |
+| 2 | Ratificación de Diseño | Reunión grupal | [`docs/design-summary.md`](design-summary.md) listo para aprobación | 🟡 Listo para ratificar |
+| **3** | **Implementation** | Ramas `ticket/<NN>-<slug>` | Código y tests unitarios desarrollados vía TDD estricto | ⚪ Próxima etapa |
 | **4** | **Review & Integración** | PRs + Skill `code-review` | Pull Requests con DoD completo y $\ge 2$ aprobaciones | ⚪ No iniciada |
 
 > [!NOTE]
