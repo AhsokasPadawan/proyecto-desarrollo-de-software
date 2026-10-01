@@ -3,652 +3,513 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chess TPO — Resumen Ejecutivo de Diseño, UML y Flujos</title>
+  <title>Chess TPO - Resumen Ejecutivo de Diseno, UML y Flujos</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: {
+        background: '#020617',
+        primaryColor: '#0f172a',
+        primaryTextColor: '#e2e8f0',
+        primaryBorderColor: '#334155',
+        lineColor: '#64748b',
+        secondaryColor: '#1e293b',
+        tertiaryColor: '#1e293b',
+        edgeLabelBackground: '#0f172a',
+        attributeBackgroundColorEven: '#0f172a',
+        attributeBackgroundColorOdd: '#1e293b',
+        fontFamily: 'monospace',
+        fontSize: '13px',
+        classText: '#e2e8f0'
+      }
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid',
+    });
+    
+    const svgEl = document.querySelector('.mermaid svg');
+    if (svgEl) {
+      svgEl.style.width = '100%';
+      svgEl.style.height = '650px';
+      svgPanZoom(svgEl, {
+        zoomEnabled: true,
+        controlIconsEnabled: true,
+        fit: true,
+        center: true,
+        minZoom: 0.5,
+        maxZoom: 5
+      });
+    }
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased p-6">
   <div class="max-w-7xl mx-auto space-y-6">
+
     <header class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
-          <span>Ingeniería de Software</span>
-          <span>•</span>
-          <span>Cierre de Etapa 2: Design Summary</span>
+          <span>Ingenieria de Software</span><span>&bull;</span><span>Cierre de Etapa 2: Design Summary</span>
         </div>
-        <h1 class="text-2xl md:text-3xl font-bold mt-1">♟️ Chess TPO — Arquitectura, Diagrama UML y Flujos</h1>
-        <p class="text-sm text-slate-400 mt-1">
-          Arquitectura Hexagonal (Core-Adapter) en TypeScript + Vitest + React &amp; Tailwind CSS — Balanceado en 6 Épicas × 4 Tickets (24 Tickets).
-        </p>
+        <h1 class="text-2xl md:text-3xl font-bold mt-1">&#9822; Chess TPO - Arquitectura, Diagrama UML y Flujos</h1>
+        <p class="text-sm text-slate-400 mt-1">Arquitectura Hexagonal (Core-Adapter) en TypeScript + Vitest + React &amp; Tailwind CSS - 6 Epicas x 4 Tickets (24 Tickets).</p>
       </div>
       <div class="grid grid-cols-3 gap-2.5 text-center shrink-0">
-        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5">
-          <div class="text-xl font-bold text-indigo-400">12</div>
-          <div class="text-[11px] text-slate-400">ADRs</div>
-        </div>
-        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5">
-          <div class="text-xl font-bold text-emerald-400">6</div>
-          <div class="text-[11px] text-slate-400">Épicas</div>
-        </div>
-        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5">
-          <div class="text-xl font-bold text-amber-400">24</div>
-          <div class="text-[11px] text-slate-400">Tickets</div>
-        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5"><div class="text-xl font-bold text-indigo-400">12</div><div class="text-[11px] text-slate-400">ADRs</div></div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5"><div class="text-xl font-bold text-emerald-400">6</div><div class="text-[11px] text-slate-400">Epicas</div></div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5"><div class="text-xl font-bold text-amber-400">24</div><div class="text-[11px] text-slate-400">Tickets</div></div>
       </div>
     </header>
 
     <nav class="bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex flex-wrap gap-1.5">
-      <button data-tab="uml" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition bg-indigo-600 text-white">
-        1. Diagrama de Clases UML
-      </button>
-      <button data-tab="flows" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">
-        2. Diagramas de Flujo
-      </button>
-      <button data-tab="arch" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">
-        3. 12 ADRs (What / Why / Break)
-      </button>
-      <button data-tab="epics" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">
-        4. Mapa de 6 Épicas (24 Tickets)
-      </button>
+      <button data-tab="uml" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition bg-indigo-600 text-white">1. Diagrama de Clases UML</button>
+      <button data-tab="flows" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">2. Diagramas de Flujo</button>
+      <button data-tab="arch" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">3. 12 ADRs (What / Why / Break)</button>
+      <button data-tab="epics" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">4. Mapa de 6 Epicas (24 Tickets)</button>
     </nav>
 
+    <!-- ===== PANEL UML ===== -->
     <section id="panel-uml" class="space-y-4">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <h2 class="text-lg font-bold">Diagrama de Clases UML del Dominio (Core)</h2>
-            <p class="text-xs text-slate-400">
-              Filtra por patrón GoF o haz clic en cualquier clase para inspeccionar su responsabilidad y ADR asociado.
-            </p>
+            <p class="text-xs text-slate-400">Arquitectura Hexagonal completa: State, Command, Observer, Strategy y Composition-over-Inheritance.</p>
           </div>
-          <div class="flex flex-wrap gap-1.5">
-            <button data-filter="all" class="uml-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white">Todos</button>
-            <button data-filter="port" class="uml-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300">Puerto &amp; Observer</button>
-            <button data-filter="composition" class="uml-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300">Composición (Piezas)</button>
-            <button data-filter="command" class="uml-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300">Patrón Command</button>
-            <button data-filter="state" class="uml-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300">Patrón State</button>
-            <button data-filter="strategy" class="uml-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300">Patrón Strategy (IA)</button>
+          
+          <div class="flex flex-wrap gap-2">
+            <button data-filter="all" data-color="bg-slate-700" class="uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-700 text-white transition-all">
+              Todos
+            </button>
+            <button data-filter="port" data-color="border-indigo-400" class="uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 transition-all hover:bg-slate-800">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-indigo-400"></span> Puerto &amp; Observer
+            </button>
+            <button data-filter="composition" data-color="border-indigo-600" class="uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 transition-all hover:bg-slate-800">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-indigo-600"></span> Composicion (Piezas)
+            </button>
+            <button data-filter="command" data-color="border-rose-400" class="uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 transition-all hover:bg-slate-800">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-400"></span> Patron Command
+            </button>
+            <button data-filter="state" data-color="border-emerald-400" class="uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 transition-all hover:bg-slate-800">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Patron State
+            </button>
+            <button data-filter="strategy" data-color="border-amber-400" class="uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 transition-all hover:bg-slate-800">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span> Patron Strategy (IA)
+            </button>
+            <button data-filter="board" data-color="border-cyan-400" class="uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 transition-all hover:bg-slate-800">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400"></span> Board / V.O.
+            </button>
           </div>
+
         </div>
 
-        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div>
-            <div class="flex items-center gap-2">
-              <span id="inspector-badge" class="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Dominio</span>
-              <h3 id="inspector-title" class="font-bold text-sm">ChessGame (implementa IGameEngine)</h3>
-            </div>
-            <p id="inspector-desc" class="text-xs text-slate-400 mt-1">
-              Fachada y único Driving Port del Core. Orquesta turnos, delega fases en IGameState, registra jugadas en CommandHistory, filtra jaques con CheckDetector y notifica GameSnapshot a IGameObserver.
-            </p>
-          </div>
-          <div id="inspector-adr" class="text-xs font-mono shrink-0 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">
-            ADR-005 / ADR-010 / ADR-011
-          </div>
-        </div>
+        <div class="rounded-xl bg-slate-950 border border-slate-800 p-4 overflow-x-auto">
+          <div class="mermaid">classDiagram
+    direction TB
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          <div class="lg:col-span-4 space-y-3">
-            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">1. Driving Port, Facade &amp; Observer</div>
-            <div data-group="port" data-class="IGameEngine" class="uml-box cursor-pointer bg-slate-950 border-2 border-blue-500/60 rounded-xl p-3 space-y-1.5 transition hover:border-blue-400">
-              <div class="text-[10px] font-mono text-blue-400">&lt;&lt;interface&gt;&gt; Driving Port</div>
-              <div class="font-bold text-sm font-mono">IGameEngine</div>
-              <hr class="border-slate-800" />
-              <ul class="text-[11px] font-mono space-y-0.5 text-slate-400">
-                <li>+getSnapshot(): GameSnapshot</li>
-                <li>+getLegalMoves(from: Position): Position[]</li>
-                <li>+makeMove(from: Position, to: Position): MoveResult</li>
-                <li>+undo(): boolean / +redo(): boolean</li>
-                <li>+subscribe(obs: IGameObserver): UnsubscribeFn</li>
-                <li>+unsubscribe(obs: IGameObserver): void</li>
-              </ul>
-            </div>
+    classDef portStyle   fill:#0f172a,stroke:#818cf8,stroke-width:2px,color:#c7d2fe
+    classDef coreStyle   fill:#0f172a,stroke:#818cf8,stroke-width:3px,color:#e2e8f0
+    classDef observStyle fill:#0f172a,stroke:#c084fc,stroke-width:1.5px,color:#e9d5ff
+    classDef stateGof    fill:#0f172a,stroke:#34d399,stroke-width:1.5px,color:#a7f3d0
+    classDef cmdGof      fill:#0f172a,stroke:#fb7185,stroke-width:1.5px,color:#fecdd3
+    classDef boardStyle  fill:#0f172a,stroke:#22d3ee,stroke-width:1.5px,color:#a5f3fc
+    classDef pieceStyle  fill:#0f172a,stroke:#6366f1,stroke-width:1.5px,color:#c7d2fe
+    classDef ruleStyle   fill:#0f172a,stroke:#fbbf24,stroke-width:1.5px,color:#fde68a
+    classDef voStyle     fill:#0f172a,stroke:#22d3ee,stroke-width:1px,color:#a5f3fc
 
-            <div class="text-center text-xs font-mono text-blue-400">▲ implementa (Realización)</div>
+    class IGameEngine {
+        &lt;&lt;interface&gt;&gt;
+        +getSnapshot() GameSnapshot
+        +getLegalMoves(from) Position[]
+        +makeMove(from, to) MoveResult
+        +undo() boolean
+        +redo() boolean
+        +subscribe(obs) UnsubscribeFn
+        +unsubscribe(obs) void
+    }
+    class IGameObserver {
+        &lt;&lt;interface&gt;&gt;
+        +onGameStateChanged(snapshot) void
+    }
+    class ChessGame {
+        -board Board
+        -currentTurn Color
+        -currentState IGameState
+        -history CommandHistory
+        -checkDetector CheckDetector
+        -observers IGameObserver[]
+        +getSnapshot() GameSnapshot
+        +getLegalMoves(from) Position[]
+        +makeMove(from, to) MoveResult
+        +undo() boolean
+        +redo() boolean
+        +subscribe(obs) UnsubscribeFn
+        +unsubscribe(obs) void
+    }
+    class IGameState {
+        &lt;&lt;interface&gt;&gt;
+        +kind GameStateKind
+        +canAcceptMoves() boolean
+        +evaluateNextState(ctx) IGameState
+    }
+    class NormalPlayState {
+        +kind IN_PROGRESS
+        +canAcceptMoves() boolean
+        +evaluateNextState(ctx) IGameState
+    }
+    class CheckState {
+        +kind CHECK
+        +canAcceptMoves() boolean
+        +evaluateNextState(ctx) IGameState
+    }
+    class CheckmateState {
+        +kind CHECKMATE
+        +canAcceptMoves() boolean
+        +evaluateNextState(ctx) IGameState
+    }
+    class StalemateState {
+        +kind STALEMATE
+        +canAcceptMoves() boolean
+        +evaluateNextState(ctx) IGameState
+    }
+    class ICommand {
+        &lt;&lt;interface&gt;&gt;
+        +execute() void
+        +undo() void
+    }
+    class MoveCommand {
+        -board Board
+        -from Position
+        -to Position
+        -movedPiece IPiece
+        -capturedPiece IPiece
+        +execute() void
+        +undo() void
+    }
+    class CommandHistory {
+        -undoStack ICommand[]
+        -redoStack ICommand[]
+        +executeCommand(cmd) void
+        +undo() boolean
+        +redo() boolean
+    }
+    class IBoardQuery {
+        &lt;&lt;interface&gt;&gt;
+        +rows number
+        +cols number
+        +isWithinBounds(pos) boolean
+        +getPieceAt(pos) IPiece
+        +isEmpty(pos) boolean
+        +findKingPosition(color) Position
+    }
+    class Board {
+        +rows number
+        +cols number
+        -grid IPiece[]
+        +placePiece(pos, piece) void
+        +removePiece(pos) IPiece
+        +movePiece(from, to) IPiece
+    }
+    class Position {
+        &lt;&lt;ValueObject&gt;&gt;
+        +row number
+        +col number
+        +offset(dRow, dCol) Position
+        +equals(other) boolean
+    }
+    class IPiece {
+        &lt;&lt;interface&gt;&gt;
+        +color Color
+        +type PieceType
+        +getPseudoLegalMoves(from, board) Position[]
+    }
+    class Piece {
+        &lt;&lt;abstract&gt;&gt;
+        +color Color
+        +type PieceType
+        -rules IMovementRule[]
+        +getPseudoLegalMoves(from, board) Position[]
+    }
+    class Pawn
+    class Rook
+    class Knight
+    class Bishop
+    class Queen
+    class King
+    class IMovementRule {
+        &lt;&lt;interface&gt;&gt;
+        +getPseudoLegalMoves(from, piece, board) Position[]
+    }
+    class SlidingMoveRule {
+        -directions DirectionVector[]
+        +getPseudoLegalMoves(from, piece, board) Position[]
+    }
+    class LeapMoveRule {
+        -offsets DirectionVector[]
+        +getPseudoLegalMoves(from, piece, board) Position[]
+    }
+    class PawnForwardRule {
+        +getPseudoLegalMoves(from, piece, board) Position[]
+    }
+    class PawnCaptureRule {
+        +getPseudoLegalMoves(from, piece, board) Position[]
+    }
+    class CheckDetector {
+        &lt;&lt;DomainService&gt;&gt;
+        +isSquareAttacked(board, pos, byColor) boolean
+        +isKingInCheck(board, kingColor) boolean
+    }
 
-            <div data-group="port" data-class="ChessGame" class="uml-box cursor-pointer bg-slate-950 border-2 border-blue-500 rounded-xl p-3 space-y-1.5 transition hover:border-blue-400">
-              <div class="text-[10px] font-mono text-blue-400">Core Orchestrator</div>
-              <div class="font-bold text-sm font-mono">ChessGame</div>
-              <hr class="border-slate-800" />
-              <ul class="text-[11px] font-mono space-y-0.5 text-slate-400">
-                <li>-board: Board</li>
-                <li>-currentTurn: Color</li>
-                <li>-currentState: IGameState</li>
-                <li>-history: CommandHistory</li>
-                <li>-checkDetector: CheckDetector</li>
-                <li>-observers: Set&lt;IGameObserver&gt;</li>
-              </ul>
-            </div>
+    IGameEngine      <|..  ChessGame
+    ChessGame        -->   IGameObserver    : notifies
+    ChessGame        *--   Board
+    ChessGame        *--   CommandHistory
+    ChessGame        *--   CheckDetector
+    ChessGame        o--   IGameState
 
-            <div class="text-center text-xs font-mono text-purple-400">▼ notifica GameSnapshot (Observer)</div>
+    IGameState       <|..  NormalPlayState
+    IGameState       <|..  CheckState
+    IGameState       <|..  CheckmateState
+    IGameState       <|..  StalemateState
 
-            <div data-group="port" data-class="IGameObserver" class="uml-box cursor-pointer bg-slate-950 border border-purple-500/60 rounded-xl p-3 space-y-1 transition hover:border-purple-400">
-              <div class="text-[10px] font-mono text-purple-400">&lt;&lt;interface&gt;&gt; Patrón Observer</div>
-              <div class="font-bold text-sm font-mono">IGameObserver</div>
-              <hr class="border-slate-800" />
-              <div class="text-[11px] font-mono text-slate-400">+onGameStateChanged(snapshot: GameSnapshot): void</div>
-            </div>
+    CommandHistory   o--   ICommand
+    ICommand         <|..  MoveCommand
+    MoveCommand      -->   Board            : mutates
 
-            <div data-group="strategy" data-class="IAiStrategy" class="uml-box cursor-pointer bg-slate-950 border border-amber-500/70 rounded-xl p-3 space-y-1.5 transition hover:border-amber-400">
-              <div class="text-[10px] font-mono text-amber-400">&lt;&lt;interface&gt;&gt; Patrón Strategy (IA)</div>
-              <div class="font-bold text-sm font-mono">IAiStrategy</div>
-              <hr class="border-slate-800" />
-              <div class="text-[11px] font-mono text-slate-400">+chooseMove(engine: IGameEngine): Move | null</div>
-              <div class="grid grid-cols-2 gap-1.5 pt-1">
-                <div class="text-[10px] font-mono bg-slate-900 border border-slate-800 rounded p-1.5 text-center">RandomAiStrategy</div>
-                <div class="text-[10px] font-mono bg-slate-900 border border-slate-800 rounded p-1.5 text-center">GreedyMaterialAi</div>
-              </div>
-            </div>
-          </div>
+    IBoardQuery      <|..  Board
+    Board            o--   IPiece
+    Board            ..>   Position
 
-          <div class="lg:col-span-4 space-y-3">
-            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">2. Patrón Command, Patrón State &amp; Tablero</div>
+    IPiece           <|..  Piece
+    Piece            <|--  Pawn
+    Piece            <|--  Rook
+    Piece            <|--  Knight
+    Piece            <|--  Bishop
+    Piece            <|--  Queen
+    Piece            <|--  King
+    Piece            *--   IMovementRule    : composes
 
-            <div data-group="state" data-class="IGameState" class="uml-box cursor-pointer bg-slate-950 border-2 border-emerald-500/70 rounded-xl p-3 space-y-1.5 transition hover:border-emerald-400">
-              <div class="text-[10px] font-mono text-emerald-400">&lt;&lt;interface&gt;&gt; Patrón State</div>
-              <div class="font-bold text-sm font-mono">IGameState</div>
-              <hr class="border-slate-800" />
-              <ul class="text-[11px] font-mono space-y-0.5 text-slate-400">
-                <li>+readonly kind: GameStateKind</li>
-                <li>+canAcceptMoves(): boolean</li>
-                <li>+evaluateNextState(ctx): IGameState</li>
-              </ul>
-              <div class="grid grid-cols-2 gap-1 pt-1 text-[10px] font-mono">
-                <span class="bg-slate-900 border border-slate-800 rounded px-1.5 py-1">NormalPlayState</span>
-                <span class="bg-slate-900 border border-slate-800 rounded px-1.5 py-1">CheckState</span>
-                <span class="bg-slate-900 border border-slate-800 rounded px-1.5 py-1">CheckmateState</span>
-                <span class="bg-slate-900 border border-slate-800 rounded px-1.5 py-1">Stalemate / Draw</span>
-              </div>
-            </div>
+    IMovementRule    <|..  SlidingMoveRule
+    IMovementRule    <|..  LeapMoveRule
+    IMovementRule    <|..  PawnForwardRule
+    IMovementRule    <|..  PawnCaptureRule
 
-            <div data-group="command" data-class="MoveCommand" class="uml-box cursor-pointer bg-slate-950 border-2 border-rose-500/70 rounded-xl p-3 space-y-1.5 transition hover:border-rose-400">
-              <div class="text-[10px] font-mono text-rose-400">&lt;&lt;interface&gt;&gt; ICommand → MoveCommand</div>
-              <div class="font-bold text-sm font-mono">MoveCommand &amp; CommandHistory</div>
-              <hr class="border-slate-800" />
-              <ul class="text-[11px] font-mono space-y-0.5 text-slate-400">
-                <li>-board: Board</li>
-                <li>-from: Position / -to: Position</li>
-                <li>-movedPiece: IPiece</li>
-                <li>-capturedPiece: IPiece | null</li>
-                <li>+execute(): void</li>
-                <li>+undo(): void</li>
-              </ul>
-            </div>
+    CheckDetector    ..>   IBoardQuery      : queries
 
-            <div data-group="composition" data-class="Board" class="uml-box cursor-pointer bg-slate-950 border-2 border-cyan-500/70 rounded-xl p-3 space-y-1.5 transition hover:border-cyan-400">
-              <div class="text-[10px] font-mono text-cyan-400">&lt;&lt;interface&gt;&gt; IBoardQuery ← Board</div>
-              <div class="font-bold text-sm font-mono">Board (implementa IBoardQuery)</div>
-              <hr class="border-slate-800" />
-              <ul class="text-[11px] font-mono space-y-0.5 text-slate-400">
-                <li>+readonly rows: number = 8</li>
-                <li>+readonly cols: number = 8</li>
-                <li>+isWithinBounds(pos: Position): boolean</li>
-                <li>+getPieceAt(pos: Position): IPiece | null</li>
-                <li>+findKingPosition(color: Color): Position | null</li>
-                <li>+placePiece / +movePiece / +removePiece</li>
-              </ul>
-            </div>
-
-            <div data-group="composition" data-class="Position" class="uml-box cursor-pointer bg-slate-950 border border-cyan-500/50 rounded-xl p-3 space-y-1 transition hover:border-cyan-400">
-              <div class="text-[10px] font-mono text-cyan-400">&lt;&lt;Value Object Inmutable&gt;&gt;</div>
-              <div class="font-bold text-sm font-mono">Position</div>
-              <div class="text-[11px] font-mono text-slate-400">
-                +row: number, +col: number | +offset(dR, dC) | +equals(other)
-              </div>
-            </div>
-          </div>
-
-          <div class="lg:col-span-4 space-y-3">
-            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">3. Composición de Piezas &amp; Reglas</div>
-
-            <div data-group="composition" data-class="Piece" class="uml-box cursor-pointer bg-slate-950 border-2 border-indigo-500/80 rounded-xl p-3 space-y-1.5 transition hover:border-indigo-400">
-              <div class="text-[10px] font-mono text-indigo-400">&lt;&lt;interface&gt;&gt; IPiece ← abstract Piece</div>
-              <div class="font-bold text-sm font-mono">Piece (Jerarquía Plana ≤ 2 niveles)</div>
-              <hr class="border-slate-800" />
-              <ul class="text-[11px] font-mono space-y-0.5 text-slate-400">
-                <li>+readonly color: Color</li>
-                <li>+readonly type: PieceType</li>
-                <li>-readonly rules: IMovementRule[]</li>
-                <li>+getPseudoLegalMoves(from, board: IBoardQuery)</li>
-              </ul>
-              <div class="grid grid-cols-3 gap-1 pt-1 text-[10px] font-mono text-center">
-                <span class="bg-slate-900 border border-slate-800 rounded py-1">Pawn</span>
-                <span class="bg-slate-900 border border-slate-800 rounded py-1">Rook</span>
-                <span class="bg-slate-900 border border-slate-800 rounded py-1">Knight</span>
-                <span class="bg-slate-900 border border-slate-800 rounded py-1">Bishop</span>
-                <span class="bg-slate-900 border border-slate-800 rounded py-1">Queen</span>
-                <span class="bg-slate-900 border border-slate-800 rounded py-1">King</span>
-              </div>
-            </div>
-
-            <div class="text-center text-xs font-mono text-indigo-400">◆── compone 1..* (Composición sobre Herencia)</div>
-
-            <div data-group="composition" data-class="IMovementRule" class="uml-box cursor-pointer bg-slate-950 border-2 border-indigo-500 rounded-xl p-3 space-y-2 transition hover:border-indigo-400">
-              <div class="text-[10px] font-mono text-indigo-400">&lt;&lt;interface&gt;&gt; Estrategias Geométricas</div>
-              <div class="font-bold text-sm font-mono">IMovementRule</div>
-              <hr class="border-slate-800" />
-              <div class="text-[11px] font-mono text-slate-400">
-                +getPseudoLegalMoves(from: Position, piece: IPiece, board: IBoardQuery): Position[]
-              </div>
-              <div class="space-y-1 pt-1 text-[11px] font-mono">
-                <div class="bg-slate-900 border border-slate-800 rounded p-1.5">
-                  <strong>SlidingMoveRule(dirs)</strong> <span class="text-slate-400">→ Rook, Bishop, Queen</span>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 rounded p-1.5">
-                  <strong>LeapMoveRule(offsets)</strong> <span class="text-slate-400">→ Knight (L), King (1)</span>
-                </div>
-                <div class="bg-slate-900 border border-slate-800 rounded p-1.5">
-                  <strong>PawnForwardRule + PawnCaptureRule</strong> <span class="text-slate-400">→ Pawn</span>
-                </div>
-              </div>
-            </div>
-
-            <div data-group="port" data-class="CheckDetector" class="uml-box cursor-pointer bg-slate-950 border border-amber-500/60 rounded-xl p-3 space-y-1 transition hover:border-amber-400">
-              <div class="text-[10px] font-mono text-amber-400">&lt;&lt;Domain Service&gt;&gt;</div>
-              <div class="font-bold text-sm font-mono">CheckDetector</div>
-              <div class="text-[11px] font-mono text-slate-400">
-                +isSquareAttacked(board: IBoardQuery, pos, byColor)<br/>
-                +isKingInCheck(board: IBoardQuery, kingColor): boolean
-              </div>
-            </div>
-          </div>
+    cssClass "IGameEngine" portStyle
+    cssClass "IGameObserver" observStyle
+    cssClass "ChessGame" coreStyle
+    
+    cssClass "IGameState" stateGof
+    cssClass "NormalPlayState" stateGof
+    cssClass "CheckState" stateGof
+    cssClass "CheckmateState" stateGof
+    cssClass "StalemateState" stateGof
+    
+    cssClass "ICommand" cmdGof
+    cssClass "MoveCommand" cmdGof
+    cssClass "CommandHistory" cmdGof
+    
+    cssClass "IBoardQuery" boardStyle
+    cssClass "Board" boardStyle
+    
+    cssClass "Position" voStyle
+    
+    cssClass "IPiece" pieceStyle
+    cssClass "Piece" pieceStyle
+    cssClass "Pawn" pieceStyle
+    cssClass "Rook" pieceStyle
+    cssClass "Knight" pieceStyle
+    cssClass "Bishop" pieceStyle
+    cssClass "Queen" pieceStyle
+    cssClass "King" pieceStyle
+    
+    cssClass "IMovementRule" ruleStyle
+    cssClass "SlidingMoveRule" ruleStyle
+    cssClass "LeapMoveRule" ruleStyle
+    cssClass "PawnForwardRule" ruleStyle
+    cssClass "PawnCaptureRule" ruleStyle
+    cssClass "CheckDetector" ruleStyle</div>
         </div>
       </div>
     </section>
 
+    <!-- ===== PANEL FLOWS ===== -->
     <section id="panel-flows" class="hidden space-y-4">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-6">
         <div>
-          <h2 class="text-lg font-bold">Flujo 1: Validación de Jugada, Simulación Reversible de Jaque y Transición de Estado</h2>
-          <p class="text-xs text-slate-400">
-            Muestra cómo interactúan <code class="font-mono">ChessGame</code>, <code class="font-mono">IGameState</code>, <code class="font-mono">IMovementRule</code>, <code class="font-mono">MoveCommand</code>, <code class="font-mono">CheckDetector</code> e <code class="font-mono">IGameObserver</code> al invocar <code class="font-mono">makeMove(from, to)</code>.
-          </p>
+          <h2 class="text-lg font-bold">Flujo 1: Validacion de Jugada, Simulacion Reversible de Jaque y Transicion de Estado</h2>
+          <p class="text-xs text-slate-400">Como interactuan ChessGame, IGameState, MoveCommand, CheckDetector e IGameObserver al invocar makeMove(from, to).</p>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-stretch">
-          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-            <div class="text-[10px] font-mono uppercase text-blue-400">Paso 1 • Estado y Turno</div>
-            <div class="font-bold text-xs mt-1">¿Fase acepta jugadas y origen es del turno activo?</div>
-            <div class="text-[11px] text-slate-400 mt-2">
-              Consulta <code class="font-mono">currentState.canAcceptMoves()</code> y <code class="font-mono">board.getPieceAt(from)</code>.
-            </div>
-            <div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30">
-              ✗ Falla → GAME_OVER / EMPTY_ORIGIN / WRONG_TURN
-            </div>
-          </div>
-
-          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-            <div class="text-[10px] font-mono uppercase text-indigo-400">Paso 2 • Geometría</div>
-            <div class="font-bold text-xs mt-1">¿Destino está en Pseudo-Legal Moves?</div>
-            <div class="text-[11px] text-slate-400 mt-2">
-              <code class="font-mono">piece.getPseudoLegalMoves(from, boardQuery)</code> evalúa rayos/saltos y obstáculos.
-            </div>
-            <div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30">
-              ✗ Falla → ILLEGAL_MOVE
-            </div>
-          </div>
-
-          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-            <div class="text-[10px] font-mono uppercase text-amber-400">Paso 3 • Simulación</div>
-            <div class="font-bold text-xs mt-1">¿Deja al propio Rey en Jaque?</div>
-            <div class="text-[11px] text-slate-400 mt-2">
-              Ejecuta <code class="font-mono">cmd.execute()</code> → consulta <code class="font-mono">CheckDetector.isKingInCheck</code>. Si hay jaque propio, llama a <code class="font-mono">cmd.undo()</code>.
-            </div>
-            <div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30">
-              ✗ Falla → KING_LEFT_IN_CHECK
-            </div>
-          </div>
-
-          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-            <div class="text-[10px] font-mono uppercase text-rose-400">Paso 4 • Command</div>
-            <div class="font-bold text-xs mt-1">Confirmar en CommandHistory</div>
-            <div class="text-[11px] text-slate-400 mt-2">
-              Se apila el <code class="font-mono">MoveCommand</code> en <code class="font-mono">undoStack</code>, se limpia <code class="font-mono">redoStack</code> y se alterna <code class="font-mono">currentTurn</code>.
-            </div>
-            <div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-              ✓ Reversible con undo()
-            </div>
-          </div>
-
-          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-            <div class="text-[10px] font-mono uppercase text-emerald-400">Paso 5 • Patrón State</div>
-            <div class="font-bold text-xs mt-1">Transición Polimórfica de Fase</div>
-            <div class="text-[11px] text-slate-400 mt-2">
-              Evalúa <code class="font-mono">(isInCheck, hasAnyLegalMove)</code> vía Lookup Table → <code class="font-mono">IN_PROGRESS</code>, <code class="font-mono">CHECK</code>, <code class="font-mono">CHECKMATE</code> o <code class="font-mono">STALEMATE/DRAW</code>.
-            </div>
-            <div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-              ✓ Cero bloques switch
-            </div>
-          </div>
-
-          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-            <div class="text-[10px] font-mono uppercase text-purple-400">Paso 6 • Observer</div>
-            <div class="font-bold text-xs mt-1">Emisión de GameSnapshot y MoveResult</div>
-            <div class="text-[11px] text-slate-400 mt-2">
-              Notifica a cada <code class="font-mono">IGameObserver</code> con el nuevo <code class="font-mono">GameSnapshot</code> inmutable y retorna <code class="font-mono">{ success: true }</code>.
-            </div>
-            <div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/30">
-              ✓ UI React re-renderiza
-            </div>
-          </div>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between"><div class="text-[10px] font-mono uppercase text-blue-400">Paso 1 - Estado y Turno</div><div class="font-bold text-xs mt-1">Fase acepta jugadas?</div><div class="text-[11px] text-slate-400 mt-2">Consulta currentState.canAcceptMoves() y board.getPieceAt(from).</div><div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30">GAME_OVER / EMPTY / WRONG_TURN</div></div>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between"><div class="text-[10px] font-mono uppercase text-indigo-400">Paso 2 - Geometria</div><div class="font-bold text-xs mt-1">Destino en Pseudo-Legal Moves?</div><div class="text-[11px] text-slate-400 mt-2">piece.getPseudoLegalMoves(from, boardQuery) evalua rayos, saltos y obstaculos.</div><div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30">ILLEGAL_MOVE</div></div>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between"><div class="text-[10px] font-mono uppercase text-amber-400">Paso 3 - Simulacion</div><div class="font-bold text-xs mt-1">Deja Rey en Jaque?</div><div class="text-[11px] text-slate-400 mt-2">Ejecuta cmd.execute(), consulta CheckDetector.isKingInCheck. Si hay jaque propio llama cmd.undo().</div><div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30">KING_LEFT_IN_CHECK</div></div>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between"><div class="text-[10px] font-mono uppercase text-rose-400">Paso 4 - Command</div><div class="font-bold text-xs mt-1">Confirmar en CommandHistory</div><div class="text-[11px] text-slate-400 mt-2">Apila MoveCommand en undoStack, limpia redoStack, alterna currentTurn.</div><div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">OK - Reversible con undo()</div></div>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between"><div class="text-[10px] font-mono uppercase text-emerald-400">Paso 5 - Patron State</div><div class="font-bold text-xs mt-1">Transicion Polimorfica</div><div class="text-[11px] text-slate-400 mt-2">Evalua (isInCheck, hasAnyLegalMove): IN_PROGRESS, CHECK, CHECKMATE o STALEMATE/DRAW.</div><div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">OK - Cero bloques switch</div></div>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-between"><div class="text-[10px] font-mono uppercase text-purple-400">Paso 6 - Observer</div><div class="font-bold text-xs mt-1">Emision de GameSnapshot</div><div class="text-[11px] text-slate-400 mt-2">Notifica a cada IGameObserver con GameSnapshot inmutable y retorna success:true.</div><div class="mt-2 text-[10px] font-mono px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/30">OK - UI React re-renderiza</div></div>
         </div>
       </div>
-
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-3">
-          <h3 class="text-base font-bold">Flujo 2: Matriz de Transición del Patrón State (Lookup Table)</h3>
-          <p class="text-xs text-slate-400">
-            Al cambiar el turno, el siguiente <code class="font-mono">IGameState</code> se selecciona sin <code class="font-mono">switch</code> evaluando dos predicados sobre el jugador entrante:
-          </p>
-          <div class="overflow-x-auto">
-            <table class="w-full text-xs border-collapse">
-              <thead>
-                <tr class="border-b border-slate-800 text-left text-slate-400">
-                  <th class="py-2 pr-2">¿Rey en Jaque?</th>
-                  <th class="py-2 px-2">¿Tiene Legal Moves?</th>
-                  <th class="py-2 px-2">¿Regla 50m / 3x / Insuf.?</th>
-                  <th class="py-2 pl-2">Clase IGameState Resultante</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-800 font-mono text-[11px]">
-                <tr>
-                  <td class="py-2 pr-2">false</td>
-                  <td class="py-2 px-2">true</td>
-                  <td class="py-2 px-2">false</td>
-                  <td class="py-2 pl-2 text-emerald-400 font-bold">NormalPlayState (IN_PROGRESS)</td>
-                </tr>
-                <tr>
-                  <td class="py-2 pr-2">true</td>
-                  <td class="py-2 px-2">true</td>
-                  <td class="py-2 px-2">false</td>
-                  <td class="py-2 pl-2 text-amber-400 font-bold">CheckState (CHECK)</td>
-                </tr>
-                <tr>
-                  <td class="py-2 pr-2">true</td>
-                  <td class="py-2 px-2">false</td>
-                  <td class="py-2 px-2">—</td>
-                  <td class="py-2 pl-2 text-rose-400 font-bold">CheckmateState (CHECKMATE)</td>
-                </tr>
-                <tr>
-                  <td class="py-2 pr-2">false</td>
-                  <td class="py-2 px-2">false</td>
-                  <td class="py-2 px-2">—</td>
-                  <td class="py-2 pl-2 text-purple-400 font-bold">StalemateState (STALEMATE)</td>
-                </tr>
-                <tr>
-                  <td class="py-2 pr-2">—</td>
-                  <td class="py-2 px-2">true</td>
-                  <td class="py-2 px-2">true</td>
-                  <td class="py-2 pl-2 text-cyan-400 font-bold">DrawState (DRAW)</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <h3 class="text-base font-bold">Flujo 2: Matriz de Transicion del Patron State</h3>
+          <div class="overflow-x-auto"><table class="w-full text-xs border-collapse"><thead><tr class="border-b border-slate-800 text-left text-slate-400"><th class="py-2 pr-2">Rey en Jaque?</th><th class="py-2 px-2">Legal Moves?</th><th class="py-2 px-2">50m/3x?</th><th class="py-2 pl-2">IGameState</th></tr></thead><tbody class="divide-y divide-slate-800 font-mono text-[11px]"><tr><td class="py-2 pr-2">false</td><td class="py-2 px-2">true</td><td class="py-2 px-2">false</td><td class="py-2 pl-2 text-emerald-400 font-bold">NormalPlayState</td></tr><tr><td class="py-2 pr-2">true</td><td class="py-2 px-2">true</td><td class="py-2 px-2">false</td><td class="py-2 pl-2 text-amber-400 font-bold">CheckState</td></tr><tr><td class="py-2 pr-2">true</td><td class="py-2 px-2">false</td><td class="py-2 px-2">-</td><td class="py-2 pl-2 text-rose-400 font-bold">CheckmateState</td></tr><tr><td class="py-2 pr-2">false</td><td class="py-2 px-2">false</td><td class="py-2 px-2">-</td><td class="py-2 pl-2 text-purple-400 font-bold">StalemateState</td></tr><tr><td class="py-2 pr-2">-</td><td class="py-2 px-2">true</td><td class="py-2 px-2">true</td><td class="py-2 pl-2 text-cyan-400 font-bold">DrawState</td></tr></tbody></table></div>
         </div>
-
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-3">
-          <h3 class="text-base font-bold">Flujo 3: Adaptador React + Tailwind en 2 Clics (Cero useEffect)</h3>
-          <p class="text-xs text-slate-400">
-            Cómo fluye la interacción del usuario respetando las reglas de codificación de React:
-          </p>
+          <h3 class="text-base font-bold">Flujo 3: Adaptador React + Tailwind en 2 Clics</h3>
           <ol class="text-xs space-y-2 text-slate-400">
-            <li class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
-              <strong class="text-slate-100">1. Suscripción Declarativa:</strong> El componente invoca <code class="font-mono">useSyncExternalStore(game.subscribe, game.getSnapshot)</code>. Cuando el Core cambia, React recibe el nuevo <code class="font-mono">GameSnapshot</code> inmutable.
-            </li>
-            <li class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
-              <strong class="text-slate-100">2. Primer Clic (Selección):</strong> En <code class="font-mono">onSquareClick(pos)</code>, si hay una pieza del turno activo, guarda <code class="font-mono">selectedPos</code> y llama a <code class="font-mono">game.getLegalMoves(pos)</code> para resaltar destinos válidos.
-            </li>
-            <li class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
-              <strong class="text-slate-100">3. Segundo Clic (Acción directa en handler):</strong> Llama a <code class="font-mono">const res = game.makeMove(selectedPos, targetPos)</code>. Si falla, busca el mensaje en <code class="font-mono">REJECTION_MESSAGES[res.reason]</code>; si tiene éxito y el modo IA está activo, dispara <code class="font-mono">aiStrategy.chooseMove(game)</code> en el mismo flujo de evento.
-            </li>
+            <li class="p-2.5 rounded-lg bg-slate-950 border border-slate-800"><strong class="text-slate-100">1. Suscripcion:</strong> useSyncExternalStore(game.subscribe, game.getSnapshot) - React recibe GameSnapshot inmutable cuando el Core cambia.</li>
+            <li class="p-2.5 rounded-lg bg-slate-950 border border-slate-800"><strong class="text-slate-100">2. Primer Clic:</strong> onSquareClick(pos) guarda selectedPos y llama game.getLegalMoves(pos) para resaltar destinos validos.</li>
+            <li class="p-2.5 rounded-lg bg-slate-950 border border-slate-800"><strong class="text-slate-100">3. Segundo Clic:</strong> game.makeMove(selectedPos, targetPos). Si falla usa REJECTION_MESSAGES[res.reason]; si exito y modo IA activo dispara aiStrategy.chooseMove(game).</li>
           </ol>
         </div>
       </div>
     </section>
 
+    <!-- ===== PANEL ARCH ===== -->
     <section id="panel-arch" class="hidden space-y-4">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
-        <h2 class="text-lg font-bold">Índice de las 12 Decisiones Arquitectónicas (Marco What / Why / When to Break)</h2>
+        <h2 class="text-lg font-bold">12 Decisiones Arquitectonicas (What / Why / When to Break)</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="adr-grid"></div>
       </div>
     </section>
 
+    <!-- ===== PANEL EPICS ===== -->
     <section id="panel-epics" class="hidden space-y-4">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
-        <div>
-          <h2 class="text-lg font-bold">Distribución para 6 Desarrolladores: 6 Épicas × 4 Tickets (24 Tickets)</h2>
-          <p class="text-xs text-slate-400">
-            Una vez completados los Tickets 01–03 de la Épica 1, las Épicas 2 y 3 quedan desbloqueadas para avanzar en paralelo en ramas <code class="font-mono">ticket/&lt;NN&gt;-&lt;slug&gt;</code>.
-          </p>
-        </div>
+        <h2 class="text-lg font-bold">Distribucion para 6 Desarrolladores: 6 Epicas x 4 Tickets</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="epics-grid"></div>
       </div>
     </section>
+
   </div>
 
   <script>
-    const CLASS_DETAILS = {
-      IGameEngine: {
-        badge: 'Driving Port (ADR-005)',
-        title: 'IGameEngine',
-        desc: 'Contrato único de entrada al Core que consumen tanto el adaptador Web en React como la suite de tests de integración en Vitest.',
-        adr: 'ADR-005 / ADR-010'
-      },
-      ChessGame: {
-        badge: 'Orquestador del Dominio',
-        title: 'ChessGame',
-        desc: 'Implementa IGameEngine. Recibe Board por inyección en constructor, coordina turnos, delega en IGameState, ejecuta/revierte con CommandHistory y notifica a IGameObserver.',
-        adr: 'ADR-005 / ADR-007'
-      },
-      IGameObserver: {
-        badge: 'Patrón Observer (ADR-011)',
-        title: 'IGameObserver',
-        desc: 'Permite suscribir múltiples escuchas desacoplados con rutina explícita de teardown (unsubscribe) recibiendo un GameSnapshot inmutable.',
-        adr: 'ADR-011'
-      },
-      IAiStrategy: {
-        badge: 'Patrón Strategy (ADR-002)',
-        title: 'IAiStrategy (RandomAiStrategy / GreedyMaterialAiStrategy)',
-        desc: 'Encapsula algoritmos intercambiables en tiempo de ejecución para seleccionar jugadas válidas usando una lookup table de valoración material.',
-        adr: 'ADR-002'
-      },
-      IGameState: {
-        badge: 'Patrón State (ADR-009)',
-        title: 'IGameState (NormalPlay, Check, Checkmate, Stalemate, Draw)',
-        desc: 'Gobierna polimórficamente qué operaciones se permiten en cada fase de la partida y resuelve transiciones sin bloques switch.',
-        adr: 'ADR-009'
-      },
-      MoveCommand: {
-        badge: 'Patrón Command (ADR-004)',
-        title: 'MoveCommand & CommandHistory',
-        desc: 'Encapsula la mutación in-place sobre Board (execute) y su reversión exacta (undo), garantizando State_before === State_Act(Undo).',
-        adr: 'ADR-004'
-      },
-      Board: {
-        badge: 'Entidad Mutable + ISP (ADR-004 / ADR-006)',
-        title: 'Board e IBoardQuery',
-        desc: 'Mantiene la grilla de casillas con dimensiones parametrizables (rows, cols). Expone IBoardQuery de solo lectura hacia las reglas de movimiento.',
-        adr: 'ADR-004 / ADR-006 / ADR-007'
-      },
-      Position: {
-        badge: 'Value Object Inmutable (ADR-006)',
-        title: 'Position',
-        desc: 'Coordenada entera 0-indexed (row, col) con aritmética vectorial offset(dRow, dCol), igualdad por valor y conversión algebraica.',
-        adr: 'ADR-006'
-      },
-      Piece: {
-        badge: 'Jerarquía Superficial + Composición (ADR-003)',
-        title: 'IPiece / Piece / Pawn, Rook, Knight, Bishop, Queen, King',
-        desc: 'Cada pieza tiene su clase nominal para expresividad en el dominio y UML, pero delega el cálculo geométrico en su lista compuesta de IMovementRule[].',
-        adr: 'ADR-003'
-      },
-      IMovementRule: {
-        badge: 'Composición / Strategy Geométrica (ADR-008)',
-        title: 'IMovementRule (Sliding, Leap, PawnForward, PawnCapture)',
-        desc: 'Reglas atómicas reutilizables que permiten crear cualquier pieza estándar o de Fairy Chess en menos de 5 minutos sin editar clases existentes.',
-        adr: 'ADR-003 / ADR-008'
-      },
-      CheckDetector: {
-        badge: 'Servicio de Dominio (ADR-007)',
-        title: 'CheckDetector',
-        desc: 'Evalúa sobre IBoardQuery si una coordenada o el Rey de un color está amenazado por los movimientos pseudo-legales del oponente.',
-        adr: 'ADR-007'
-      }
-    };
-
-    const ADRS = [
-      { id: 'ADR-001', title: 'Stack TypeScript + Vitest + React/Tailwind', what: 'Lenguaje único TS en Core y Adaptador Web con tests en memoria en Vitest.', why: 'Integración directa de tipos sin serialización intermedia y ejecución en milisegundos.', breakWhen: 'Si se requiriera búsqueda minimax multithread de millones de nodos/seg en código nativo.' },
-      { id: 'ADR-002', title: 'Alcance Completo para 6 Desarrolladores', what: 'Baseline + Jaque Mate/Ahogado/Tablas, Movimientos Especiales y Patrones Command, State, Strategy y Observer.', why: 'Reparte equitativamente 6 épicas de 4 tickets para que cada integrante defienda patrones GoF.', breakWhen: 'Si se redujera el equipo o el tiempo disponible a un MVP estrictamente 1.1.' },
-      { id: 'ADR-003', title: 'Clases Nominales Componiendo IMovementRule', what: 'Pawn, Rook, Knight, Bishop, Queen y King extienden Piece y componen IMovementRule[].', why: 'Claridad en UML combinada con 100% reutilización por composición y prueba de fuego en <5 min.', breakWhen: 'Si las piezas se definieran dinámicamente desde archivos JSON externos sin clases nominales.' },
-      { id: 'ADR-004', title: 'Board Mutable In-Place + Patrón Command', what: 'Board muta su grilla in-place; MoveCommand ejecuta y revierte cada cambio.', why: 'Demuestra genuinamente el patrón Command (execute/undo) y permite simular jugadas sin clonar matrices.', breakWhen: 'Si múltiples hilos exploraran el mismo Board en paralelo (requeriría estructuras inmutables).' },
-      { id: 'ADR-005', title: 'IGameEngine Único + Inyección de Board', what: 'Adaptadores consumen solo IGameEngine; ChessGame recibe Board por constructor.', why: 'Aísla la UI y permite armar escenarios AAA en 3 líneas sin necesitar un parser FEN.', breakWhen: 'Si se agregara importación/exportación de partidas estándar en formato FEN/PGN.' },
-      { id: 'ADR-006', title: 'Position 0-Indexed y Bordes Dinámicos', what: 'Position(row, col) inmutable sin límite fijo; Board valida isWithinBounds(pos).', why: 'Cambiar a un tablero de 10x10 en la defensa toma 1 línea sin tocar Position ni las piezas.', breakWhen: 'Si el tablero dejara de ser una grilla cartesiana (ej. ajedrez hexagonal).' },
-      { id: 'ADR-007', title: 'Separación Pseudo-Legal vs. Legal Moves', what: 'IMovementRule usa IBoardQuery; ChessGame filtra jaque propio con MoveCommand + CheckDetector.', why: 'Respeta SRP/ISP y evita recursión infinita al evaluar jaques de piezas clavadas.', breakWhen: 'Si en una variante exótica la amenaza al Rey no dependiera de la captura geométrica.' },
-      { id: 'ADR-008', title: 'Catálogo de 4 Reglas Atómicas Base', what: 'SlidingMoveRule, LeapMoveRule, PawnForwardRule (con salto doble) y PawnCaptureRule.', why: 'Cero código duplicado entre piezas y deja servido el terreno para EnPassantCaptureRule.', breakWhen: 'Si se agregan piezas con salto condicionado (ej. Cañón de Xiangqi), creando una nueva regla.' },
-      { id: 'ADR-009', title: 'Patrón State para Fases de Partida', what: 'IGameState con NormalPlayState, CheckState, CheckmateState, StalemateState y DrawState.', why: 'Elimina condicionales de fase en ChessGame y demuestra polimorfismo de estados.', breakWhen: 'Si el juego solo tuviera un booleano activo/terminado sin reglas diferenciadas.' },
-      { id: 'ADR-010', title: 'Unión Discriminada MoveResult', what: 'makeMove devuelve { success: true, ... } o { success: false, reason } tipado.', why: 'Jugadas inválidas son flujo esperado de usuario; permite usar lookup tables en UI y tests AAA claros.', breakWhen: 'Si un framework externo exigiera excepciones para hacer rollback transaccional.' },
-      { id: 'ADR-011', title: 'Patrón Observer + GameSnapshot Inmutable', what: 'subscribe/unsubscribe explícito en IGameEngine emitiendo GameSnapshot.', why: 'Desacopla la vista usando useSyncExternalStore en React sin abusar de useEffect.', breakWhen: 'En una arquitectura serverless stateless sin suscriptores vivos en memoria.' },
-      { id: 'ADR-012', title: 'Adaptador Web React + Tailwind Resiliente', what: 'Interacción en 2 clics, grilla dinámica rows×cols y lookup table con fallback de piezas.', why: 'Cualquier pieza de Fairy Chess o tamaño de tablero funciona en vivo en la UI sin editar React.', breakWhen: 'Si se requiriera un runner de terminal sin navegador para torneos automatizados.' }
-    ];
-
-    const EPICS = [
-      {
-        name: 'Épica 1: Tablero, Coordenadas y Base',
-        folder: '01-tablero-coordenadas-y-base',
-        tickets: [
-          '01: Scaffolding TS/Vite/Vitest y Value Object Position',
-          '02: Entidad Mutable Board e Interfaz IBoardQuery',
-          '03: Contratos IPiece, Piece, IMovementRule y BoardSetupFactory',
-          '04: Servicio de Amenazas CheckDetector (isSquareAttacked / isKingInCheck)'
-        ]
-      },
-      {
-        name: 'Épica 2: Piezas y Reglas Geométricas',
-        folder: '02-piezas-y-reglas-geometricas',
-        tickets: [
-          '05: SlidingMoveRule y Clases Rook, Bishop y Queen',
-          '06: LeapMoveRule y Clases Knight y King',
-          '07: PawnForwardRule, PawnCaptureRule y Clase Pawn',
-          '08: Extensibilidad Fairy Chess y Tableros N×M'
-        ]
-      },
-      {
-        name: 'Épica 3: Motor, Command y Observer',
-        folder: '03-motor-turnos-command-y-jaque',
-        tickets: [
-          '09: Patrón Command (MoveCommand) y CommandHistory (Undo/Redo)',
-          '10: Turnos, Capturas y MoveResult en ChessGame',
-          '11: Filtrado de Legal Moves y Piezas Clavadas',
-          '12: Patrón Observer (IGameObserver) y GameSnapshot'
-        ]
-      },
-      {
-        name: 'Épica 4: Patrón State y Fin de Juego',
-        folder: '04-fases-state-y-condiciones-fin',
-        tickets: [
-          '13: Patrón State para Fases Activas (NormalPlay y CheckState)',
-          '14: Estados Terminales (CheckmateState y StalemateState)',
-          '15: Tablas por Regla de 50 Movimientos y Material Insuficiente',
-          '16: Tablas por Triple Repetición de Posición'
-        ]
-      },
-      {
-        name: 'Épica 5: Movimientos Especiales y Strategy IA',
-        folder: '05-movimientos-especiales-y-strategy-ia',
-        tickets: [
-          '17: Coronación de Peón Reversible con Command',
-          '18: Enroque (Castling) y Captura al Paso (En Passant)',
-          '19: Patrón Strategy para IA: IAiStrategy y RandomAiStrategy',
-          '20: Estrategia Heurística GreedyMaterialAiStrategy'
-        ]
-      },
-      {
-        name: 'Épica 6: Adaptador Web y Defensa',
-        folder: '06-adaptador-web-y-entrega',
-        tickets: [
-          '21: Tablero Web Dinámico (N×M) y Fallback de Piezas en React + Tailwind',
-          '22: Interacción en 2 Clics, Resaltado Legal y Feedback MoveResult',
-          '23: Panel de Estado, Controles Undo/Redo y Selector de IA',
-          '24: Sincronización Final de UML, Justificación y Guía de Defensa'
-        ]
-      }
-    ];
-
-    const PANELS = {
-      uml: document.getElementById('panel-uml'),
-      flows: document.getElementById('panel-flows'),
-      arch: document.getElementById('panel-arch'),
-      epics: document.getElementById('panel-epics')
-    };
-
-    document.querySelectorAll('.tab-btn').forEach((button) => {
-      button.addEventListener('click', () => {
-        const targetTab = button.getAttribute('data-tab');
-        Object.entries(PANELS).forEach(([key, panel]) => {
-          panel.classList.toggle('hidden', key !== targetTab);
-        });
-        document.querySelectorAll('.tab-btn').forEach((btn) => {
-          const isSelected = btn.getAttribute('data-tab') === targetTab;
-          btn.className = isSelected
+    // ---- Tabs ----
+    const PANELS = {uml:document.getElementById('panel-uml'),flows:document.getElementById('panel-flows'),arch:document.getElementById('panel-arch'),epics:document.getElementById('panel-epics')};
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = btn.getAttribute('data-tab');
+        Object.entries(PANELS).forEach(([k,p]) => p.classList.toggle('hidden', k !== t));
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.className = b.getAttribute('data-tab') === t
             ? 'tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition bg-indigo-600 text-white'
             : 'tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white';
         });
       });
     });
 
-    document.querySelectorAll('.uml-filter-btn').forEach((button) => {
-      button.addEventListener('click', () => {
-        const selectedFilter = button.getAttribute('data-filter');
-        document.querySelectorAll('.uml-filter-btn').forEach((btn) => {
-          const isActive = btn.getAttribute('data-filter') === selectedFilter;
-          btn.className = isActive
-            ? 'uml-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white'
-            : 'uml-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300';
+    // ---- Filter buttons ----
+    
+    const filterMap = {
+      all: [],
+      port: ['portStyle', 'observStyle'],
+      composition: ['pieceStyle'],
+      command: ['cmdGof'],
+      state: ['stateGof'],
+      strategy: ['ruleStyle'],
+      board: ['boardStyle', 'voStyle']
+    };
+
+    document.querySelectorAll('.uml-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const f = btn.getAttribute('data-filter');
+        
+        document.querySelectorAll('.uml-filter-btn').forEach(b => {
+          const isActive = b.getAttribute('data-filter') === f;
+          const colorClass = b.getAttribute('data-color');
+          
+          if (isActive) {
+            if (f === 'all') {
+              b.className = `uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-all ${colorClass}`;
+            } else {
+              b.className = `uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-all bg-slate-800 border ${colorClass}`;
+            }
+          } else {
+            b.className = 'uml-filter-btn flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 transition-all hover:bg-slate-800';
+          }
         });
-        document.querySelectorAll('.uml-box').forEach((box) => {
-          const matches = selectedFilter === 'all' || box.getAttribute('data-group') === selectedFilter;
-          box.style.opacity = matches ? '1' : '0.25';
+        
+        const nodes = document.querySelectorAll('.mermaid svg .node');
+        const classes = filterMap[f] || [];
+        
+        nodes.forEach(node => {
+          if (f === 'all') {
+            node.style.opacity = '1';
+            node.style.transition = 'opacity 0.3s';
+          } else {
+            let hasClass = false;
+            for (const cls of classes) {
+              if (node.classList.contains(cls)) {
+                hasClass = true;
+                break;
+              }
+            }
+            node.style.transition = 'opacity 0.3s';
+            node.style.opacity = hasClass ? '1' : '0.15';
+          }
+        });
+        
+        const edges = document.querySelectorAll('.mermaid svg .edgePaths path, .mermaid svg .edgeLabels g');
+        edges.forEach(edge => {
+          edge.style.transition = 'opacity 0.3s';
+          edge.style.opacity = (f === 'all') ? '1' : '0.15';
         });
       });
     });
+// ---- ADRs ----
+    const ADRS = [
+      {id:'ADR-001',title:'Stack TypeScript + Vitest + React/Tailwind',what:'Lenguaje unico TS en Core y Adaptador Web con tests en memoria en Vitest.',why:'Integracion directa de tipos sin serializacion intermedia.',breakWhen:'Si se requiriera busqueda minimax multithread en codigo nativo.'},
+      {id:'ADR-002',title:'Alcance Completo para 6 Desarrolladores',what:'Baseline + Jaque Mate/Ahogado/Tablas, Movimientos Especiales y Patrones GoF.',why:'Reparte equitativamente 6 epicas de 4 tickets.',breakWhen:'Si se redujera el equipo o el tiempo disponible.'},
+      {id:'ADR-003',title:'Clases Nominales Componiendo IMovementRule',what:'Pawn, Rook, Knight, Bishop, Queen y King extienden Piece y componen IMovementRule[].',why:'Claridad en UML combinada con 100% reutilizacion por composicion.',breakWhen:'Si las piezas se definieran dinamicamente desde archivos JSON.'},
+      {id:'ADR-004',title:'Board Mutable In-Place + Patron Command',what:'Board muta su grilla in-place; MoveCommand ejecuta y revierte cada cambio.',why:'Demuestra genuinamente el patron Command (execute/undo) sin clonar matrices.',breakWhen:'Si multiples hilos exploraran el mismo Board en paralelo.'},
+      {id:'ADR-005',title:'IGameEngine Unico + Inyeccion de Board',what:'Adaptadores consumen solo IGameEngine; ChessGame recibe Board por constructor.',why:'Aisla la UI y permite armar escenarios AAA en 3 lineas.',breakWhen:'Si se agregara importacion/exportacion en formato FEN/PGN.'},
+      {id:'ADR-006',title:'Position 0-Indexed y Bordes Dinamicos',what:'Position(row, col) inmutable sin limite fijo; Board valida isWithinBounds(pos).',why:'Cambiar a un tablero de 10x10 toma 1 linea sin tocar Position ni las piezas.',breakWhen:'Si el tablero dejara de ser una grilla cartesiana.'},
+      {id:'ADR-007',title:'Separacion Pseudo-Legal vs. Legal Moves',what:'IMovementRule usa IBoardQuery; ChessGame filtra jaque propio con MoveCommand + CheckDetector.',why:'Respeta SRP/ISP y evita recursion infinita al evaluar jaques de piezas clavadas.',breakWhen:'Si la amenaza al Rey no dependiera de la captura geometrica.'},
+      {id:'ADR-008',title:'Catalogo de 4 Reglas Atomicas Base',what:'SlidingMoveRule, LeapMoveRule, PawnForwardRule y PawnCaptureRule.',why:'Cero codigo duplicado entre piezas y extensible para EnPassantCaptureRule.',breakWhen:'Si se agregan piezas con salto condicionado como el Canon de Xiangqi.'},
+      {id:'ADR-009',title:'Patron State para Fases de Partida',what:'IGameState con NormalPlayState, CheckState, CheckmateState, StalemateState y DrawState.',why:'Elimina condicionales de fase en ChessGame y demuestra polimorfismo de estados.',breakWhen:'Si el juego solo tuviera un booleano activo/terminado.'},
+      {id:'ADR-010',title:'Union Discriminada MoveResult',what:'makeMove devuelve success:true o success:false+reason tipado.',why:'Jugadas invalidas son flujo esperado; permite lookup tables en UI y tests AAA claros.',breakWhen:'Si un framework externo exigiera excepciones para rollback transaccional.'},
+      {id:'ADR-011',title:'Patron Observer + GameSnapshot Inmutable',what:'subscribe/unsubscribe explicito en IGameEngine emitiendo GameSnapshot.',why:'Desacopla la vista usando useSyncExternalStore en React sin abusar de useEffect.',breakWhen:'En arquitectura serverless stateless sin suscriptores vivos en memoria.'},
+      {id:'ADR-012',title:'Adaptador Web React + Tailwind Resiliente',what:'Interaccion en 2 clics, grilla dinamica rows x cols y lookup table con fallback de piezas.',why:'Cualquier pieza de Fairy Chess o tamano de tablero funciona sin editar React.',breakWhen:'Si se requiriera un runner de terminal sin navegador.'}
+    ];
 
-    document.querySelectorAll('.uml-box').forEach((box) => {
-      box.addEventListener('click', () => {
-        const classKey = box.getAttribute('data-class');
-        const info = CLASS_DETAILS[classKey];
-        if (!info) return;
-        document.getElementById('inspector-badge').textContent = info.badge;
-        document.getElementById('inspector-title').textContent = info.title;
-        document.getElementById('inspector-desc').textContent = info.desc;
-        document.getElementById('inspector-adr').textContent = info.adr;
-      });
-    });
+    const EPICS = [
+      {name:'Epica 1: Tablero, Coordenadas y Base',folder:'01-tablero-coordenadas-y-base',tickets:['01: Scaffolding TS/Vite/Vitest y Value Object Position','02: Entidad Mutable Board e Interfaz IBoardQuery','03: Contratos IPiece, Piece, IMovementRule y BoardSetupFactory','04: Servicio de Amenazas CheckDetector']},
+      {name:'Epica 2: Piezas y Reglas Geometricas',folder:'02-piezas-y-reglas-geometricas',tickets:['05: SlidingMoveRule y Clases Rook, Bishop y Queen','06: LeapMoveRule y Clases Knight y King','07: PawnForwardRule, PawnCaptureRule y Clase Pawn','08: Extensibilidad Fairy Chess y Tableros N x M']},
+      {name:'Epica 3: Motor, Command y Observer',folder:'03-motor-turnos-command-y-jaque',tickets:['09: Patron Command (MoveCommand) y CommandHistory (Undo/Redo)','10: Turnos, Capturas y MoveResult en ChessGame','11: Filtrado de Legal Moves y Piezas Clavadas','12: Patron Observer (IGameObserver) y GameSnapshot']},
+      {name:'Epica 4: Patron State y Fin de Juego',folder:'04-fases-state-y-condiciones-fin',tickets:['13: Patron State para Fases Activas (NormalPlay y CheckState)','14: Estados Terminales (CheckmateState y StalemateState)','15: Tablas por Regla de 50 Movimientos y Material Insuficiente','16: Tablas por Triple Repeticion de Posicion']},
+      {name:'Epica 5: Movimientos Especiales y Strategy IA',folder:'05-movimientos-especiales-y-strategy-ia',tickets:['17: Coronacion de Peon Reversible con Command','18: Enroque (Castling) y Captura al Paso (En Passant)','19: Patron Strategy para IA: IAiStrategy y RandomAiStrategy','20: Estrategia Heuristica GreedyMaterialAiStrategy']},
+      {name:'Epica 6: Adaptador Web y Defensa',folder:'06-adaptador-web-y-entrega',tickets:['21: Tablero Web Dinamico y Fallback de Piezas en React + Tailwind','22: Interaccion en 2 Clics, Resaltado Legal y Feedback MoveResult','23: Panel de Estado, Controles Undo/Redo y Selector de IA','24: Sincronizacion Final de UML, Justificacion y Guia de Defensa']}
+    ];
 
-    const adrGrid = document.getElementById('adr-grid');
-    adrGrid.innerHTML = ADRS.map((adr) => `
-      <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+    document.getElementById('adr-grid').innerHTML = ADRS.map(a =>
+      `<div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-indigo-300">${adr.id}</span>
+          <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-indigo-300">${a.id}</span>
           <span class="text-[11px] text-emerald-400 font-semibold">Aceptado</span>
         </div>
-        <h3 class="font-bold text-sm">${adr.title}</h3>
+        <h3 class="font-bold text-sm">${a.title}</h3>
         <div class="text-xs space-y-1 text-slate-400">
-          <p><strong class="text-slate-200">What:</strong> ${adr.what}</p>
-          <p><strong class="text-slate-200">Why:</strong> ${adr.why}</p>
-          <p><strong class="text-slate-200">When to break:</strong> ${adr.breakWhen}</p>
+          <p><strong class="text-slate-200">What:</strong> ${a.what}</p>
+          <p><strong class="text-slate-200">Why:</strong> ${a.why}</p>
+          <p><strong class="text-slate-200">When to break:</strong> ${a.breakWhen}</p>
         </div>
-      </div>
-    `).join('');
+      </div>`
+    ).join('');
 
-    const epicsGrid = document.getElementById('epics-grid');
-    epicsGrid.innerHTML = EPICS.map((epic) => `
-      <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2.5">
-        <div class="text-[11px] font-mono text-indigo-400">docs/tickets/${epic.folder}/</div>
-        <h3 class="font-bold text-sm">${epic.name}</h3>
+    document.getElementById('epics-grid').innerHTML = EPICS.map(e =>
+      `<div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2.5">
+        <div class="text-[11px] font-mono text-indigo-400">docs/tickets/${e.folder}/</div>
+        <h3 class="font-bold text-sm">${e.name}</h3>
         <ul class="space-y-1.5 text-xs text-slate-400">
-          ${epic.tickets.map((t) => `<li class="p-2 rounded bg-slate-900 border border-slate-800 font-mono text-[11px]">${t}</li>`).join('')}
+          ${e.tickets.map(t => `<li class="p-2 rounded bg-slate-900 border border-slate-800 font-mono text-[11px]">${t}</li>`).join('')}
         </ul>
-      </div>
-    `).join('');
+      </div>`
+    ).join('');
   </script>
 </body>
 </html>
