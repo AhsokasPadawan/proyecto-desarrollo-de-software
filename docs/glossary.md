@@ -86,6 +86,21 @@ _Avoid_: Exponer la instancia mutable de `Board` a la UI
 Contrato del patrón `Strategy` que encapsula un algoritmo intercambiable en tiempo de ejecución (`RandomAiStrategy`, `GreedyMaterialAiStrategy`) capaz de seleccionar una jugada válida a partir del estado expuesto por `IGameEngine`.
 _Avoid_: Bot acoplado dentro de `ChessGame`
 
+## Replay y Exportación de Partida
+
+**MoveRecord (Registro de Jugada)**:
+Estructura de datos inmutable generada por el Core que encapsula la metadata pura de una jugada ejecutada (`turn`, `piece`, `from`, `to` en formato algebraico letra-número, pieza capturada e indicadores de enroque y coronación), expuesta como parte de `GameSnapshot`.
+_Avoid_: String crudo de log, comando ejecutable expuesto a la UI
+
+**ReplayMode (Modo de Revisión)**:
+Modo operativo de solo lectura del adaptador visual en el que se inhabilita la interacción de movimiento sobre el tablero y se delega el control a una barra de transporte temporal que invoca los métodos reversibles `undo()` y `redo()` del motor.
+_Avoid_: Tablero interactivo secundario, motor duplicado
+
+**TranscriptionExport (Exportación de Transcripción)**:
+Procedimiento del adaptador web que formatea el historial `moveHistory` en una transcripción estructurada letra-número (`e2 -> e4`) con cabecera de partida y genera un archivo descargable `.txt` nombrado con marca temporal (`partida-ajedrez-YYYYMMDD-HHmm.txt`).
+_Avoid_: Guardado en disco en el Core, formato binario propietario
+
+
 
 
 

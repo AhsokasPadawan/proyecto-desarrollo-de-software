@@ -23,3 +23,8 @@ export function getStateLabel(stateKind: GameStateKind): string {
 export function getStateBadgeClass(stateKind: GameStateKind): string {
   return STATE_BADGE_CLASSES[stateKind] ?? 'bg-zinc-800 text-zinc-200 border-zinc-700';
 }
+
+export function isTerminalState(stateKind: GameStateKind): boolean {
+  return stateKind === 'CHECKMATE' || stateKind === 'STALEMATE' || stateKind === 'DRAW';
+}
+

@@ -2,7 +2,7 @@ import { Board } from '../board/Board';
 import { BoardSetupFactory } from '../board/BoardSetupFactory';
 import { Position } from '../board/Position';
 import { Color, OPPOSITE_COLOR, PieceType } from '../pieces/types';
-import { GameSnapshot, PieceSnapshot } from '../ports/GameSnapshot';
+import { GameSnapshot, MoveRecord, PieceSnapshot } from '../ports/GameSnapshot';
 import { IGameEngine } from '../ports/IGameEngine';
 import { IGameObserver, UnsubscribeFn } from '../ports/IGameObserver';
 import { MoveResult } from '../ports/MoveResult';
@@ -35,6 +35,8 @@ export class ChessGame implements IGameEngine {
   private readonly positionCounts: Map<string, number> = new Map();
   private readonly turnHistory: TurnRecord[] = [];
   private readonly redoHistory: TurnRecord[] = [];
+  private readonly recordedMoves: MoveRecord[] = [];
+  private appliedMoveCount: number = 0;
   private cachedSnapshot: GameSnapshot | null = null;
 
   constructor(
@@ -85,6 +87,8 @@ export class ChessGame implements IGameEngine {
       winner: this.currentState.getWinner(this.currentTurn),
       canUndo: this.history.canUndo,
       canRedo: this.history.canRedo,
+      moveHistory: Object.freeze([...this.recordedMoves]),
+      currentMoveIndex: this.appliedMoveCount,
     });
 
     return this.cachedSnapshot;
@@ -152,8 +156,30 @@ export class ChessGame implements IGameEngine {
       return { success: false, reason: 'KING_LEFT_IN_CHECK' };
     }
 
+    const pieceType = piece.type;
+    const pieceColor = piece.color;
+    const isCastling = pieceType === 'KING' && Math.abs(to.col - from.col) === 2;
+    const isPromotion = pieceType === 'PAWN' && (to.row === this.board.rows - 1 || to.row === 0);
+
     const command = new MoveCommand(this.board, from, to, promotionPiece);
     this.history.executeCommand(command);
+
+    const capturedPiece = command.getCapturedPiece()?.type;
+    const record: MoveRecord = Object.freeze({
+      moveIndex: this.appliedMoveCount,
+      turn: pieceColor,
+      piece: pieceType,
+      from: from.toAlgebraic(),
+      to: to.toAlgebraic(),
+      capturedPiece,
+      isCastling,
+      isPromotion,
+      promotionPiece: isPromotion ? (promotionPiece ?? 'QUEEN') : undefined,
+    });
+
+    this.recordedMoves.length = this.appliedMoveCount;
+    this.recordedMoves.push(record);
+    this.appliedMoveCount += 1;
 
     this.turnHistory.push({
       state: this.currentState,
@@ -205,6 +231,8 @@ export class ChessGame implements IGameEngine {
       return false;
     }
 
+    this.appliedMoveCount = Math.max(0, this.appliedMoveCount - 1);
+
     const previousTurn = this.turnHistory.pop();
     if (previousTurn) {
       this.decrementPositionCount(this.currentPositionSignature);
@@ -229,6 +257,8 @@ export class ChessGame implements IGameEngine {
     if (!redone) {
       return false;
     }
+
+    this.appliedMoveCount = Math.min(this.recordedMoves.length, this.appliedMoveCount + 1);
 
     const nextTurn = this.redoHistory.pop();
     if (nextTurn) {

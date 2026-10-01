@@ -60,6 +60,8 @@ describe('Web Adapter - ChessBoardView', () => {
       winner: null,
       canUndo: false,
       canRedo: false,
+      moveHistory: [],
+      currentMoveIndex: 0,
     };
 
     render(

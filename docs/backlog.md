@@ -1,6 +1,6 @@
 # Backlog Maestro Centralizado — Chess TPO
 
-Índice maestro de las **6 Épicas** y **24 Tickets** (4 tickets por cada uno de los 6 desarrolladores del equipo).
+Índice maestro de las **7 Épicas** y **28 Tickets** (incluyendo la épica de extensión de Replay, Animación y Exportación).
 
 > [!IMPORTANT]
 > **Disciplina On-Commit (`how-we-work.md`):** Al trabajar en una rama `ticket/<NN>-<slug>`, el autor debe mantener sincronizados los checkboxes del archivo del ticket y el estado en esta tabla (`ready-for-agent` $\rightarrow$ `In Progress` $\rightarrow$ `In Review` $\rightarrow$ `Done`).
@@ -70,3 +70,15 @@
 | **22** | [`22-interaccion-dos-clics-y-feedback`](tickets/06-adaptador-web-y-entrega/22-interaccion-dos-clics-y-feedback.md) | `21` | `ticket/22-interaccion-dos-clics-y-feedback` | `Done` |
 | **23** | [`23-panel-control-historial-y-selector-ia`](tickets/06-adaptador-web-y-entrega/23-panel-control-historial-y-selector-ia.md) | `14`, `20`, `22` | `ticket/23-panel-control-historial-y-selector-ia` | `Done` |
 | **24** | [`24-sincronizacion-uml-y-justificacion-defensa`](tickets/06-adaptador-web-y-entrega/24-sincronizacion-uml-y-justificacion-defensa.md) | `16`, `18`, `23` | `ticket/24-sincronizacion-uml-y-justificacion-defensa` | `Done` |
+
+---
+
+## Épica 7: `07-replay-animacion-y-exportacion`
+
+| ID | Ticket | Blocked By | Rama Git | Estado |
+| :---: | :--- | :--- | :--- | :---: |
+| **25** | [`25-modelo-dominio-historial-moverecord`](tickets/07-replay-animacion-y-exportacion/25-modelo-dominio-historial-moverecord.md) | `12`, `23` | `ticket/25-modelo-dominio-historial-moverecord` | `Done` |
+| **26** | [`26-generador-transcripcion-y-exportacion-txt`](tickets/07-replay-animacion-y-exportacion/26-generador-transcripcion-y-exportacion-txt.md) | `25` | `ticket/26-generador-transcripcion-y-exportacion-txt` | `Done` |
+| **27** | [`27-reproductor-replay-y-controles-transporte`](tickets/07-replay-animacion-y-exportacion/27-reproductor-replay-y-controles-transporte.md) | `25` | `ticket/27-reproductor-replay-y-controles-transporte` | `Done` |
+| **28** | [`28-lista-interactiva-y-resaltado-tablero`](tickets/07-replay-animacion-y-exportacion/28-lista-interactiva-y-resaltado-tablero.md) | `27` | `ticket/28-lista-interactiva-y-resaltado-tablero` | `Done` |
+

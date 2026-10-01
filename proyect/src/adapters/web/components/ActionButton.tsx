@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-export type ActionButtonVariant = 'default' | 'danger';
+export type ActionButtonVariant = 'default' | 'danger' | 'primary';
 
 export interface ActionButtonProps {
   readonly onClick: () => void;
@@ -16,6 +16,8 @@ const ACTION_BUTTON_VARIANTS: Record<ActionButtonVariant, string> = {
     'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700 hover:border-zinc-500',
   danger:
     'bg-rose-950/60 border-rose-800/80 text-rose-200 hover:bg-rose-900/80 hover:border-rose-700',
+  primary:
+    'bg-amber-600 border-amber-500 text-zinc-100 hover:bg-amber-500 hover:border-amber-400',
 };
 
 export function ActionButton({

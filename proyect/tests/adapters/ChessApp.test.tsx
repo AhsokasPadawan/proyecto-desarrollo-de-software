@@ -194,4 +194,49 @@ describe('Web Adapter - ChessApp Integration', () => {
     expect(screen.getByTestId('turn-indicator')).toHaveTextContent('Blancas');
     expect(screen.getByTestId('undo-button')).toBeEnabled();
   });
+
+  it('enters replay mode upon checkmate and allows manual navigation', () => {
+    render(<ChessApp />);
+
+    fireEvent.click(screen.getByTestId('square-1-5'));
+    fireEvent.click(screen.getByTestId('square-2-5'));
+
+    fireEvent.click(screen.getByTestId('square-6-4'));
+    fireEvent.click(screen.getByTestId('square-4-4'));
+
+    fireEvent.click(screen.getByTestId('square-1-6'));
+    fireEvent.click(screen.getByTestId('square-3-6'));
+
+    fireEvent.click(screen.getByTestId('square-7-3'));
+    fireEvent.click(screen.getByTestId('square-3-7'));
+
+    expect(screen.getByTestId('game-state-banner')).toHaveTextContent('Jaque Mate');
+    expect(screen.getByTestId('review-match-button')).toBeInTheDocument();
+    expect(screen.getByTestId('export-match-button')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('review-match-button'));
+
+    expect(screen.getByTestId('replay-progress-indicator')).toHaveTextContent('Movimiento 0 de 4');
+
+    fireEvent.click(screen.getByTestId('square-1-4'));
+    expect(screen.getByTestId('square-1-4').className).not.toContain('ring-amber-400');
+
+    fireEvent.click(screen.getByTestId('replay-next-button'));
+    expect(screen.getByTestId('replay-progress-indicator')).toHaveTextContent('Movimiento 1 de 4');
+    expect(screen.getByTestId('square-1-5')).toHaveAttribute('data-highlighted', 'true');
+    expect(screen.getByTestId('square-2-5')).toHaveAttribute('data-highlighted', 'true');
+
+    fireEvent.click(screen.getByTestId('replay-move-item-2'));
+    expect(screen.getByTestId('replay-progress-indicator')).toHaveTextContent('Movimiento 3 de 4');
+    expect(screen.getByTestId('square-1-6')).toHaveAttribute('data-highlighted', 'true');
+    expect(screen.getByTestId('square-3-6')).toHaveAttribute('data-highlighted', 'true');
+
+    fireEvent.click(screen.getByTestId('replay-end-button'));
+    expect(screen.getByTestId('replay-progress-indicator')).toHaveTextContent('Movimiento 4 de 4');
+
+    fireEvent.click(screen.getByTestId('exit-replay-button'));
+    expect(screen.queryByTestId('replay-progress-indicator')).toBeNull();
+    expect(screen.getByTestId('review-match-button')).toBeInTheDocument();
+  });
 });
+

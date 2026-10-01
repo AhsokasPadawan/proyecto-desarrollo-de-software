@@ -6,6 +6,18 @@ export interface PieceSnapshot {
   readonly color: Color;
 }
 
+export interface MoveRecord {
+  readonly moveIndex: number;
+  readonly turn: Color;
+  readonly piece: PieceType;
+  readonly from: string;
+  readonly to: string;
+  readonly capturedPiece?: PieceType;
+  readonly isCastling?: boolean;
+  readonly isPromotion?: boolean;
+  readonly promotionPiece?: PieceType;
+}
+
 export interface GameSnapshot {
   readonly rows: number;
   readonly cols: number;
@@ -15,4 +27,7 @@ export interface GameSnapshot {
   readonly winner: Color | null;
   readonly canUndo: boolean;
   readonly canRedo: boolean;
+  readonly moveHistory: readonly MoveRecord[];
+  readonly currentMoveIndex: number;
 }
+

@@ -36,6 +36,8 @@ describe('Web Adapter - ControlPanelView', () => {
       winner: null,
       canUndo: true,
       canRedo: false,
+      moveHistory: [],
+      currentMoveIndex: 0,
     };
 
     render(
@@ -84,6 +86,8 @@ describe('Web Adapter - ControlPanelView', () => {
       winner: null,
       canUndo: true,
       canRedo: false,
+      moveHistory: [],
+      currentMoveIndex: 0,
     };
 
     render(
@@ -132,6 +136,8 @@ describe('Web Adapter - ControlPanelView', () => {
       winner: null,
       canUndo: true,
       canRedo: false,
+      moveHistory: [],
+      currentMoveIndex: 0,
     };
 
     render(
@@ -182,6 +188,8 @@ describe('Web Adapter - ControlPanelView', () => {
       winner: null,
       canUndo: false,
       canRedo: true,
+      moveHistory: [],
+      currentMoveIndex: 0,
     };
 
     render(
@@ -286,4 +294,59 @@ describe('Web Adapter - ControlPanelView', () => {
     expect(handleModeChange).toHaveBeenCalledWith('HUMAN_VS_GREEDY_AI');
     expect(handleModeChange).toHaveBeenCalledTimes(1);
   });
+
+  it('renders export button when state is terminal and invokes onExportMatch upon click', () => {
+    const handleExportMatch = vi.fn();
+    const terminalSnapshot: GameSnapshot = {
+      rows: 8,
+      cols: 8,
+      grid: Array.from({ length: 8 }, () => Array.from({ length: 8 }, () => null)),
+      currentTurn: 'BLACK',
+      stateKind: 'CHECKMATE',
+      winner: 'WHITE',
+      canUndo: true,
+      canRedo: false,
+      moveHistory: [],
+      currentMoveIndex: 0,
+    };
+
+    render(
+      <ControlPanelView
+        snapshot={terminalSnapshot}
+        currentGameMode="HUMAN_VS_HUMAN"
+        feedbackMessage={null}
+        onModeChange={() => {}}
+        onUndo={() => {}}
+        onRedo={() => {}}
+        onReset={() => {}}
+        onExportMatch={handleExportMatch}
+      />
+    );
+
+    const exportButton = screen.getByTestId('export-match-button');
+    expect(exportButton).toBeInTheDocument();
+    fireEvent.click(exportButton);
+    expect(handleExportMatch).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not render export button when state is in progress', () => {
+    const game = new ChessGame();
+    const snapshot = game.getSnapshot();
+
+    render(
+      <ControlPanelView
+        snapshot={snapshot}
+        currentGameMode="HUMAN_VS_HUMAN"
+        feedbackMessage={null}
+        onModeChange={() => {}}
+        onUndo={() => {}}
+        onRedo={() => {}}
+        onReset={() => {}}
+        onExportMatch={() => {}}
+      />
+    );
+
+    expect(screen.queryByTestId('export-match-button')).toBeNull();
+  });
 });
+

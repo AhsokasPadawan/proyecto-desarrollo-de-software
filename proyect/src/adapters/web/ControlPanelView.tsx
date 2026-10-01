@@ -1,11 +1,12 @@
 import { Color } from '../../core/pieces/types';
 import { GameSnapshot } from '../../core/ports/GameSnapshot';
-import { getStateBadgeClass, getStateLabel } from './stateDisplayLookup';
+import { getStateBadgeClass, getStateLabel, isTerminalState } from './stateDisplayLookup';
 import { GAME_MODES, GameMode } from './types';
 import { ActionButton } from './components/ActionButton';
 import { ModeSelectorButton } from './components/ModeSelectorButton';
 import { ControlSection } from './components/ControlSection';
 import { FeedbackBanner } from './components/FeedbackBanner';
+import { PlaybackSpeed, ReplayControlSection } from './components/ReplayControlSection';
 
 export interface ControlPanelViewProps {
   readonly snapshot: GameSnapshot;
@@ -15,6 +16,18 @@ export interface ControlPanelViewProps {
   readonly onUndo: () => void;
   readonly onRedo: () => void;
   readonly onReset: () => void;
+  readonly onExportMatch?: () => void;
+  readonly isReplaying?: boolean;
+  readonly isPlaying?: boolean;
+  readonly playbackSpeed?: PlaybackSpeed;
+  readonly onStartReplay?: () => void;
+  readonly onExitReplay?: () => void;
+  readonly onGoToStart?: () => void;
+  readonly onStepBackward?: () => void;
+  readonly onTogglePlay?: () => void;
+  readonly onStepForward?: () => void;
+  readonly onGoToEnd?: () => void;
+  readonly onSpeedChange?: (speed: PlaybackSpeed) => void;
 }
 
 export const TURN_LABELS: Record<Color, string> = {
@@ -35,6 +48,18 @@ export function ControlPanelView({
   onUndo,
   onRedo,
   onReset,
+  onExportMatch,
+  isReplaying = false,
+  isPlaying = false,
+  playbackSpeed = 1000,
+  onStartReplay,
+  onExitReplay,
+  onGoToStart,
+  onStepBackward,
+  onTogglePlay,
+  onStepForward,
+  onGoToEnd,
+  onSpeedChange,
 }: ControlPanelViewProps): JSX.Element {
   const turnLabel = TURN_LABELS[snapshot.currentTurn] ?? snapshot.currentTurn;
   const turnBadgeClass = TURN_BADGES[snapshot.currentTurn] ?? 'bg-zinc-800 text-zinc-200';
@@ -93,32 +118,70 @@ export function ControlPanelView({
         </div>
       </ControlSection>
 
-      <ControlSection title="Historial y Acciones" hasDivider>
-        <div className="grid grid-cols-2 gap-2">
+      {isReplaying && onExitReplay && onGoToStart && onStepBackward && onTogglePlay && onStepForward && onGoToEnd && onSpeedChange ? (
+        <ReplayControlSection
+          currentMoveIndex={snapshot.currentMoveIndex}
+          totalMoves={snapshot.moveHistory.length}
+          isPlaying={isPlaying}
+          playbackSpeed={playbackSpeed}
+          onGoToStart={onGoToStart}
+          onStepBackward={onStepBackward}
+          onTogglePlay={onTogglePlay}
+          onStepForward={onStepForward}
+          onGoToEnd={onGoToEnd}
+          onSpeedChange={onSpeedChange}
+          onExitReplay={onExitReplay}
+        />
+      ) : (
+        <ControlSection title="Historial y Acciones" hasDivider>
+          {isTerminalState(snapshot.stateKind) && (
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {onStartReplay && (
+                <ActionButton
+                  onClick={onStartReplay}
+                  variant="primary"
+                  testId="review-match-button"
+                >
+                  Revisar Partida
+                </ActionButton>
+              )}
+              {onExportMatch && (
+                <ActionButton
+                  onClick={onExportMatch}
+                  testId="export-match-button"
+                  className="bg-emerald-700 hover:bg-emerald-600 text-white"
+                >
+                  Exportar (.txt)
+                </ActionButton>
+              )}
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-2">
+            <ActionButton
+              onClick={onUndo}
+              disabled={!snapshot.canUndo}
+              testId="undo-button"
+            >
+              Deshacer (Undo)
+            </ActionButton>
+            <ActionButton
+              onClick={onRedo}
+              disabled={!snapshot.canRedo}
+              testId="redo-button"
+            >
+              Rehacer (Redo)
+            </ActionButton>
+          </div>
           <ActionButton
-            onClick={onUndo}
-            disabled={!snapshot.canUndo}
-            testId="undo-button"
+            onClick={onReset}
+            variant="danger"
+            testId="reset-button"
+            className="mt-1"
           >
-            Deshacer (Undo)
+            Reiniciar Partida
           </ActionButton>
-          <ActionButton
-            onClick={onRedo}
-            disabled={!snapshot.canRedo}
-            testId="redo-button"
-          >
-            Rehacer (Redo)
-          </ActionButton>
-        </div>
-        <ActionButton
-          onClick={onReset}
-          variant="danger"
-          testId="reset-button"
-          className="mt-1"
-        >
-          Reiniciar Partida
-        </ActionButton>
-      </ControlSection>
+        </ControlSection>
+      )}
     </aside>
   );
 }
