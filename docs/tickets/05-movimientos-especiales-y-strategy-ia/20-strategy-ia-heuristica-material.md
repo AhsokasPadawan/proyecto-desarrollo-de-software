@@ -6,10 +6,10 @@
 
 **Branch:** `ticket/20-strategy-ia-heuristica-material`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Evalúa los `Legal Move`s disponibles priorizando jugadas que dan jaque mate o capturan la pieza enemiga de mayor valor según la *lookup table* de material (con valor *fallback* por defecto para piezas de *Fairy Chess*).
-- [ ] Es intercambiable en tiempo de ejecución con `RandomAiStrategy` detrás de la misma interfaz `IAiStrategy` sin modificar `ChessGame`.
-- [ ] Suite de tests unitarios **AAA** en memoria demostrando que ante múltiples opciones de captura o mate en 1, `GreedyMaterialAiStrategy` selecciona consistentemente la captura de mayor valor o el jaque mate.
+- [x] Evalúa los `Legal Move`s disponibles priorizando jugadas que dan jaque mate o capturan la pieza enemiga de mayor valor según la *lookup table* de material (con valor *fallback* por defecto para piezas de *Fairy Chess*).
+- [x] Es intercambiable en tiempo de ejecución con `RandomAiStrategy` detrás de la misma interfaz `IAiStrategy` sin modificar `ChessGame`.
+- [x] Suite de tests unitarios **AAA** en memoria demostrando que ante múltiples opciones de captura o mate en 1, `GreedyMaterialAiStrategy` selecciona consistentemente la captura de mayor valor o el jaque mate.

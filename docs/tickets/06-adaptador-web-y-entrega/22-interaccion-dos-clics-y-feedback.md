@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/22-interaccion-dos-clics-y-feedback`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Un primer clic sobre una pieza del turno activo selecciona la casilla y resalta visualmente todos sus `Legal Move`s (distinguiendo casillas vacías de casillas con captura).
-- [ ] Un segundo clic sobre otra pieza del mismo color cambia la selección activa; un segundo clic sobre cualquier otra casilla invoca `game.makeMove(selected, target)` directamente en el handler `onClick`.
-- [ ] Si `MoveResult` es `{ success: false, reason }`, traduce `reason` mediante una *lookup table* de mensajes en español y lo muestra en la interfaz sin bloques `switch` ni `useEffect`.
-- [ ] Incluye selector visual compacto cuando un peón alcanza la fila de coronación.
+- [x] Un primer clic sobre una pieza del turno activo selecciona la casilla y resalta visualmente todos sus `Legal Move`s (distinguiendo casillas vacías de casillas con captura).
+- [x] Un segundo clic sobre otra pieza del mismo color cambia la selección activa; un segundo clic sobre cualquier otra casilla invoca `game.makeMove(selected, target)` directamente en el handler `onClick`.
+- [x] Si `MoveResult` es `{ success: false, reason }`, traduce `reason` mediante una *lookup table* de mensajes en español y lo muestra en la interfaz sin bloques `switch` ni `useEffect`.
+- [x] Incluye selector visual compacto cuando un peón alcanza la fila de coronación.

@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/12-patron-observer-y-game-snapshot`
 
-**Status:** ready-for-agent
+**Status:** Done
 
 ## Acceptance Criteria
 
-- [ ] `getSnapshot()` retorna una referencia inmutable `GameSnapshot` con dimensiones, grilla de casillas (`{ type, color } | null`), `currentTurn`, `stateKind`, `winner`, `canUndo` y `canRedo` sin exponer referencias mutables internas de `Board`.
-- [ ] `subscribe(observer)` registra al observador y retorna una función de limpieza `UnsubscribeFn` que delega en `unsubscribe(observer)`.
-- [ ] Todos los observadores activos reciben el nuevo `GameSnapshot` automáticamente cuando `makeMove` tiene éxito, o cuando `undo()` / `redo()` revierten o rehacen una jugada.
-- [ ] Suite de tests unitarios **AAA** en memoria con dobles de prueba (*mocks/spies*) verificando notificaciones en jugadas, ausencia de notificación en jugadas rechazadas y limpieza efectiva tras `unsubscribe`.
+- [x] `getSnapshot()` retorna una referencia inmutable `GameSnapshot` con dimensiones, grilla de casillas (`{ type, color } | null`), `currentTurn`, `stateKind`, `winner`, `canUndo` y `canRedo` sin exponer referencias mutables internas de `Board`.
+- [x] `subscribe(observer)` registra al observador y retorna una función de limpieza `UnsubscribeFn` que delega en `unsubscribe(observer)`.
+- [x] Todos los observadores activos reciben el nuevo `GameSnapshot` automáticamente cuando `makeMove` tiene éxito, o cuando `undo()` / `redo()` revierten o rehacen una jugada.
+- [x] Suite de tests unitarios **AAA** en memoria con dobles de prueba (*mocks/spies*) verificando notificaciones en jugadas, ausencia de notificación en jugadas rechazadas y limpieza efectiva tras `unsubscribe`.

@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/04-detector-de-amenazas-check-detector`
 
-**Status:** ready-for-agent
+**Status:** Done
 
 ## Acceptance Criteria
 
-- [ ] `isSquareAttacked(board: IBoardQuery, target: Position, byColor: Color): boolean` verifica si alguna pieza de `byColor` en el tablero incluye `target` dentro de sus `Pseudo-Legal Move`s.
-- [ ] `isKingInCheck(board: IBoardQuery, kingColor: Color): boolean` localiza la posición del `King` de `kingColor` y evalúa si está atacada por el color opuesto (usando una *lookup table* `OPPOSITE_COLOR`).
-- [ ] Si un tablero de prueba no contiene un `King` de ese color, `isKingInCheck` retorna `false` de forma segura sin lanzar excepciones.
-- [ ] Suite de tests unitarios **AAA** en memoria validando amenazas directas, amenazas bloqueadas por otra pieza intermedia y ausencia de jaque.
+- [x] `isSquareAttacked(board: IBoardQuery, target: Position, byColor: Color): boolean` verifica si alguna pieza de `byColor` en el tablero incluye `target` dentro de sus `Pseudo-Legal Move`s.
+- [x] `isKingInCheck(board: IBoardQuery, kingColor: Color): boolean` localiza la posición del `King` de `kingColor` y evalúa si está atacada por el color opuesto (usando una *lookup table* `OPPOSITE_COLOR`).
+- [x] Si un tablero de prueba no contiene un `King` de ese color, `isKingInCheck` retorna `false` de forma segura sin lanzar excepciones.
+- [x] Suite de tests unitarios **AAA** en memoria validando amenazas directas, amenazas bloqueadas por otra pieza intermedia y ausencia de jaque.

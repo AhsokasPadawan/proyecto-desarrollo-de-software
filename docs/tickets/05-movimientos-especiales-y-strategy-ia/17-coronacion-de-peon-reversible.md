@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/17-coronacion-de-peon-reversible`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Cuando un `Pawn` mueve o captura hacia la última fila del tablero, es reemplazado en la casilla destino por una instancia del `PieceType` de coronación elegido (por defecto `QUEEN` usando una *lookup table* de constructores de pieza).
-- [ ] Al ejecutar `undo()`, la pieza promovida se retira, el `Pawn` original vuelve a su casilla previa y cualquier pieza capturada en la coronación es restaurada ($\text{State}_{\text{before}} \equiv \text{State}_{\text{Act(Undo)}}$).
-- [ ] Si la nueva pieza promovida amenaza al `King` rival, el estado de la partida transiciona inmediatamente a `CheckState` o `CheckmateState`.
-- [ ] Suite de tests unitarios **AAA** en memoria validando coronación con avance, coronación con captura, jaque inmediato tras coronar y reversión con `undo()`.
+- [x] Cuando un `Pawn` mueve o captura hacia la última fila del tablero, es reemplazado en la casilla destino por una instancia del `PieceType` de coronación elegido (por defecto `QUEEN` usando una *lookup table* de constructores de pieza).
+- [x] Al ejecutar `undo()`, la pieza promovida se retira, el `Pawn` original vuelve a su casilla previa y cualquier pieza capturada en la coronación es restaurada ($\text{State}_{\text{before}} \equiv \text{State}_{\text{Act(Undo)}}$).
+- [x] Si la nueva pieza promovida amenaza al `King` rival, el estado de la partida transiciona inmediatamente a `CheckState` o `CheckmateState`.
+- [x] Suite de tests unitarios **AAA** en memoria validando coronación con avance, coronación con captura, jaque inmediato tras coronar y reversión con `undo()`.

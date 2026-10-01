@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/21-tablero-web-dinamico-y-piezas`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] El adaptador React se suscribe al Core usando `useSyncExternalStore` sobre `subscribe` y `getSnapshot` sin utilizar `useEffect` para sincronizar el estado del tablero.
-- [ ] La grilla genera dinámicamente `snapshot.rows` filas y `snapshot.cols` columnas con etiquetas algebraicas laterales e inferiores, adaptándose sin romperse tanto a $8 \times 8$ como a dimensiones personalizadas ($10 \times 10$).
-- [ ] Una *lookup table* mapea las 6 piezas estándar a su representación visual por color, y provee un *fallback* automático (insignia estilizada con las iniciales de `piece.type`) para cualquier pieza nueva inyectada en la defensa oral.
-- [ ] Tests de componente / renderizado verificando la visualización de un `GameSnapshot` estándar y de un `GameSnapshot` con dimensiones y pieza personalizada.
+- [x] El adaptador React se suscribe al Core usando `useSyncExternalStore` sobre `subscribe` y `getSnapshot` sin utilizar `useEffect` para sincronizar el estado del tablero.
+- [x] La grilla genera dinámicamente `snapshot.rows` filas y `snapshot.cols` columnas con etiquetas algebraicas laterales e inferiores, adaptándose sin romperse tanto a $8 \times 8$ como a dimensiones personalizadas ($10 \times 10$).
+- [x] Una *lookup table* mapea las 6 piezas estándar a su representación visual por color, y provee un *fallback* automático (insignia estilizada con las iniciales de `piece.type`) para cualquier pieza nueva inyectada en la defensa oral.
+- [x] Tests de componente / renderizado verificando la visualización de un `GameSnapshot` estándar y de un `GameSnapshot` con dimensiones y pieza personalizada.

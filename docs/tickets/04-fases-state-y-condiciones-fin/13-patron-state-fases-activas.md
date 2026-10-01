@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/13-patron-state-fases-activas`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] `IGameState` define `kind: GameStateKind`, `canAcceptMoves(): boolean` y el contrato de evaluación de transición hacia el siguiente estado.
-- [ ] Cuando una jugada deja al `King` del jugador entrante bajo amenaza (`isKingInCheck === true`) y dicho jugador posee al menos un `Legal Move`, la partida transiciona a `CheckState`.
-- [ ] Cuando el jugador entrante resuelve el jaque en el turno siguiente, la partida transiciona de vuelta a `NormalPlayState`.
-- [ ] Suite de tests unitarios **AAA** en memoria verificando transiciones `IN_PROGRESS` $\rightarrow$ `CHECK` $\rightarrow$ `IN_PROGRESS` tanto al avanzar como al deshacer con `undo()`.
+- [x] `IGameState` define `kind: GameStateKind`, `canAcceptMoves(): boolean` y el contrato de evaluación de transición hacia el siguiente estado.
+- [x] Cuando una jugada deja al `King` del jugador entrante bajo amenaza (`isKingInCheck === true`) y dicho jugador posee al menos un `Legal Move`, la partida transiciona a `CheckState`.
+- [x] Cuando el jugador entrante resuelve el jaque en el turno siguiente, la partida transiciona de vuelta a `NormalPlayState`.
+- [x] Suite de tests unitarios **AAA** en memoria verificando transiciones `IN_PROGRESS` $\rightarrow$ `CHECK` $\rightarrow$ `IN_PROGRESS` tanto al avanzar como al deshacer con `undo()`.

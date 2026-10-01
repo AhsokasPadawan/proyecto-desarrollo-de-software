@@ -90,9 +90,9 @@ Este índice refleja en qué fase se encuentra el equipo y qué hitos restan por
 | **2** | **Design — Arquitectura** | Skill `grill-with-docs` | [`docs/architecture.md`](architecture.md), [`docs/glossary.md`](glossary.md) y `docs/adr/ADR-001..012` | ✅ Completada |
 | 2 | **Design — Especificaciones** | Skill `to-spec` | [`docs/spec.md`](spec.md) con Historias de Usuario y *seams* | ✅ Completada |
 | 2 | **Design — Tickets & Backlog** | Skill `to-tickets` | 6 Épicas en `docs/tickets/` y [`docs/backlog.md`](backlog.md) (24 tickets) | ✅ Completada |
-| 2 | Ratificación de Diseño | Reunión grupal | [`docs/design-summary.md`](design-summary.md) listo para aprobación | 🟡 Listo para ratificar |
-| **3** | **Implementation** | Ramas `ticket/<NN>-<slug>` | Código y tests unitarios desarrollados vía TDD estricto | ⚪ Próxima etapa |
-| **4** | **Review & Integración** | PRs + Skill `code-review` | Pull Requests con DoD completo y $\ge 2$ aprobaciones | ⚪ No iniciada |
+| 2 | Ratificación de Diseño | Reunión grupal | [`docs/design-summary.md`](design-summary.md) aprobado por el equipo | ✅ Completada |
+| **3** | **Implementation** | Ramas `ticket/<NN>-<slug>` | 24 tickets desarrollados vía TDD estricto (166 tests de dominio) | ✅ Completada |
+| **4** | **Review & Integración** | PRs + Code Reviews | 24 tickets auditados, 43 tests de UI con RTL, 209 tests en verde | ✅ Completada |
 
 > [!NOTE]
-> La transición formal a la **Etapa 2 (Design)** se habilitará una vez que el equipo analice el archivo `docs/project-setup-summary.md` y consagre las decisiones clave de configuración inicial.
+> Todas las etapas del ciclo de vida (Setup, Design, Implementation y Review) han sido completadas y verificadas al 100%. El proyecto está listo para su evaluación y defensa oral individual.

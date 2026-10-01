@@ -1,0 +1,83 @@
+import { Position } from '../../core/board/Position';
+import { GameSnapshot } from '../../core/ports/GameSnapshot';
+import { ChessSquare } from './components/ChessSquare';
+
+export interface ChessBoardViewProps {
+  readonly snapshot: GameSnapshot;
+  readonly selectedPosition: Position | null;
+  readonly legalMoves: readonly Position[];
+  readonly onSquareClick: (position: Position) => void;
+}
+
+export function getFileLabel(colIndex: number): string {
+  return String.fromCharCode(97 + colIndex);
+}
+
+export function getRankLabel(rowIndex: number): string {
+  return (rowIndex + 1).toString();
+}
+
+export function ChessBoardView({
+  snapshot,
+  selectedPosition,
+  legalMoves,
+  onSquareClick,
+}: ChessBoardViewProps): JSX.Element {
+  const rowIndices = Array.from({ length: snapshot.rows }, (_, i) => snapshot.rows - 1 - i);
+  const colIndices = Array.from({ length: snapshot.cols }, (_, i) => i);
+
+  const legalTargetsMap = new Map<string, Position>();
+  for (const move of legalMoves) {
+    legalTargetsMap.set(`${move.row},${move.col}`, move);
+  }
+
+  const selectedPiece = selectedPosition
+    ? snapshot.grid[selectedPosition.row][selectedPosition.col]
+    : null;
+
+  return (
+    <div className="flex flex-col items-center justify-center p-3 select-none">
+      <div className="relative border-4 border-zinc-800 rounded-lg shadow-2xl bg-zinc-900 p-2">
+        <div
+          className="grid gap-0 border border-zinc-700/60 rounded overflow-hidden"
+          style={{
+            gridTemplateColumns: `repeat(${snapshot.cols}, minmax(0, 1fr))`,
+          }}
+          data-testid="chess-grid"
+        >
+          {rowIndices.map((row) =>
+            colIndices.map((col) => {
+              const piece = snapshot.grid[row][col];
+              const isSelected = selectedPosition
+                ? selectedPosition.row === row && selectedPosition.col === col
+                : false;
+              const isLegalTarget = legalTargetsMap.has(`${row},${col}`);
+              const isEnPassantCapture = Boolean(
+                selectedPiece &&
+                  selectedPiece.type === 'PAWN' &&
+                  selectedPosition &&
+                  selectedPosition.col !== col
+              );
+              const isCaptureTarget = piece !== null || isEnPassantCapture;
+
+              return (
+                <ChessSquare
+                  key={`${row}-${col}`}
+                  position={new Position(row, col)}
+                  piece={piece}
+                  isSelected={isSelected}
+                  isLegalTarget={isLegalTarget}
+                  isCaptureTarget={isCaptureTarget}
+                  rankLabel={col === 0 ? getRankLabel(row) : null}
+                  fileLabel={row === 0 ? getFileLabel(col) : null}
+                  ariaLabel={`Casilla ${getFileLabel(col)}${getRankLabel(row)}`}
+                  onClick={onSquareClick}
+                />
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

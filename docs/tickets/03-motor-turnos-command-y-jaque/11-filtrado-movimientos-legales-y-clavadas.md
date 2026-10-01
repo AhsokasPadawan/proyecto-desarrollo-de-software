@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/11-filtrado-movimientos-legales-y-clavadas`
 
-**Status:** ready-for-agent
+**Status:** Done
 
 ## Acceptance Criteria
 
-- [ ] `getLegalMoves(from)` evalúa cada `Pseudo-Legal Move` ejecutando temporalmente `MoveCommand.execute()`, consultando `checkDetector.isKingInCheck(board, piece.color)` y revirtiendo inmediatamente con `MoveCommand.undo()`.
-- [ ] Si un jugador intenta en `makeMove(from, to)` un movimiento geométricamente válido pero que deja a su propio `King` en jaque, el tablero queda intacto y se retorna `{ success: false, reason: 'KING_LEFT_IN_CHECK' }`.
-- [ ] Una pieza clavada (*pinned*) no puede moverse fuera de la línea de ataque que protege a su Rey, pero sí puede moverse sobre esa misma línea o capturar al atacante.
-- [ ] Suite de tests unitarios **AAA** en memoria probando piezas clavadas absolutas, evasión de jaque (mover Rey, bloquear rayo o capturar atacante) y prohibición de suicidio del Rey.
+- [x] `getLegalMoves(from)` evalúa cada `Pseudo-Legal Move` ejecutando temporalmente `MoveCommand.execute()`, consultando `checkDetector.isKingInCheck(board, piece.color)` y revirtiendo inmediatamente con `MoveCommand.undo()`.
+- [x] Si un jugador intenta en `makeMove(from, to)` un movimiento geométricamente válido pero que deja a su propio `King` en jaque, el tablero queda intacto y se retorna `{ success: false, reason: 'KING_LEFT_IN_CHECK' }`.
+- [x] Una pieza clavada (*pinned*) no puede moverse fuera de la línea de ataque que protege a su Rey, pero sí puede moverse sobre esa misma línea o capturar al atacante.
+- [x] Suite de tests unitarios **AAA** en memoria probando piezas clavadas absolutas, evasión de jaque (mover Rey, bloquear rayo o capturar atacante) y prohibición de suicidio del Rey.

@@ -6,12 +6,12 @@
 
 **Branch:** `ticket/01-scaffolding-y-position`
 
-**Status:** ready-for-agent
+**Status:** Done
 
 ## Acceptance Criteria
 
-- [ ] `proyect/` cuenta con configuración funcional de TypeScript estricto, Vite, React, Tailwind CSS y script `npm test` con Vitest corriendo en memoria sin dependencias externas en `src/core/`.
-- [ ] `Position` es inmutable (`readonly row: number`, `readonly col: number`), valida que las coordenadas sean números enteros y no acopla un límite fijo de `8`.
-- [ ] `position.offset(deltaRow, deltaCol)` retorna una nueva instancia de `Position` desplazada y `position.equals(other)` compara igualdad por valor.
-- [ ] Provee conversión bidireccional con notación algebraica (`Position.fromAlgebraic('e2')` $\leftrightarrow$ `toAlgebraic()`) donde `'a1'` corresponde a `(row: 0, col: 0)`.
-- [ ] Suite de tests unitarios bajo el patrón **AAA** en memoria cubriendo creación, desplazamientos, igualdad y conversión algebraica.
+- [x] `proyect/` cuenta con configuración funcional de TypeScript estricto, Vite, React, Tailwind CSS y script `npm test` con Vitest corriendo en memoria sin dependencias externas en `src/core/`.
+- [x] `Position` es inmutable (`readonly row: number`, `readonly col: number`), valida que las coordenadas sean números enteros y no acopla un límite fijo de `8`.
+- [x] `position.offset(deltaRow, deltaCol)` retorna una nueva instancia de `Position` desplazada y `position.equals(other)` compara igualdad por valor.
+- [x] Provee conversión bidireccional con notación algebraica (`Position.fromAlgebraic('e2')` $\leftrightarrow$ `toAlgebraic()`) donde `'a1'` corresponde a `(row: 0, col: 0)`.
+- [x] Suite de tests unitarios bajo el patrón **AAA** en memoria cubriendo creación, desplazamientos, igualdad y conversión algebraica.
