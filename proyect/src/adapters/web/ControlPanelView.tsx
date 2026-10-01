@@ -151,7 +151,7 @@ export function ControlPanelView({
                   testId="export-match-button"
                   className="bg-emerald-700 hover:bg-emerald-600 text-white"
                 >
-                  Exportar (.txt)
+                  Exportar Partida
                 </ActionButton>
               )}
             </div>

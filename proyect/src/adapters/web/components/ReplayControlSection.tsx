@@ -45,7 +45,7 @@ export function ReplayControlSection({
         className="px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-200 text-xs font-semibold text-center border border-zinc-700"
         data-testid="replay-progress-indicator"
       >
-        Movimiento {currentMoveIndex} de {totalMoves}
+        Jugada {currentMoveIndex} de {totalMoves}
       </div>
 
       <div className="grid grid-cols-5 gap-1.5 mt-2">

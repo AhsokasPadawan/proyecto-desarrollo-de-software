@@ -320,6 +320,7 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
           legalMoves={legalMoves}
           onSquareClick={handleSquareClick}
           activeMoveSquares={activeMoveSquares}
+          readOnly={isReplaying}
         />
 
         <ControlPanelView

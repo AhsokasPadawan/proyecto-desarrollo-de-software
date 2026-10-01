@@ -1,6 +1,7 @@
 import { Position } from '../../core/board/Position';
 import { GameSnapshot } from '../../core/ports/GameSnapshot';
 import { ChessSquare } from './components/ChessSquare';
+import { MoveHighlightLegend } from './components/MoveHighlightLegend';
 
 export interface ChessBoardViewProps {
   readonly snapshot: GameSnapshot;
@@ -8,6 +9,7 @@ export interface ChessBoardViewProps {
   readonly legalMoves: readonly Position[];
   readonly onSquareClick: (position: Position) => void;
   readonly activeMoveSquares?: { readonly from: string; readonly to: string } | null;
+  readonly readOnly?: boolean;
 }
 
 export function getFileLabel(colIndex: number): string {
@@ -24,6 +26,7 @@ export function ChessBoardView({
   legalMoves,
   onSquareClick,
   activeMoveSquares = null,
+  readOnly = false,
 }: ChessBoardViewProps): JSX.Element {
   const rowIndices = Array.from({ length: snapshot.rows }, (_, i) => snapshot.rows - 1 - i);
   const colIndices = Array.from({ length: snapshot.cols }, (_, i) => i);
@@ -84,7 +87,7 @@ export function ChessBoardView({
                   rankLabel={col === 0 ? getRankLabel(row) : null}
                   fileLabel={row === 0 ? getFileLabel(col) : null}
                   ariaLabel={`Casilla ${getFileLabel(col)}${getRankLabel(row)}`}
-                  onClick={onSquareClick}
+                  onClick={readOnly ? () => {} : onSquareClick}
                   highlightRole={highlightRole}
                   isHighlighted={highlightRole !== null}
                 />
@@ -95,24 +98,11 @@ export function ChessBoardView({
       </div>
 
       {activeMoveSquares && (
-        <div
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mt-3 text-xs text-zinc-200 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-lg shadow-md"
-          data-testid="move-highlight-legend"
-        >
-          <div className="flex items-center gap-2">
-            <span className="w-3.5 h-3.5 rounded border border-sky-400 bg-sky-500 ring-2 ring-sky-400/50 flex-shrink-0" />
-            <span>
-              <strong className="text-sky-300 font-bold">Origen (From: {activeMoveSquares.from}):</strong>
-              <span className="text-zinc-400 ml-1">Casilla de salida</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3.5 h-3.5 rounded border border-amber-400 bg-amber-500 ring-2 ring-amber-400/50 flex-shrink-0" />
-            <span>
-              <strong className="text-amber-300 font-bold">Destino (To: {activeMoveSquares.to}):</strong>
-              <span className="text-zinc-400 ml-1">Casilla de llegada</span>
-            </span>
-          </div>
+        <div className="mt-3">
+          <MoveHighlightLegend
+            originAlgebraic={activeMoveSquares.from}
+            destinationAlgebraic={activeMoveSquares.to}
+          />
         </div>
       )}
     </div>

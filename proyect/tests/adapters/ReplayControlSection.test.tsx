@@ -21,7 +21,7 @@ describe('Web Adapter - ReplayControlSection', () => {
       />
     );
 
-    expect(screen.getByTestId('replay-progress-indicator')).toHaveTextContent('Movimiento 2 de 5');
+    expect(screen.getByTestId('replay-progress-indicator')).toHaveTextContent('Jugada 2 de 5');
     expect(screen.getByTestId('replay-play-button')).toHaveTextContent('Play');
   });
 

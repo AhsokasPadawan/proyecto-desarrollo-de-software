@@ -1,5 +1,6 @@
 import { MoveRecord } from '../../../core/ports/GameSnapshot';
 import { PIECE_NAMES_LOOKUP } from '../transcriptionFormatter';
+import { MoveHighlightLegend } from './MoveHighlightLegend';
 
 export interface MoveHistoryPanelProps {
   readonly moveHistory: readonly MoveRecord[];
@@ -34,22 +35,7 @@ export function MoveHistoryPanel({
         </span>
       </header>
 
-      <div className="flex flex-col gap-1.5 p-2.5 bg-zinc-950/60 border border-zinc-800 rounded-lg text-xs text-zinc-300">
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded bg-sky-500 ring-2 ring-sky-400/60 border border-sky-300 flex-shrink-0" />
-          <span>
-            <strong className="text-sky-300 font-bold">Origen (From):</strong>
-            <span className="text-zinc-400 ml-1">Casilla de salida</span>
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded bg-amber-500 ring-2 ring-amber-400/60 border border-amber-300 flex-shrink-0" />
-          <span>
-            <strong className="text-amber-300 font-bold">Destino (To):</strong>
-            <span className="text-zinc-400 ml-1">Casilla de llegada</span>
-          </span>
-        </div>
-      </div>
+      <MoveHighlightLegend />
 
       <div
         className="max-h-[460px] overflow-y-auto border border-zinc-800/80 rounded-lg bg-zinc-950/40"
