@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { ChessApp } from '../../src/adapters/web/ChessApp';
 import { Board } from '../../src/core/board/Board';
@@ -279,6 +279,39 @@ describe('Web Adapter - ChessApp Integration', () => {
     expect(pauseButton).toHaveTextContent('Pausar Tiempo');
     fireEvent.click(blackPawn);
     expect(blackPawn.className).toContain('ring-amber-400');
+  });
+
+  it('declares timeout victory when player timer reaches zero and keeps frozen clocks in replay', () => {
+    vi.useFakeTimers();
+    try {
+      render(<ChessApp />);
+
+      fireEvent.click(screen.getByTestId('clock-enable-toggle'));
+
+      fireEvent.click(screen.getByTestId('white-preset-3'));
+      const whiteMinusButton = screen.getByTestId('white-minus-button');
+      fireEvent.click(whiteMinusButton);
+      fireEvent.click(whiteMinusButton);
+      expect(screen.getByText('1 min')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByTestId('start-clock-match-button'));
+      expect(screen.getByTestId('game-state-banner')).toHaveTextContent('Partida en Curso');
+
+      act(() => {
+        vi.advanceTimersByTime(60000);
+      });
+
+      expect(screen.getByTestId('game-state-banner')).toHaveTextContent('Tiempo Agotado — Victoria de Negras');
+      expect(screen.getByTestId('review-match-button')).toBeInTheDocument();
+      expect(screen.getByTestId('export-match-button')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByTestId('review-match-button'));
+      expect(screen.getByTestId('player-clock-white')).toBeInTheDocument();
+      expect(screen.getByTestId('player-clock-black')).toBeInTheDocument();
+      expect(screen.getByTestId('player-clock-white')).toHaveTextContent('00:00');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

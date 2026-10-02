@@ -365,7 +365,7 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
     const activeModeConfig = GAME_MODES.find((mode) => mode.id === gameMode);
     const baseLabel = activeModeConfig?.label ?? gameMode;
     const modeLabel = isClockEnabled ? `${baseLabel} (Con Reloj)` : baseLabel;
-    const resultLabel = getStateLabel(snapshot.stateKind);
+    const resultLabel = getStateLabel(snapshot.stateKind, snapshot.winner);
     const content = formatMatchTranscription({
       modeLabel,
       resultLabel,
@@ -373,7 +373,7 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
     });
     const filename = generateExportFilename();
     downloadTranscriptionFile(filename, content);
-  }, [gameMode, isClockEnabled, snapshot.moveHistory, snapshot.stateKind]);
+  }, [gameMode, isClockEnabled, snapshot.moveHistory, snapshot.stateKind, snapshot.winner]);
 
   const activeMove =
     isReplaying && snapshot.currentMoveIndex > 0

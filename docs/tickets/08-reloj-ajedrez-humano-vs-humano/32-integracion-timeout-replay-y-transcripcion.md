@@ -11,12 +11,12 @@
 
 **Branch:** `ticket/32-integracion-timeout-replay-y-transcripcion`
 
-**Status:** todo
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Cuando expira el tiempo de un jugador, la partida finaliza automáticamente en `'TIMEOUT'` y el cartel de estado informa la victoria del rival por tiempo agotado.
-- [ ] Los botones "Revisar Partida" y "Exportar Partida" se activan al finalizar la partida por tiempo.
-- [ ] En modo Replay, los relojes de Blancas y Negras continúan mostrándose congelados con el tiempo remanente con el que concluyó el juego.
-- [ ] `formatMatchTranscription` incluye en el encabezado la información del modo (`Humano vs Humano (Con Reloj)`) y el resultado de victoria por caída de bandera.
-- [ ] Se añaden pruebas de integración end-to-end en `tests/adapters/ChessApp.test.tsx` y pruebas de serialización en `tests/adapters/transcriptionFormatter.test.ts`.
+- [x] Cuando expira el tiempo de un jugador, la partida finaliza automáticamente en `'TIMEOUT'` y el cartel de estado informa la victoria del rival por tiempo agotado.
+- [x] Los botones "Revisar Partida" y "Exportar Partida" se activan al finalizar la partida por tiempo.
+- [x] En modo Replay, los relojes de Blancas y Negras continúan mostrándose congelados con el tiempo remanente con el que concluyó el juego.
+- [x] `formatMatchTranscription` incluye en el encabezado la información del modo (`Humano vs Humano (Con Reloj)`) y el resultado de victoria por caída de bandera.
+- [x] Se añaden pruebas de integración end-to-end en `tests/adapters/ChessApp.test.tsx` y pruebas de serialización en `tests/adapters/transcriptionFormatter.test.ts`.

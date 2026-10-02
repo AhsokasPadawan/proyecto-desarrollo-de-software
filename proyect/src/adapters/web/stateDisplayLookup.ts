@@ -1,3 +1,4 @@
+import { Color } from '../../core/pieces/types';
 import { GameStateKind } from '../../core/ports/MoveResult';
 
 export const STATE_LABELS: Record<GameStateKind, string> = {
@@ -9,6 +10,11 @@ export const STATE_LABELS: Record<GameStateKind, string> = {
   TIMEOUT: 'Tiempo Agotado',
 };
 
+export const TIMEOUT_WINNER_LABELS: Record<Color, string> = {
+  WHITE: 'Tiempo Agotado — Victoria de Blancas',
+  BLACK: 'Tiempo Agotado — Victoria de Negras',
+};
+
 export const STATE_BADGE_CLASSES: Record<GameStateKind, string> = {
   IN_PROGRESS: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50',
   CHECK: 'bg-amber-950/90 text-amber-300 border-amber-500 animate-pulse font-semibold',
@@ -18,7 +24,10 @@ export const STATE_BADGE_CLASSES: Record<GameStateKind, string> = {
   TIMEOUT: 'bg-red-950/90 text-red-200 border-red-500 font-bold shadow-lg shadow-red-950/50',
 };
 
-export function getStateLabel(stateKind: GameStateKind): string {
+export function getStateLabel(stateKind: GameStateKind, winner?: Color | null): string {
+  if (stateKind === 'TIMEOUT' && winner) {
+    return TIMEOUT_WINNER_LABELS[winner] ?? STATE_LABELS.TIMEOUT;
+  }
   return STATE_LABELS[stateKind] ?? stateKind;
 }
 

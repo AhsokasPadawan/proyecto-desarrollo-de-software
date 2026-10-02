@@ -73,7 +73,7 @@ export function ControlPanelView({
 }: ControlPanelViewProps): JSX.Element {
   const turnLabel = TURN_LABELS[snapshot.currentTurn] ?? snapshot.currentTurn;
   const turnBadgeClass = TURN_BADGES[snapshot.currentTurn] ?? 'bg-zinc-800 text-zinc-200';
-  const stateLabel = getStateLabel(snapshot.stateKind);
+  const stateLabel = getStateLabel(snapshot.stateKind, snapshot.winner);
   const stateBadgeClass = getStateBadgeClass(snapshot.stateKind);
   const hasGameStarted = snapshot.moveHistory.length > 0;
 
