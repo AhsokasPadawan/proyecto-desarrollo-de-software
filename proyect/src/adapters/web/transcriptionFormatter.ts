@@ -19,24 +19,23 @@ export interface FormatTranscriptionOptions {
 
 export function formatSingleMove(record: MoveRecord): string {
   const pieceName = PIECE_NAMES_LOOKUP[record.piece] ?? record.piece;
-  let moveDetails = `${pieceName} (${record.from} -> ${record.to})`;
+  const baseNotation = `${pieceName} (${record.from} -> ${record.to})`;
+  const eventTags: string[] = [];
 
   if (record.isCastling) {
-    return `${pieceName} (${record.from} -> ${record.to}) [Enroque]`;
+    eventTags.push('[Enroque]');
   }
-
+  if (record.capturedPiece) {
+    eventTags.push('[Captura]');
+  }
   if (record.isPromotion) {
     const promotedName = record.promotionPiece
       ? PIECE_NAMES_LOOKUP[record.promotionPiece] ?? record.promotionPiece
       : 'DAMA';
-    return `${pieceName} (${record.from} -> ${record.to}) [Coronación: ${promotedName}]`;
+    eventTags.push(`[Coronación: ${promotedName}]`);
   }
 
-  if (record.capturedPiece) {
-    return `${moveDetails} [Captura]`;
-  }
-
-  return moveDetails;
+  return eventTags.length > 0 ? `${baseNotation} ${eventTags.join(' ')}` : baseNotation;
 }
 
 export function formatMatchTranscription(options: FormatTranscriptionOptions): string {

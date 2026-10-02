@@ -92,24 +92,26 @@ export function MoveHistoryTable({
                       </span>
                     </td>
                     <td className="py-1.5 px-2 text-right">
-                      {record.isCastling && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-950/70 text-purple-300 border border-purple-700/50">
-                          Enroque
-                        </span>
-                      )}
-                      {record.isPromotion && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-950/70 text-indigo-300 border border-indigo-700/50">
-                          Coronación
-                        </span>
-                      )}
-                      {record.capturedPiece && !record.isPromotion && !record.isCastling && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-red-950/70 text-red-300 border border-red-700/50">
-                          Captura
-                        </span>
-                      )}
-                      {!record.isCastling && !record.isPromotion && !record.capturedPiece && (
-                        <span className="text-zinc-600">-</span>
-                      )}
+                      <div className="flex items-center justify-end gap-1">
+                        {record.isCastling && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-950/70 text-purple-300 border border-purple-700/50">
+                            Enroque
+                          </span>
+                        )}
+                        {record.capturedPiece && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-red-950/70 text-red-300 border border-red-700/50">
+                            Captura
+                          </span>
+                        )}
+                        {record.isPromotion && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-950/70 text-indigo-300 border border-indigo-700/50">
+                            Coronación
+                          </span>
+                        )}
+                        {!record.isCastling && !record.isPromotion && !record.capturedPiece && (
+                          <span className="text-zinc-600">-</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
