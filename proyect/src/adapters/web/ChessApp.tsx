@@ -8,10 +8,10 @@ import { ChessBoardView } from './ChessBoardView';
 import { ControlPanelView } from './ControlPanelView';
 import { PromotionModal } from './PromotionModal';
 import { AppHeader } from './components/AppHeader';
-import { MoveHistoryPanel } from './components/MoveHistoryPanel';
+import { GameActionBar } from './components/GameActionBar';
 import { PlaybackSpeed } from './components/ReplayControlSection';
 import { getRejectionMessage } from './rejectionMessages';
-import { getStateLabel } from './stateDisplayLookup';
+import { getStateLabel, isTerminalState } from './stateDisplayLookup';
 import { downloadTranscriptionFile, formatMatchTranscription, generateExportFilename } from './transcriptionFormatter';
 import { GAME_MODES, GameMode } from './types';
 
@@ -313,29 +313,39 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-4 md:p-8">
       <AppHeader />
 
-      <main className="w-full max-w-7xl flex flex-col xl:flex-row items-center xl:items-start justify-center gap-6">
-        <ChessBoardView
-          snapshot={snapshot}
-          selectedPosition={selectedPosition}
-          legalMoves={legalMoves}
-          onSquareClick={handleSquareClick}
-          activeMoveSquares={activeMoveSquares}
-          readOnly={isReplaying}
-        />
+      <main className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8">
+        <div className="flex flex-col items-center gap-3">
+          <ChessBoardView
+            snapshot={snapshot}
+            selectedPosition={selectedPosition}
+            legalMoves={legalMoves}
+            onSquareClick={handleSquareClick}
+            activeMoveSquares={activeMoveSquares}
+            readOnly={isReplaying}
+          />
+
+          {!isReplaying && (
+            <GameActionBar
+              canUndo={snapshot.canUndo}
+              canRedo={snapshot.canRedo}
+              isTerminalState={isTerminalState(snapshot.stateKind)}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              onReset={handleReset}
+              onStartReplay={handleStartReplay}
+              onExportMatch={handleExportMatch}
+            />
+          )}
+        </div>
 
         <ControlPanelView
           snapshot={snapshot}
           currentGameMode={gameMode}
           feedbackMessage={feedbackMessage}
           onModeChange={handleModeChange}
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onReset={handleReset}
-          onExportMatch={handleExportMatch}
           isReplaying={isReplaying}
           isPlaying={isPlaying}
           playbackSpeed={playbackSpeed}
-          onStartReplay={handleStartReplay}
           onExitReplay={handleExitReplay}
           onGoToStart={handleGoToStart}
           onStepBackward={handleStepBackward}
@@ -343,16 +353,8 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
           onStepForward={handleStepForward}
           onGoToEnd={handleGoToEnd}
           onSpeedChange={handleSpeedChange}
+          onJumpToMove={handleJumpToMove}
         />
-
-        {(isReplaying || snapshot.moveHistory.length > 0) && (
-          <MoveHistoryPanel
-            moveHistory={snapshot.moveHistory}
-            currentMoveIndex={snapshot.currentMoveIndex}
-            onJumpToMove={handleJumpToMove}
-            isReplaying={isReplaying}
-          />
-        )}
       </main>
 
       <PromotionModal
