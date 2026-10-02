@@ -1,5 +1,4 @@
 import { ActionButton } from './ActionButton';
-import { ControlSection } from './ControlSection';
 
 export type PlaybackSpeed = 500 | 1000 | 2000;
 
@@ -15,6 +14,8 @@ export interface ReplayControlSectionProps {
   readonly onGoToEnd: () => void;
   readonly onSpeedChange: (speed: PlaybackSpeed) => void;
   readonly onExitReplay: () => void;
+  readonly onReset?: () => void;
+  readonly onExportMatch?: () => void;
 }
 
 const SPEED_OPTIONS: readonly { readonly speed: PlaybackSpeed; readonly label: string }[] = [
@@ -35,65 +36,48 @@ export function ReplayControlSection({
   onGoToEnd,
   onSpeedChange,
   onExitReplay,
+  onReset,
+  onExportMatch,
 }: ReplayControlSectionProps): JSX.Element {
   const isAtStart = currentMoveIndex <= 0;
   const isAtEnd = currentMoveIndex >= totalMoves;
 
   return (
-    <ControlSection title="Reproducción de Partida" hasDivider>
-      <div
-        className="px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-200 text-xs font-semibold text-center border border-zinc-700"
-        data-testid="replay-progress-indicator"
-      >
-        Jugada {currentMoveIndex} de {totalMoves}
+    <nav
+      className="w-full flex flex-wrap lg:flex-nowrap items-center justify-between gap-3 p-3 bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-xl backdrop-blur-md"
+      aria-label="Controles de reproducción de partida"
+      data-testid="replay-control-bar"
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className="px-2.5 py-1.5 rounded-lg bg-zinc-800 text-zinc-200 text-xs font-bold border border-zinc-700 whitespace-nowrap"
+          data-testid="replay-progress-indicator"
+        >
+          Jugada {currentMoveIndex} de {totalMoves}
+        </div>
+
+        <div className="flex items-center gap-1">
+          <ActionButton onClick={onGoToStart} disabled={isAtStart} testId="replay-start-button" className="px-2.5 py-1.5 text-xs font-bold">
+            |&lt;&lt;
+          </ActionButton>
+          <ActionButton onClick={onStepBackward} disabled={isAtStart} testId="replay-prev-button" className="px-2.5 py-1.5 text-xs font-bold">
+            &lt;
+          </ActionButton>
+          <ActionButton onClick={onTogglePlay} variant={isPlaying ? 'danger' : 'primary'} testId="replay-play-button" className="px-3 py-1.5 text-xs font-bold">
+            {isPlaying ? 'Pausa' : 'Play'}
+          </ActionButton>
+          <ActionButton onClick={onStepForward} disabled={isAtEnd} testId="replay-next-button" className="px-2.5 py-1.5 text-xs font-bold">
+            &gt;
+          </ActionButton>
+          <ActionButton onClick={onGoToEnd} disabled={isAtEnd} testId="replay-end-button" className="px-2.5 py-1.5 text-xs font-bold">
+            &gt;&gt;|
+          </ActionButton>
+        </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-1.5 mt-2">
-        <ActionButton
-          onClick={onGoToStart}
-          disabled={isAtStart}
-          testId="replay-start-button"
-          className="text-xs px-1"
-        >
-          |&lt;&lt;
-        </ActionButton>
-        <ActionButton
-          onClick={onStepBackward}
-          disabled={isAtStart}
-          testId="replay-prev-button"
-          className="text-xs px-1"
-        >
-          &lt;
-        </ActionButton>
-        <ActionButton
-          onClick={onTogglePlay}
-          variant={isPlaying ? 'danger' : 'primary'}
-          testId="replay-play-button"
-          className="text-xs px-1 font-bold"
-        >
-          {isPlaying ? 'Pausa' : 'Play'}
-        </ActionButton>
-        <ActionButton
-          onClick={onStepForward}
-          disabled={isAtEnd}
-          testId="replay-next-button"
-          className="text-xs px-1"
-        >
-          &gt;
-        </ActionButton>
-        <ActionButton
-          onClick={onGoToEnd}
-          disabled={isAtEnd}
-          testId="replay-end-button"
-          className="text-xs px-1"
-        >
-          &gt;&gt;|
-        </ActionButton>
-      </div>
-
-      <div className="flex items-center justify-between gap-1.5 mt-3">
-        <span className="text-xs text-zinc-400">Velocidad:</span>
-        <div className="flex gap-1">
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-zinc-400 font-medium">Velocidad:</span>
+        <div className="flex items-center gap-1">
           {SPEED_OPTIONS.map((option) => (
             <button
               key={option.speed}
@@ -112,14 +96,21 @@ export function ReplayControlSection({
         </div>
       </div>
 
-      <ActionButton
-        onClick={onExitReplay}
-        variant="danger"
-        testId="exit-replay-button"
-        className="mt-3 w-full"
-      >
-        Salir de Revisión
-      </ActionButton>
-    </ControlSection>
+      <div className="flex items-center gap-2">
+        {onExportMatch && (
+          <ActionButton onClick={onExportMatch} testId="export-match-button" className="px-3 py-1.5 text-xs font-semibold bg-emerald-700 hover:bg-emerald-600 text-white">
+            Exportar Partida
+          </ActionButton>
+        )}
+        {onReset && (
+          <ActionButton onClick={onReset} variant="danger" testId="reset-button" className="px-3 py-1.5 text-xs font-semibold">
+            Reiniciar Partida
+          </ActionButton>
+        )}
+        <ActionButton onClick={onExitReplay} variant="primary" testId="exit-replay-button" className="px-3 py-1.5 text-xs font-semibold">
+          Salir de Revisión
+        </ActionButton>
+      </div>
+    </nav>
   );
 }
