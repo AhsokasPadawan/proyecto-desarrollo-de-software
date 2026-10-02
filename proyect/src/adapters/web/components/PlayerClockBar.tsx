@@ -57,7 +57,7 @@ export function PlayerClockBar({
 
   return (
     <div
-      className={`w-full max-w-[474px] flex items-center justify-between px-3.5 py-1.5 rounded-xl border backdrop-blur-md transition-all shadow-md ${stateClass}`}
+      className={`w-full flex items-center justify-between px-3.5 py-1.5 rounded-xl border backdrop-blur-md transition-all shadow-md ${stateClass}`}
       data-testid={`player-clock-${color.toLowerCase()}`}
     >
       <div className="flex items-center gap-2">

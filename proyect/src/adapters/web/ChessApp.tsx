@@ -386,9 +386,9 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
       <main className="w-full max-w-[1240px] flex flex-col lg:flex-row items-center lg:items-start justify-center gap-4 lg:gap-6">
         <AppHeader />
 
-        <div className="flex flex-col items-center gap-3 w-full max-w-[820px]">
+        <div className="flex flex-col items-center gap-3 w-full max-w-[820px] lg:max-w-[930px]">
           <div className="flex flex-col lg:flex-row items-start justify-center gap-4 lg:gap-6 w-full">
-            <div className="flex flex-col items-stretch gap-2.5 w-full max-w-[474px]">
+            <div className="flex flex-col items-stretch gap-2.5 w-full max-w-[474px] lg:max-w-[586px]">
               {isClockEnabled && (
                 <PlayerClockBar
                   color="BLACK"

@@ -55,7 +55,7 @@ export function ChessSquare({
     <button
       type="button"
       onClick={() => onClick(position)}
-      className={`relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 aspect-square flex items-center justify-center transition-colors focus:outline-none ${squareBackground} ${
+      className={`relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-[70px] lg:h-[70px] aspect-square flex items-center justify-center transition-colors focus:outline-none ${squareBackground} ${
         isSelected ? 'ring-4 ring-amber-400 ring-inset z-10' : activeHighlightClass
       }`}
       data-testid={`square-${position.row}-${position.col}`}

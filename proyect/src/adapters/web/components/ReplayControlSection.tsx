@@ -48,7 +48,7 @@ export function ReplayControlSection({
       aria-label="Controles de reproducción de partida"
       data-testid="replay-control-bar"
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-shrink-0">
         <div
           className="px-2 py-1 rounded-lg bg-zinc-800 text-zinc-200 text-xs font-bold border border-zinc-700 whitespace-nowrap"
           data-testid="replay-progress-indicator"
@@ -96,7 +96,7 @@ export function ReplayControlSection({
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 flex-shrink-0">
         {onExportMatch && (
           <ActionButton onClick={onExportMatch} testId="export-match-button" className="px-2.5 py-1 text-xs font-semibold bg-emerald-700 hover:bg-emerald-600 text-white">
             Exportar Partida
