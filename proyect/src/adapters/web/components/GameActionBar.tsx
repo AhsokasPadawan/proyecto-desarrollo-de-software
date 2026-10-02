@@ -9,6 +9,10 @@ export interface GameActionBarProps {
   readonly onReset: () => void;
   readonly onStartReplay?: () => void;
   readonly onExportMatch?: () => void;
+  readonly isClockEnabled?: boolean;
+  readonly isClockRunning?: boolean;
+  readonly isClockPaused?: boolean;
+  readonly onToggleClockPause?: () => void;
 }
 
 function CurvedArrowBackIcon(): JSX.Element {
@@ -50,6 +54,10 @@ export function GameActionBar({
   onReset,
   onStartReplay,
   onExportMatch,
+  isClockEnabled = false,
+  isClockRunning = false,
+  isClockPaused = false,
+  onToggleClockPause,
 }: GameActionBarProps): JSX.Element {
   return (
     <nav
@@ -57,25 +65,40 @@ export function GameActionBar({
       aria-label="Acciones de la partida"
       data-testid="game-action-bar"
     >
-      <ActionButton
-        onClick={onUndo}
-        disabled={!canUndo}
-        testId="undo-button"
-        className="px-3 py-1.5 text-xs flex items-center justify-center font-medium"
-      >
-        <CurvedArrowBackIcon />
-        <span>Deshacer</span>
-      </ActionButton>
+      {!isClockEnabled && (
+        <>
+          <ActionButton
+            onClick={onUndo}
+            disabled={!canUndo}
+            testId="undo-button"
+            className="px-3 py-1.5 text-xs flex items-center justify-center font-medium"
+          >
+            <CurvedArrowBackIcon />
+            <span>Deshacer</span>
+          </ActionButton>
 
-      <ActionButton
-        onClick={onRedo}
-        disabled={!canRedo}
-        testId="redo-button"
-        className="px-3 py-1.5 text-xs flex items-center justify-center font-medium"
-      >
-        <span>Rehacer</span>
-        <CurvedArrowForwardIcon />
-      </ActionButton>
+          <ActionButton
+            onClick={onRedo}
+            disabled={!canRedo}
+            testId="redo-button"
+            className="px-3 py-1.5 text-xs flex items-center justify-center font-medium"
+          >
+            <span>Rehacer</span>
+            <CurvedArrowForwardIcon />
+          </ActionButton>
+        </>
+      )}
+
+      {isClockEnabled && !isTerminalState && onToggleClockPause && (isClockRunning || isClockPaused) && (
+        <ActionButton
+          onClick={onToggleClockPause}
+          variant={isClockPaused ? 'primary' : 'default'}
+          testId="toggle-clock-pause-button"
+          className="px-3 py-1.5 text-xs font-semibold"
+        >
+          {isClockPaused ? 'Reanudar Tiempo' : 'Pausar Tiempo'}
+        </ActionButton>
+      )}
 
       <ActionButton
         onClick={onReset}

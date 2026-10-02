@@ -7,6 +7,7 @@ import { ControlSection } from './components/ControlSection';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { MoveHistoryTable } from './components/MoveHistoryTable';
 import { PlaybackSpeed, ReplayControlSection } from './components/ReplayControlSection';
+import { ClockConfigSection } from './components/ClockConfigSection';
 
 export interface ControlPanelViewProps {
   readonly snapshot: GameSnapshot;
@@ -25,6 +26,14 @@ export interface ControlPanelViewProps {
   readonly onGoToEnd?: () => void;
   readonly onSpeedChange?: (speed: PlaybackSpeed) => void;
   readonly onJumpToMove?: (targetIndex: number) => void;
+  readonly isClockEnabled?: boolean;
+  readonly isClockRunning?: boolean;
+  readonly whiteMinutes?: number;
+  readonly blackMinutes?: number;
+  readonly onToggleClock?: (enabled: boolean) => void;
+  readonly onWhiteMinutesChange?: (minutes: number) => void;
+  readonly onBlackMinutesChange?: (minutes: number) => void;
+  readonly onStartClockMatch?: () => void;
 }
 
 export const TURN_LABELS: Record<Color, string> = {
@@ -53,6 +62,14 @@ export function ControlPanelView({
   onGoToEnd,
   onSpeedChange,
   onJumpToMove,
+  isClockEnabled = false,
+  isClockRunning = false,
+  whiteMinutes = 10,
+  blackMinutes = 10,
+  onToggleClock,
+  onWhiteMinutesChange,
+  onBlackMinutesChange,
+  onStartClockMatch,
 }: ControlPanelViewProps): JSX.Element {
   const turnLabel = TURN_LABELS[snapshot.currentTurn] ?? snapshot.currentTurn;
   const turnBadgeClass = TURN_BADGES[snapshot.currentTurn] ?? 'bg-zinc-800 text-zinc-200';
@@ -111,6 +128,19 @@ export function ControlPanelView({
               />
             ))}
           </div>
+
+          {currentGameMode === 'HUMAN_VS_HUMAN' && onToggleClock && onWhiteMinutesChange && onBlackMinutesChange && onStartClockMatch && (
+            <ClockConfigSection
+              isClockEnabled={isClockEnabled}
+              isClockRunning={isClockRunning}
+              whiteMinutes={whiteMinutes}
+              blackMinutes={blackMinutes}
+              onToggleClock={onToggleClock}
+              onWhiteMinutesChange={onWhiteMinutesChange}
+              onBlackMinutesChange={onBlackMinutesChange}
+              onStartMatch={onStartClockMatch}
+            />
+          )}
         </ControlSection>
       ) : (
         <ControlSection title={`Historial de Jugadas (${snapshot.moveHistory.length})`} hasDivider>

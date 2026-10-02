@@ -85,4 +85,51 @@ describe('Web Adapter - GameActionBar', () => {
     fireEvent.click(exportButton);
     expect(handleExportMatch).toHaveBeenCalledTimes(1);
   });
+
+  it('hides undo and redo buttons and renders pause button when clock is active', () => {
+    const handleToggleClockPause = vi.fn();
+
+    render(
+      <GameActionBar
+        canUndo={true}
+        canRedo={true}
+        isTerminalState={false}
+        onUndo={() => {}}
+        onRedo={() => {}}
+        onReset={() => {}}
+        isClockEnabled={true}
+        isClockRunning={true}
+        isClockPaused={false}
+        onToggleClockPause={handleToggleClockPause}
+      />
+    );
+
+    expect(screen.queryByTestId('undo-button')).toBeNull();
+    expect(screen.queryByTestId('redo-button')).toBeNull();
+    const pauseButton = screen.getByTestId('toggle-clock-pause-button');
+    expect(pauseButton).toHaveTextContent('Pausar Tiempo');
+
+    fireEvent.click(pauseButton);
+    expect(handleToggleClockPause).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders resume button when clock is paused', () => {
+    render(
+      <GameActionBar
+        canUndo={false}
+        canRedo={false}
+        isTerminalState={false}
+        onUndo={() => {}}
+        onRedo={() => {}}
+        onReset={() => {}}
+        isClockEnabled={true}
+        isClockRunning={false}
+        isClockPaused={true}
+        onToggleClockPause={() => {}}
+      />
+    );
+
+    const resumeButton = screen.getByTestId('toggle-clock-pause-button');
+    expect(resumeButton).toHaveTextContent('Reanudar Tiempo');
+  });
 });

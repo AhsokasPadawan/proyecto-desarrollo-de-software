@@ -238,5 +238,47 @@ describe('Web Adapter - ChessApp Integration', () => {
     expect(screen.queryByTestId('replay-progress-indicator')).toBeNull();
     expect(screen.getByTestId('review-match-button')).toBeInTheDocument();
   });
+
+  it('supports chess clock match lifecycle with board locking and pause controls', () => {
+    render(<ChessApp />);
+
+    const clockToggle = screen.getByTestId('clock-enable-toggle');
+    fireEvent.click(clockToggle);
+
+    expect(screen.getByTestId('player-clock-white')).toBeInTheDocument();
+    expect(screen.getByTestId('player-clock-black')).toBeInTheDocument();
+    expect(screen.queryByTestId('undo-button')).toBeNull();
+    expect(screen.queryByTestId('redo-button')).toBeNull();
+
+    const whitePawn = screen.getByTestId('square-1-4');
+    fireEvent.click(whitePawn);
+    expect(whitePawn.className).not.toContain('ring-amber-400');
+
+    const startClockButton = screen.getByTestId('start-clock-match-button');
+    fireEvent.click(startClockButton);
+
+    expect(screen.getByTestId('player-clock-white')).toHaveClass('ring-2');
+
+    fireEvent.click(whitePawn);
+    expect(whitePawn.className).toContain('ring-amber-400');
+    fireEvent.click(screen.getByTestId('square-3-4'));
+
+    expect(screen.getByTestId('turn-indicator')).toHaveTextContent('Negras');
+    expect(screen.getByTestId('player-clock-black')).toHaveClass('ring-2');
+
+    const pauseButton = screen.getByTestId('toggle-clock-pause-button');
+    expect(pauseButton).toHaveTextContent('Pausar Tiempo');
+    fireEvent.click(pauseButton);
+
+    expect(pauseButton).toHaveTextContent('Reanudar Tiempo');
+    const blackPawn = screen.getByTestId('square-6-4');
+    fireEvent.click(blackPawn);
+    expect(blackPawn.className).not.toContain('ring-amber-400');
+
+    fireEvent.click(pauseButton);
+    expect(pauseButton).toHaveTextContent('Pausar Tiempo');
+    fireEvent.click(blackPawn);
+    expect(blackPawn.className).toContain('ring-amber-400');
+  });
 });
 

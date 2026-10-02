@@ -201,4 +201,32 @@ describe('Web Adapter - ControlPanelView', () => {
     fireEvent.click(screen.getByTestId('exit-replay-button'));
     expect(handleExitReplay).toHaveBeenCalledTimes(1);
   });
+
+  it('renders clock configuration section in human vs human mode when handlers are provided', () => {
+    const game = new ChessGame();
+    const snapshot = game.getSnapshot();
+    const handleToggleClock = vi.fn();
+    const handleWhiteMinutesChange = vi.fn();
+    const handleBlackMinutesChange = vi.fn();
+    const handleStartClockMatch = vi.fn();
+
+    render(
+      <ControlPanelView
+        snapshot={snapshot}
+        currentGameMode="HUMAN_VS_HUMAN"
+        feedbackMessage={null}
+        onModeChange={() => {}}
+        isClockEnabled={true}
+        whiteMinutes={10}
+        blackMinutes={10}
+        onToggleClock={handleToggleClock}
+        onWhiteMinutesChange={handleWhiteMinutesChange}
+        onBlackMinutesChange={handleBlackMinutesChange}
+        onStartClockMatch={handleStartClockMatch}
+      />
+    );
+
+    expect(screen.getByTestId('clock-enable-toggle')).toBeChecked();
+    expect(screen.getByTestId('start-clock-match-button')).toBeInTheDocument();
+  });
 });

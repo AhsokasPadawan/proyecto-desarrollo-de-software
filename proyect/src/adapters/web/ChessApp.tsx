@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, useSyncExternalStore } from 'react';
 import { Position } from '../../core/board/Position';
 import { ChessGame } from '../../core/game/ChessGame';
-import { PieceType } from '../../core/pieces/types';
+import { Color, PieceType } from '../../core/pieces/types';
 import { IGameEngine } from '../../core/ports/IGameEngine';
 import { MoveResult } from '../../core/ports/MoveResult';
 import { ChessBoardView } from './ChessBoardView';
@@ -9,7 +9,9 @@ import { ControlPanelView } from './ControlPanelView';
 import { PromotionModal } from './PromotionModal';
 import { AppHeader } from './components/AppHeader';
 import { GameActionBar } from './components/GameActionBar';
+import { PlayerClockBar } from './components/PlayerClockBar';
 import { PlaybackSpeed } from './components/ReplayControlSection';
+import { useChessClock } from './clock/useChessClock';
 import { getRejectionMessage } from './rejectionMessages';
 import { getStateLabel, isTerminalState } from './stateDisplayLookup';
 import { downloadTranscriptionFile, formatMatchTranscription, generateExportFilename } from './transcriptionFormatter';
@@ -34,7 +36,62 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
   const [isReplaying, setIsReplaying] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<PlaybackSpeed>(1000);
+  const [isClockEnabled, setIsClockEnabled] = useState(false);
+  const [whiteMinutes, setWhiteMinutes] = useState(10);
+  const [blackMinutes, setBlackMinutes] = useState(10);
   const playbackTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const handleTimeout = useCallback(
+    (timedOutColor: Color) => {
+      engine.declareTimeout(timedOutColor);
+      const winnerColor = timedOutColor === 'WHITE' ? 'Negras' : 'Blancas';
+      setFeedbackMessage(`¡Tiempo agotado! Victoria para ${winnerColor}.`);
+    },
+    [engine]
+  );
+
+  const clock = useChessClock({
+    isEnabled: isClockEnabled,
+    onTimeout: handleTimeout,
+  });
+
+  const handleToggleClock = useCallback(
+    (enabled: boolean) => {
+      setIsClockEnabled(enabled);
+      if (!enabled) {
+        clock.resetClock();
+      }
+    },
+    [clock]
+  );
+
+  const handleWhiteMinutesChange = useCallback(
+    (minutes: number) => {
+      setWhiteMinutes(minutes);
+      clock.setPlayerMinutes('WHITE', minutes);
+    },
+    [clock]
+  );
+
+  const handleBlackMinutesChange = useCallback(
+    (minutes: number) => {
+      setBlackMinutes(minutes);
+      clock.setPlayerMinutes('BLACK', minutes);
+    },
+    [clock]
+  );
+
+  const handleStartClockMatch = useCallback(() => {
+    clock.startClock('WHITE');
+  }, [clock]);
+
+  const handleToggleClockPause = useCallback(() => {
+    if (clock.clockStatus === 'RUNNING') {
+      clock.pauseClock();
+    } else if (clock.clockStatus === 'PAUSED') {
+      clock.resumeClock();
+    }
+  }, [clock]);
 
   const snapshot = useSyncExternalStore(
     useCallback(
@@ -84,15 +141,28 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
       if (!result.success) {
         setFeedbackMessage(getRejectionMessage(result.reason));
       } else {
+        const nextSnapshot = engine.getSnapshot();
+        if (isTerminalState(nextSnapshot.stateKind)) {
+          if (isClockEnabled) {
+            clock.pauseClock();
+          }
+        } else if (isClockEnabled && clock.clockStatus === 'RUNNING') {
+          clock.switchClockTurn(nextSnapshot.currentTurn);
+        }
         triggerAiMoveIfNeeded(engine, gameMode);
       }
     },
-    [clearSelection, engine, gameMode, triggerAiMoveIfNeeded]
+    [clearSelection, clock, engine, gameMode, isClockEnabled, triggerAiMoveIfNeeded]
   );
+
+  const isBoardLocked =
+    isReplaying ||
+    (isClockEnabled && clock.clockStatus !== 'RUNNING') ||
+    isTerminalState(snapshot.stateKind);
 
   const handleSquareClick = useCallback(
     (targetPosition: Position) => {
-      if (isReplaying) {
+      if (isBoardLocked) {
         return;
       }
 
@@ -132,7 +202,7 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
       const result = engine.makeMove(selectedPosition, targetPosition);
       processMoveOutcome(result);
     },
-    [clearSelection, engine, isReplaying, legalMoves, processMoveOutcome, selectedPosition, snapshot, updateSelection]
+    [clearSelection, engine, isBoardLocked, legalMoves, processMoveOutcome, selectedPosition, snapshot, updateSelection]
   );
 
   const handleSelectPromotionPiece = useCallback(
@@ -268,29 +338,33 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
   const handleReset = useCallback(() => {
     stopPlayback();
     setIsReplaying(false);
+    clock.resetClock();
     setEngine(engineFactory());
     clearSelection();
     setFeedbackMessage(null);
     setPendingPromotion(null);
-  }, [clearSelection, engineFactory, stopPlayback]);
+  }, [clearSelection, clock, engineFactory, stopPlayback]);
 
   const handleModeChange = useCallback(
     (newMode: GameMode) => {
       setGameMode(newMode);
       setFeedbackMessage(null);
       if (newMode !== 'HUMAN_VS_HUMAN') {
+        clock.resetClock();
+        setIsClockEnabled(false);
         const currentSnap = engine.getSnapshot();
         if (currentSnap.currentTurn === 'BLACK') {
           triggerAiMoveIfNeeded(engine, newMode);
         }
       }
     },
-    [engine, triggerAiMoveIfNeeded]
+    [clock, engine, triggerAiMoveIfNeeded]
   );
 
   const handleExportMatch = useCallback(() => {
     const activeModeConfig = GAME_MODES.find((mode) => mode.id === gameMode);
-    const modeLabel = activeModeConfig?.label ?? gameMode;
+    const baseLabel = activeModeConfig?.label ?? gameMode;
+    const modeLabel = isClockEnabled ? `${baseLabel} (Con Reloj)` : baseLabel;
     const resultLabel = getStateLabel(snapshot.stateKind);
     const content = formatMatchTranscription({
       modeLabel,
@@ -299,7 +373,7 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
     });
     const filename = generateExportFilename();
     downloadTranscriptionFile(filename, content);
-  }, [gameMode, snapshot.moveHistory, snapshot.stateKind]);
+  }, [gameMode, isClockEnabled, snapshot.moveHistory, snapshot.stateKind]);
 
   const activeMove =
     isReplaying && snapshot.currentMoveIndex > 0
@@ -315,14 +389,34 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
         <AppHeader />
 
         <div className="flex flex-col items-stretch justify-between gap-2.5 w-full max-w-[474px]">
+          {isClockEnabled && (
+            <PlayerClockBar
+              color="BLACK"
+              formattedTime={clock.blackFormatted}
+              isActive={clock.activeColor === 'BLACK' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
+              isLowTime={clock.isBlackLowTime}
+              isPaused={clock.clockStatus === 'PAUSED'}
+            />
+          )}
+
           <ChessBoardView
             snapshot={snapshot}
             selectedPosition={selectedPosition}
             legalMoves={legalMoves}
             onSquareClick={handleSquareClick}
             activeMoveSquares={activeMoveSquares}
-            readOnly={isReplaying}
+            readOnly={isBoardLocked}
           />
+
+          {isClockEnabled && (
+            <PlayerClockBar
+              color="WHITE"
+              formattedTime={clock.whiteFormatted}
+              isActive={clock.activeColor === 'WHITE' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
+              isLowTime={clock.isWhiteLowTime}
+              isPaused={clock.clockStatus === 'PAUSED'}
+            />
+          )}
 
           <GameActionBar
             canUndo={!isReplaying && snapshot.canUndo}
@@ -333,6 +427,10 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
             onReset={handleReset}
             onStartReplay={handleStartReplay}
             onExportMatch={handleExportMatch}
+            isClockEnabled={isClockEnabled}
+            isClockRunning={clock.clockStatus === 'RUNNING'}
+            isClockPaused={clock.clockStatus === 'PAUSED'}
+            onToggleClockPause={handleToggleClockPause}
           />
         </div>
 
@@ -352,6 +450,14 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
           onGoToEnd={handleGoToEnd}
           onSpeedChange={handleSpeedChange}
           onJumpToMove={handleJumpToMove}
+          isClockEnabled={isClockEnabled}
+          isClockRunning={clock.clockStatus === 'RUNNING'}
+          whiteMinutes={whiteMinutes}
+          blackMinutes={blackMinutes}
+          onToggleClock={handleToggleClock}
+          onWhiteMinutesChange={handleWhiteMinutesChange}
+          onBlackMinutesChange={handleBlackMinutesChange}
+          onStartClockMatch={handleStartClockMatch}
         />
       </main>
 

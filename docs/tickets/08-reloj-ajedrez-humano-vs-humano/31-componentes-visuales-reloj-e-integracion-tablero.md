@@ -11,14 +11,14 @@
 
 **Branch:** `ticket/31-componentes-visuales-reloj-e-integracion-tablero`
 
-**Status:** todo
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] `PlayerClockBar` renderiza el tiempo en formato digital `mm:ss` con ancho coincidente al tablero (474px) y estado visual activo.
-- [ ] La franja del reloj de Negras se posiciona arriba del tablero y la de Blancas debajo del tablero.
-- [ ] Cuando restan menos de 30 segundos, el reloj activo muestra estilos de advertencia (texto/borde rojo y animación sutil de pulso).
-- [ ] En `ControlPanelView` se ofrece la opción de activar el reloj antes de iniciar, con controles independientes para Blancas y Negras (presets 3m, 5m, 10m, 15m y `+`/`-`).
-- [ ] Al seleccionar jugar con reloj, los botones Deshacer y Rehacer desaparecen de `GameActionBar`.
-- [ ] Durante la partida con reloj, se provee el botón "Pausar Tiempo" / "Reanudar Tiempo"; al estar pausado, el tablero no permite realizar movimientos.
-- [ ] Se añaden pruebas de componentes en React Testing Library en `tests/adapters/PlayerClockBar.test.tsx` y `tests/adapters/ClockConfigSection.test.tsx`.
+- [x] `PlayerClockBar` renderiza el tiempo en formato digital `mm:ss` con ancho coincidente al tablero (474px) y estado visual activo.
+- [x] La franja del reloj de Negras se posiciona arriba del tablero y la de Blancas debajo del tablero.
+- [x] Cuando restan menos de 30 segundos, el reloj activo muestra estilos de advertencia (texto/borde rojo y animación sutil de pulso).
+- [x] En `ControlPanelView` se ofrece la opción de activar el reloj antes de iniciar, con controles independientes para Blancas y Negras (presets 3m, 5m, 10m, 15m y `+`/`-`).
+- [x] Al seleccionar jugar con reloj, los botones Deshacer y Rehacer desaparecen de `GameActionBar`.
+- [x] Durante la partida con reloj, se provee el botón "Pausar Tiempo" / "Reanudar Tiempo"; al estar pausado, el tablero no permite realizar movimientos.
+- [x] Se añaden pruebas de componentes en React Testing Library en `tests/adapters/PlayerClockBar.test.tsx` y `tests/adapters/ClockConfigSection.test.tsx`.
