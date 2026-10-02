@@ -14,6 +14,7 @@ import { InsufficientMaterialEvaluator } from './InsufficientMaterialEvaluator';
 import { MoveCommand } from './MoveCommand';
 import { NormalPlayState } from './NormalPlayState';
 import { PositionHasher } from './PositionHasher';
+import { TimeoutState } from './TimeoutState';
 
 interface TurnRecord {
   readonly state: IGameState;
@@ -223,6 +224,17 @@ export class ChessGame implements IGameEngine {
       capturedPiece: command.getCapturedPiece(),
       nextState: this.currentState.kind,
     };
+  }
+
+  declareTimeout(timedOutColor: Color): GameSnapshot {
+    if (!this.currentState.canAcceptMoves()) {
+      return this.getSnapshot();
+    }
+
+    this.currentState = new TimeoutState(timedOutColor);
+    this.cachedSnapshot = null;
+    this.notifyObservers();
+    return this.getSnapshot();
   }
 
   undo(): boolean {

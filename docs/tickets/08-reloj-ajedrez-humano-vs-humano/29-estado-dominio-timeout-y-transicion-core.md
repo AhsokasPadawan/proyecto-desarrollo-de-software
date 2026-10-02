@@ -6,12 +6,12 @@
 
 **Branch:** `ticket/29-estado-dominio-timeout-y-transicion-core`
 
-**Status:** todo
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Se añade el valor literal `'TIMEOUT'` al tipo `GameStateKind` en `src/core/ports/MoveResult.ts`.
-- [ ] Se implementa en `ChessGame` el método de dominio `declareTimeout(timedOutColor: Color): GameSnapshot`.
-- [ ] Al declarar el timeout, el estado interno transiciona a `TIMEOUT`, se asigna el ganador correspondiente (si Blancas agota tiempo gana Negras, y viceversa), y se notifica el snapshot actualizado a los observadores.
-- [ ] Ningún movimiento posterior es permitido una vez transicionado a `TIMEOUT`, retornando `{ success: false, reason: 'GAME_OVER' }`.
-- [ ] Se crean pruebas unitarias exhaustivas en `tests/core/TimeoutLoss.test.ts` verificando la transición, el ganador opuesto y la inviolabilidad del estado terminal.
+- [x] Se añade el valor literal `'TIMEOUT'` al tipo `GameStateKind` en `src/core/ports/MoveResult.ts`.
+- [x] Se implementa en `ChessGame` el método de dominio `declareTimeout(timedOutColor: Color): GameSnapshot`.
+- [x] Al declarar el timeout, el estado interno transiciona a `TIMEOUT`, se asigna el ganador correspondiente (si Blancas agota tiempo gana Negras, y viceversa), y se notifica el snapshot actualizado a los observadores.
+- [x] Ningún movimiento posterior es permitido una vez transicionado a `TIMEOUT`, retornando `{ success: false, reason: 'GAME_OVER' }`.
+- [x] Se crean pruebas unitarias exhaustivas en `tests/core/TimeoutLoss.test.ts` verificando la transición, el ganador opuesto y la inviolabilidad del estado terminal.

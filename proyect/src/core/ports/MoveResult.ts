@@ -1,6 +1,6 @@
 import { IPiece } from '../pieces/IPiece';
 
-export type GameStateKind = 'IN_PROGRESS' | 'CHECK' | 'CHECKMATE' | 'STALEMATE' | 'DRAW';
+export type GameStateKind = 'IN_PROGRESS' | 'CHECK' | 'CHECKMATE' | 'STALEMATE' | 'DRAW' | 'TIMEOUT';
 
 export type MoveRejectionReason =
   | 'GAME_OVER'

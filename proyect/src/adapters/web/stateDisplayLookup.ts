@@ -6,6 +6,7 @@ export const STATE_LABELS: Record<GameStateKind, string> = {
   CHECKMATE: '¡Jaque Mate! Partida Finalizada',
   STALEMATE: 'Tablas por Ahogado',
   DRAW: 'Tablas Declaradas',
+  TIMEOUT: 'Tiempo Agotado',
 };
 
 export const STATE_BADGE_CLASSES: Record<GameStateKind, string> = {
@@ -14,6 +15,7 @@ export const STATE_BADGE_CLASSES: Record<GameStateKind, string> = {
   CHECKMATE: 'bg-red-950/90 text-red-200 border-red-500 font-bold shadow-lg shadow-red-950/50',
   STALEMATE: 'bg-blue-950/90 text-blue-200 border-blue-500 font-semibold',
   DRAW: 'bg-zinc-900 text-zinc-300 border-zinc-600 font-semibold',
+  TIMEOUT: 'bg-red-950/90 text-red-200 border-red-500 font-bold shadow-lg shadow-red-950/50',
 };
 
 export function getStateLabel(stateKind: GameStateKind): string {
@@ -25,6 +27,6 @@ export function getStateBadgeClass(stateKind: GameStateKind): string {
 }
 
 export function isTerminalState(stateKind: GameStateKind): boolean {
-  return stateKind === 'CHECKMATE' || stateKind === 'STALEMATE' || stateKind === 'DRAW';
+  return stateKind === 'CHECKMATE' || stateKind === 'STALEMATE' || stateKind === 'DRAW' || stateKind === 'TIMEOUT';
 }
 
