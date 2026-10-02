@@ -9,6 +9,7 @@ import { ControlPanelView } from './ControlPanelView';
 import { PromotionModal } from './PromotionModal';
 import { AppHeader } from './components/AppHeader';
 import { GameActionBar } from './components/GameActionBar';
+import { GameLayout } from './components/GameLayout';
 import { PlayerClockBar } from './components/PlayerClockBar';
 import { PlaybackSpeed, ReplayControlSection } from './components/ReplayControlSection';
 import { useChessClock } from './clock/useChessClock';
@@ -381,109 +382,119 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
     ? { from: activeMove.from, to: activeMove.to }
     : null;
 
-  const boardMaxDimension = isClockEnabled
+  const boardMaxWidth = isClockEnabled
     ? 'min(480px, calc(100dvh - 210px))'
     : 'min(520px, calc(100dvh - 130px))';
 
+  const boardColumnHeight = isReplaying
+    ? isClockEnabled
+      ? `calc(${boardMaxWidth} + 84px)`
+      : boardMaxWidth
+    : isClockEnabled
+      ? `calc(${boardMaxWidth} + 136px)`
+      : `calc(${boardMaxWidth} + 52px)`;
+
+  const boardArea = (
+    <>
+      {isClockEnabled && (
+        <PlayerClockBar
+          color="BLACK"
+          formattedTime={clock.blackFormatted}
+          isActive={!isReplaying && clock.activeColor === 'BLACK' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
+          isLowTime={!isReplaying && clock.isBlackLowTime}
+          isPaused={!isReplaying && clock.clockStatus === 'PAUSED'}
+        />
+      )}
+
+      <ChessBoardView
+        snapshot={snapshot}
+        selectedPosition={selectedPosition}
+        legalMoves={legalMoves}
+        onSquareClick={handleSquareClick}
+        activeMoveSquares={activeMoveSquares}
+        readOnly={isBoardLocked}
+      />
+
+      {isClockEnabled && (
+        <PlayerClockBar
+          color="WHITE"
+          formattedTime={clock.whiteFormatted}
+          isActive={!isReplaying && clock.activeColor === 'WHITE' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
+          isLowTime={!isReplaying && clock.isWhiteLowTime}
+          isPaused={!isReplaying && clock.clockStatus === 'PAUSED'}
+        />
+      )}
+
+      {!isReplaying && (
+        <GameActionBar
+          canUndo={snapshot.canUndo}
+          canRedo={snapshot.canRedo}
+          isTerminalState={isTerminalState(snapshot.stateKind)}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          onReset={handleReset}
+          onStartReplay={handleStartReplay}
+          onExportMatch={handleExportMatch}
+          isClockEnabled={isClockEnabled}
+          isClockRunning={clock.clockStatus === 'RUNNING'}
+          isClockPaused={clock.clockStatus === 'PAUSED'}
+          onToggleClockPause={handleToggleClockPause}
+        />
+      )}
+    </>
+  );
+
+  const controlPanel = (
+    <ControlPanelView
+      snapshot={snapshot}
+      currentGameMode={gameMode}
+      feedbackMessage={feedbackMessage}
+      onModeChange={handleModeChange}
+      isReplaying={isReplaying}
+      isPlaying={isPlaying}
+      playbackSpeed={playbackSpeed}
+      onJumpToMove={handleJumpToMove}
+      clockConfig={{
+        isClockEnabled,
+        isClockRunning: clock.clockStatus === 'RUNNING',
+        whiteMinutes,
+        blackMinutes,
+        onToggleClock: handleToggleClock,
+        onWhiteMinutesChange: handleWhiteMinutesChange,
+        onBlackMinutesChange: handleBlackMinutesChange,
+        onStartMatch: handleStartClockMatch,
+      }}
+    />
+  );
+
+  const replayBar = isReplaying ? (
+    <ReplayControlSection
+      currentMoveIndex={snapshot.currentMoveIndex}
+      totalMoves={snapshot.moveHistory.length}
+      isPlaying={isPlaying}
+      playbackSpeed={playbackSpeed}
+      onGoToStart={handleGoToStart}
+      onStepBackward={handleStepBackward}
+      onTogglePlay={handleTogglePlay}
+      onStepForward={handleStepForward}
+      onGoToEnd={handleGoToEnd}
+      onSpeedChange={handleSpeedChange}
+      onExitReplay={handleExitReplay}
+      onReset={handleReset}
+      onExportMatch={handleExportMatch}
+    />
+  ) : undefined;
+
   return (
-    <div className="min-h-screen lg:h-screen w-full bg-zinc-950 text-zinc-100 flex items-center justify-center p-2 sm:p-3 overflow-x-hidden lg:overflow-hidden">
-      <main className="w-full max-w-[1240px] flex flex-col lg:flex-row items-center lg:items-start justify-center gap-3 lg:gap-5">
-        <AppHeader />
-
-        <div className="flex flex-col items-center gap-2.5 w-full max-w-[860px]">
-          <div className="flex flex-col lg:flex-row items-stretch justify-center gap-3 lg:gap-5 w-full">
-            <div
-              className="flex flex-col items-stretch gap-2 w-full"
-              style={{ maxWidth: boardMaxDimension }}
-            >
-              {isClockEnabled && (
-                <PlayerClockBar
-                  color="BLACK"
-                  formattedTime={clock.blackFormatted}
-                  isActive={!isReplaying && clock.activeColor === 'BLACK' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
-                  isLowTime={!isReplaying && clock.isBlackLowTime}
-                  isPaused={!isReplaying && clock.clockStatus === 'PAUSED'}
-                />
-              )}
-
-              <ChessBoardView
-                snapshot={snapshot}
-                selectedPosition={selectedPosition}
-                legalMoves={legalMoves}
-                onSquareClick={handleSquareClick}
-                activeMoveSquares={activeMoveSquares}
-                readOnly={isBoardLocked}
-              />
-
-              {isClockEnabled && (
-                <PlayerClockBar
-                  color="WHITE"
-                  formattedTime={clock.whiteFormatted}
-                  isActive={!isReplaying && clock.activeColor === 'WHITE' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
-                  isLowTime={!isReplaying && clock.isWhiteLowTime}
-                  isPaused={!isReplaying && clock.clockStatus === 'PAUSED'}
-                />
-              )}
-
-              {!isReplaying && (
-                <GameActionBar
-                  canUndo={snapshot.canUndo}
-                  canRedo={snapshot.canRedo}
-                  isTerminalState={isTerminalState(snapshot.stateKind)}
-                  onUndo={handleUndo}
-                  onRedo={handleRedo}
-                  onReset={handleReset}
-                  onStartReplay={handleStartReplay}
-                  onExportMatch={handleExportMatch}
-                  isClockEnabled={isClockEnabled}
-                  isClockRunning={clock.clockStatus === 'RUNNING'}
-                  isClockPaused={clock.clockStatus === 'PAUSED'}
-                  onToggleClockPause={handleToggleClockPause}
-                />
-              )}
-            </div>
-
-            <ControlPanelView
-              snapshot={snapshot}
-              currentGameMode={gameMode}
-              feedbackMessage={feedbackMessage}
-              onModeChange={handleModeChange}
-              isReplaying={isReplaying}
-              isPlaying={isPlaying}
-              playbackSpeed={playbackSpeed}
-              onJumpToMove={handleJumpToMove}
-              clockConfig={{
-                isClockEnabled,
-                isClockRunning: clock.clockStatus === 'RUNNING',
-                whiteMinutes,
-                blackMinutes,
-                onToggleClock: handleToggleClock,
-                onWhiteMinutesChange: handleWhiteMinutesChange,
-                onBlackMinutesChange: handleBlackMinutesChange,
-                onStartMatch: handleStartClockMatch,
-              }}
-            />
-          </div>
-
-          {isReplaying && (
-            <ReplayControlSection
-              currentMoveIndex={snapshot.currentMoveIndex}
-              totalMoves={snapshot.moveHistory.length}
-              isPlaying={isPlaying}
-              playbackSpeed={playbackSpeed}
-              onGoToStart={handleGoToStart}
-              onStepBackward={handleStepBackward}
-              onTogglePlay={handleTogglePlay}
-              onStepForward={handleStepForward}
-              onGoToEnd={handleGoToEnd}
-              onSpeedChange={handleSpeedChange}
-              onExitReplay={handleExitReplay}
-              onReset={handleReset}
-              onExportMatch={handleExportMatch}
-            />
-          )}
-        </div>
-      </main>
+    <>
+      <GameLayout
+        header={<AppHeader />}
+        boardArea={boardArea}
+        controlPanel={controlPanel}
+        replayBar={replayBar}
+        boardMaxWidth={boardMaxWidth}
+        boardColumnHeight={boardColumnHeight}
+      />
 
       <PromotionModal
         color={snapshot.currentTurn}
@@ -491,6 +502,6 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
         onSelectPiece={handleSelectPromotionPiece}
         onCancel={handleCancelPromotion}
       />
-    </div>
+    </>
   );
 }
