@@ -14,11 +14,11 @@ export function MoveHistoryTable({
   onJumpToMove,
 }: MoveHistoryTableProps): JSX.Element {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 flex-1 min-h-0">
       <MoveHighlightLegend />
 
       <div
-        className="max-h-56 overflow-y-auto border border-zinc-800 rounded-lg bg-zinc-950/60 shadow-inner"
+        className="flex-1 min-h-[220px] overflow-y-auto border border-zinc-800 rounded-lg bg-zinc-950/60 shadow-inner"
         data-testid="replay-move-list"
       >
         {moveHistory.length === 0 ? (
@@ -32,16 +32,15 @@ export function MoveHistoryTable({
           <table className="w-full text-left border-collapse text-xs">
             <thead className="sticky top-0 bg-zinc-900 border-b border-zinc-800 text-zinc-400 z-10 shadow-sm">
               <tr>
-                <th className="py-1.5 px-2 text-center w-7">#</th>
-                <th className="py-1.5 px-1">Bando</th>
-                <th className="py-1.5 px-1">Pieza</th>
-                <th className="py-1.5 px-1 text-center">
+                <th className="py-1.5 px-2 text-center w-8">#</th>
+                <th className="py-1.5 px-2 text-left">Bando</th>
+                <th className="py-1.5 px-2 text-left">Pieza</th>
+                <th className="py-1.5 px-2 text-center">
                   <span className="text-sky-300 font-bold">Desde</span>
                 </th>
-                <th className="py-1.5 px-1 text-center">
+                <th className="py-1.5 px-2 text-center">
                   <span className="text-amber-300 font-bold">Hasta</span>
                 </th>
-                <th className="py-1.5 px-2 text-right">Detalle</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60">
@@ -66,12 +65,12 @@ export function MoveHistoryTable({
                         : 'text-zinc-300 hover:bg-zinc-800/60'
                     }`}
                   >
-                    <td className="py-1.5 px-2 text-center text-zinc-400 font-mono">
+                    <td className="py-1.5 px-2 text-center text-zinc-400 font-mono w-8">
                       {isActive ? '▶' : moveNumber}
                     </td>
-                    <td className="py-1.5 px-1">
+                    <td className="py-1.5 px-2 text-left">
                       <span
-                        className={`inline-block px-1 py-0.5 rounded text-[10px] font-bold ${
+                        className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${
                           isWhite
                             ? 'bg-amber-100/90 text-amber-950'
                             : 'bg-zinc-800 text-zinc-200 border border-zinc-700'
@@ -80,38 +79,16 @@ export function MoveHistoryTable({
                         {teamLabel}
                       </span>
                     </td>
-                    <td className="py-1.5 px-1 font-medium">{pieceName}</td>
-                    <td className="py-1.5 px-1 text-center">
+                    <td className="py-1.5 px-2 text-left font-medium">{pieceName}</td>
+                    <td className="py-1.5 px-2 text-center">
                       <span className="font-mono px-1.5 py-0.5 rounded text-sky-300 bg-sky-950/70 border border-sky-600/40">
                         {record.from}
                       </span>
                     </td>
-                    <td className="py-1.5 px-1 text-center">
+                    <td className="py-1.5 px-2 text-center">
                       <span className="font-mono px-1.5 py-0.5 rounded text-amber-300 bg-amber-950/70 border border-amber-600/40">
                         {record.to}
                       </span>
-                    </td>
-                    <td className="py-1.5 px-2 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {record.isCastling && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-950/70 text-purple-300 border border-purple-700/50">
-                            Enroque
-                          </span>
-                        )}
-                        {record.capturedPiece && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-red-950/70 text-red-300 border border-red-700/50">
-                            Captura
-                          </span>
-                        )}
-                        {record.isPromotion && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-950/70 text-indigo-300 border border-indigo-700/50">
-                            Coronación
-                          </span>
-                        )}
-                        {!record.isCastling && !record.isPromotion && !record.capturedPiece && (
-                          <span className="text-zinc-600">-</span>
-                        )}
-                      </div>
                     </td>
                   </tr>
                 );

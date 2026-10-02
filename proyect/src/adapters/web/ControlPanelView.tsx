@@ -95,8 +95,8 @@ export function ControlPanelView({
   );
 
   return (
-    <aside className="w-full lg:w-72 xl:w-80 h-full flex flex-col justify-between gap-3 p-4 bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md">
-      <div className="flex flex-col gap-2.5">
+    <aside className="w-full lg:w-72 xl:w-80 h-full flex flex-col gap-3 p-4 bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md">
+      <div className="flex flex-col gap-2.5 flex-1 min-h-0">
         <header className="border-b border-zinc-800 pb-2">
           <h2 className="text-lg font-bold text-zinc-100 tracking-tight">Panel de Partida</h2>
         </header>
@@ -151,7 +151,7 @@ export function ControlPanelView({
           )}
         </ControlSection>
       ) : (
-        <ControlSection title={`Historial de Jugadas (${snapshot.moveHistory.length})`} hasDivider>
+        <ControlSection title={`Historial de Jugadas (${snapshot.moveHistory.length})`} hasDivider className="flex-1 flex flex-col min-h-0">
           <MoveHistoryTable
             moveHistory={snapshot.moveHistory}
             currentMoveIndex={snapshot.currentMoveIndex}
