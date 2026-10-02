@@ -14,11 +14,11 @@ export function MoveHistoryTable({
   onJumpToMove,
 }: MoveHistoryTableProps): JSX.Element {
   return (
-    <div className="flex flex-col gap-2 flex-1 min-h-0">
+    <div className="flex flex-col gap-2 flex-1 min-h-0 h-0">
       <MoveHighlightLegend />
 
       <div
-        className="flex-1 min-h-[220px] overflow-y-auto border border-zinc-800 rounded-lg bg-zinc-950/60 shadow-inner"
+        className="flex-1 h-0 min-h-0 overflow-y-auto border border-zinc-800 rounded-lg bg-zinc-950/60 shadow-inner"
         data-testid="replay-move-list"
       >
         {moveHistory.length === 0 ? (

@@ -381,14 +381,21 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
     ? { from: activeMove.from, to: activeMove.to }
     : null;
 
+  const boardMaxDimension = isClockEnabled
+    ? 'min(480px, calc(100dvh - 210px))'
+    : 'min(520px, calc(100dvh - 130px))';
+
   return (
-    <div className="min-h-screen lg:h-screen w-full bg-zinc-950 text-zinc-100 flex items-center justify-center p-3 lg:p-6 overflow-x-hidden lg:overflow-hidden">
-      <main className="w-full max-w-[1240px] flex flex-col lg:flex-row items-center lg:items-start justify-center gap-4 lg:gap-6">
+    <div className="min-h-screen lg:h-screen w-full bg-zinc-950 text-zinc-100 flex items-center justify-center p-2 sm:p-3 overflow-x-hidden lg:overflow-hidden">
+      <main className="w-full max-w-[1240px] flex flex-col lg:flex-row items-center lg:items-start justify-center gap-3 lg:gap-5">
         <AppHeader />
 
-        <div className="flex flex-col items-center gap-3 w-full max-w-[820px] lg:max-w-[930px]">
-          <div className="flex flex-col lg:flex-row items-stretch justify-center gap-4 lg:gap-6 w-full">
-            <div className="flex flex-col items-stretch gap-2.5 w-full max-w-[474px] lg:max-w-[586px]">
+        <div className="flex flex-col items-center gap-2.5 w-full max-w-[860px]">
+          <div className="flex flex-col lg:flex-row items-stretch justify-center gap-3 lg:gap-5 w-full">
+            <div
+              className="flex flex-col items-stretch gap-2 w-full"
+              style={{ maxWidth: boardMaxDimension }}
+            >
               {isClockEnabled && (
                 <PlayerClockBar
                   color="BLACK"

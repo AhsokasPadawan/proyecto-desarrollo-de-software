@@ -41,11 +41,12 @@ export function ChessBoardView({
 
   return (
     <div className="flex flex-col items-center justify-center select-none w-full">
-      <div className="relative border-4 border-zinc-800 rounded-xl shadow-2xl bg-zinc-900 p-2 w-full flex items-center justify-center">
+      <div className="relative border-4 border-zinc-800 rounded-xl shadow-2xl bg-zinc-900 p-2 w-full aspect-square flex items-center justify-center">
         <div
-          className="grid gap-0 border border-zinc-700/60 rounded overflow-hidden"
+          className="grid gap-0 border border-zinc-700/60 rounded overflow-hidden w-full h-full aspect-square"
           style={{
             gridTemplateColumns: `repeat(${snapshot.cols}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${snapshot.rows}, minmax(0, 1fr))`,
           }}
           data-testid="chess-grid"
         >
