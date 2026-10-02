@@ -310,11 +310,11 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
     : null;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-4 md:p-8">
-      <AppHeader />
+    <div className="min-h-screen lg:h-screen w-full bg-zinc-950 text-zinc-100 flex items-center justify-center p-3 lg:p-6 overflow-x-hidden lg:overflow-hidden">
+      <main className="w-full max-w-[1240px] flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-4 lg:gap-6">
+        <AppHeader />
 
-      <main className="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8">
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-stretch justify-between gap-2.5 w-full max-w-[474px]">
           <ChessBoardView
             snapshot={snapshot}
             selectedPosition={selectedPosition}
@@ -324,18 +324,16 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
             readOnly={isReplaying}
           />
 
-          {!isReplaying && (
-            <GameActionBar
-              canUndo={snapshot.canUndo}
-              canRedo={snapshot.canRedo}
-              isTerminalState={isTerminalState(snapshot.stateKind)}
-              onUndo={handleUndo}
-              onRedo={handleRedo}
-              onReset={handleReset}
-              onStartReplay={handleStartReplay}
-              onExportMatch={handleExportMatch}
-            />
-          )}
+          <GameActionBar
+            canUndo={!isReplaying && snapshot.canUndo}
+            canRedo={!isReplaying && snapshot.canRedo}
+            isTerminalState={isTerminalState(snapshot.stateKind)}
+            onUndo={handleUndo}
+            onRedo={handleRedo}
+            onReset={handleReset}
+            onStartReplay={handleStartReplay}
+            onExportMatch={handleExportMatch}
+          />
         </div>
 
         <ControlPanelView

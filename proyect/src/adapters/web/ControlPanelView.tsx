@@ -61,10 +61,11 @@ export function ControlPanelView({
   const hasGameStarted = snapshot.moveHistory.length > 0;
 
   return (
-    <aside className="w-full max-w-sm flex flex-col gap-4 p-5 bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md">
-      <header className="border-b border-zinc-800 pb-3">
-        <h2 className="text-xl font-bold text-zinc-100 tracking-tight">Panel de Partida</h2>
-      </header>
+    <aside className="w-full lg:w-72 xl:w-80 h-full flex flex-col justify-between gap-3 p-4 bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md">
+      <div className="flex flex-col gap-2.5">
+        <header className="border-b border-zinc-800 pb-2">
+          <h2 className="text-lg font-bold text-zinc-100 tracking-tight">Panel de Partida</h2>
+        </header>
 
       <ControlSection title="Estado de Partida">
         <div className="grid grid-cols-2 gap-2">
@@ -120,21 +121,24 @@ export function ControlPanelView({
           />
         </ControlSection>
       )}
+      </div>
 
       {isReplaying && onExitReplay && onGoToStart && onStepBackward && onTogglePlay && onStepForward && onGoToEnd && onSpeedChange && (
-        <ReplayControlSection
-          currentMoveIndex={snapshot.currentMoveIndex}
-          totalMoves={snapshot.moveHistory.length}
-          isPlaying={isPlaying}
-          playbackSpeed={playbackSpeed}
-          onGoToStart={onGoToStart}
-          onStepBackward={onStepBackward}
-          onTogglePlay={onTogglePlay}
-          onStepForward={onStepForward}
-          onGoToEnd={onGoToEnd}
-          onSpeedChange={onSpeedChange}
-          onExitReplay={onExitReplay}
-        />
+        <div className="mt-auto pt-2 border-t border-zinc-800">
+          <ReplayControlSection
+            currentMoveIndex={snapshot.currentMoveIndex}
+            totalMoves={snapshot.moveHistory.length}
+            isPlaying={isPlaying}
+            playbackSpeed={playbackSpeed}
+            onGoToStart={onGoToStart}
+            onStepBackward={onStepBackward}
+            onTogglePlay={onTogglePlay}
+            onStepForward={onStepForward}
+            onGoToEnd={onGoToEnd}
+            onSpeedChange={onSpeedChange}
+            onExitReplay={onExitReplay}
+          />
+        </div>
       )}
     </aside>
   );

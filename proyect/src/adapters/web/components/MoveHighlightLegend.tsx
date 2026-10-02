@@ -6,29 +6,29 @@ export interface MoveHighlightLegendProps {
 export function MoveHighlightLegend({
   originAlgebraic,
   destinationAlgebraic,
-}: MoveHighlightLegendProps): JSX.Element {
+}: MoveHighlightLegendProps = {}): JSX.Element {
   return (
     <div
-      className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs text-zinc-200 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-lg shadow-md"
+      className="flex flex-col gap-1.5 text-xs text-zinc-200 bg-zinc-950/60 border border-zinc-800 px-3 py-2 rounded-lg"
       data-testid="move-highlight-legend"
     >
-      <div className="flex items-center gap-2">
-        <span className="w-3.5 h-3.5 rounded border border-sky-400 bg-sky-500 ring-2 ring-sky-400/50 flex-shrink-0" />
-        <span>
-          <strong className="text-sky-300 font-bold">
-            Origen (From{originAlgebraic ? `: ${originAlgebraic}` : ''}):
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm border border-sky-400 bg-sky-500 ring-1 ring-sky-400/50 flex-shrink-0" />
+          <strong className="text-sky-300 font-semibold text-[11px]">
+            {originAlgebraic ? `Origen (From: ${originAlgebraic}):` : 'Origen (From):'}
           </strong>
-          <span className="text-zinc-400 ml-1">Casilla de salida</span>
-        </span>
+        </div>
+        <span className="text-zinc-400 text-[11px]">Casilla de salida</span>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="w-3.5 h-3.5 rounded border border-amber-400 bg-amber-500 ring-2 ring-amber-400/50 flex-shrink-0" />
-        <span>
-          <strong className="text-amber-300 font-bold">
-            Destino (To{destinationAlgebraic ? `: ${destinationAlgebraic}` : ''}):
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm border border-amber-400 bg-amber-500 ring-1 ring-amber-400/50 flex-shrink-0" />
+          <strong className="text-amber-300 font-semibold text-[11px]">
+            {destinationAlgebraic ? `Destino (To: ${destinationAlgebraic}):` : 'Destino (To):'}
           </strong>
-          <span className="text-zinc-400 ml-1">Casilla de llegada</span>
-        </span>
+        </div>
+        <span className="text-zinc-400 text-[11px]">Casilla de llegada</span>
       </div>
     </div>
   );

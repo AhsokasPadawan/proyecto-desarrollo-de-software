@@ -1,7 +1,6 @@
 import { Position } from '../../core/board/Position';
 import { GameSnapshot } from '../../core/ports/GameSnapshot';
 import { ChessSquare } from './components/ChessSquare';
-import { MoveHighlightLegend } from './components/MoveHighlightLegend';
 
 export interface ChessBoardViewProps {
   readonly snapshot: GameSnapshot;
@@ -41,8 +40,8 @@ export function ChessBoardView({
     : null;
 
   return (
-    <div className="flex flex-col items-center justify-center p-3 select-none">
-      <div className="relative border-4 border-zinc-800 rounded-lg shadow-2xl bg-zinc-900 p-2">
+    <div className="flex flex-col items-center justify-center select-none w-full">
+      <div className="relative border-4 border-zinc-800 rounded-xl shadow-2xl bg-zinc-900 p-2 w-full flex items-center justify-center">
         <div
           className="grid gap-0 border border-zinc-700/60 rounded overflow-hidden"
           style={{
@@ -96,15 +95,6 @@ export function ChessBoardView({
           )}
         </div>
       </div>
-
-      {activeMoveSquares && (
-        <div className="mt-3">
-          <MoveHighlightLegend
-            originAlgebraic={activeMoveSquares.from}
-            destinationAlgebraic={activeMoveSquares.to}
-          />
-        </div>
-      )}
     </div>
   );
 }
