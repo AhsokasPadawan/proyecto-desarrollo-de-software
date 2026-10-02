@@ -35,7 +35,7 @@ export function ActionButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`px-3 py-2 rounded-lg text-xs font-semibold border disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${variantClass} ${className}`.trim()}
+      className={`px-3 py-2 rounded-lg text-xs font-semibold border disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap ${variantClass} ${className}`.trim()}
       data-testid={testId}
     >
       {children}
