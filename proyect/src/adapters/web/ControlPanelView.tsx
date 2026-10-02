@@ -7,7 +7,7 @@ import { ControlSection } from './components/ControlSection';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { MoveHistoryTable } from './components/MoveHistoryTable';
 import { PlaybackSpeed, ReplayControlSection } from './components/ReplayControlSection';
-import { ClockConfigSection } from './components/ClockConfigSection';
+import { ClockConfigSection, ClockConfigSectionProps } from './components/ClockConfigSection';
 
 export interface ControlPanelViewProps {
   readonly snapshot: GameSnapshot;
@@ -26,6 +26,7 @@ export interface ControlPanelViewProps {
   readonly onGoToEnd?: () => void;
   readonly onSpeedChange?: (speed: PlaybackSpeed) => void;
   readonly onJumpToMove?: (targetIndex: number) => void;
+  readonly clockConfig?: ClockConfigSectionProps;
   readonly isClockEnabled?: boolean;
   readonly isClockRunning?: boolean;
   readonly whiteMinutes?: number;
@@ -62,6 +63,7 @@ export function ControlPanelView({
   onGoToEnd,
   onSpeedChange,
   onJumpToMove,
+  clockConfig,
   isClockEnabled = false,
   isClockRunning = false,
   whiteMinutes = 10,
@@ -76,6 +78,21 @@ export function ControlPanelView({
   const stateLabel = getStateLabel(snapshot.stateKind, snapshot.winner);
   const stateBadgeClass = getStateBadgeClass(snapshot.stateKind);
   const hasGameStarted = snapshot.moveHistory.length > 0;
+
+  const effectiveClockConfig: ClockConfigSectionProps | null = clockConfig ?? (
+    onToggleClock && onWhiteMinutesChange && onBlackMinutesChange && onStartClockMatch
+      ? {
+          isClockEnabled,
+          isClockRunning,
+          whiteMinutes,
+          blackMinutes,
+          onToggleClock,
+          onWhiteMinutesChange,
+          onBlackMinutesChange,
+          onStartMatch: onStartClockMatch,
+        }
+      : null
+  );
 
   return (
     <aside className="w-full lg:w-72 xl:w-80 h-full flex flex-col justify-between gap-3 p-4 bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md">
@@ -129,17 +146,8 @@ export function ControlPanelView({
             ))}
           </div>
 
-          {currentGameMode === 'HUMAN_VS_HUMAN' && onToggleClock && onWhiteMinutesChange && onBlackMinutesChange && onStartClockMatch && (
-            <ClockConfigSection
-              isClockEnabled={isClockEnabled}
-              isClockRunning={isClockRunning}
-              whiteMinutes={whiteMinutes}
-              blackMinutes={blackMinutes}
-              onToggleClock={onToggleClock}
-              onWhiteMinutesChange={onWhiteMinutesChange}
-              onBlackMinutesChange={onBlackMinutesChange}
-              onStartMatch={onStartClockMatch}
-            />
+          {currentGameMode === 'HUMAN_VS_HUMAN' && effectiveClockConfig && (
+            <ClockConfigSection {...effectiveClockConfig} />
           )}
         </ControlSection>
       ) : (

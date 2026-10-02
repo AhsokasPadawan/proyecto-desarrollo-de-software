@@ -18,6 +18,30 @@ const BADGE_COLOR_CLASSES: Record<Color, string> = {
   BLACK: 'bg-zinc-950 text-zinc-100 border-zinc-700 font-bold',
 };
 
+export type ClockVisualState = 'LOW_TIME' | 'ACTIVE' | 'INACTIVE';
+
+export const CLOCK_BAR_STYLES: Record<ClockVisualState, string> = {
+  LOW_TIME: 'bg-red-950/80 border-red-500 ring-2 ring-red-500/60 shadow-lg shadow-red-950/50 animate-pulse',
+  ACTIVE: 'bg-zinc-900 border-emerald-500 ring-2 ring-emerald-500/50 shadow-lg shadow-emerald-950/30',
+  INACTIVE: 'bg-zinc-900/80 border-zinc-800 opacity-80',
+};
+
+export const CLOCK_TIME_STYLES: Record<ClockVisualState, string> = {
+  LOW_TIME: 'text-red-300',
+  ACTIVE: 'text-emerald-300',
+  INACTIVE: 'text-zinc-300',
+};
+
+export function resolveClockVisualState(isActive: boolean, isLowTime: boolean): ClockVisualState {
+  if (isActive && isLowTime) {
+    return 'LOW_TIME';
+  }
+  if (isActive) {
+    return 'ACTIVE';
+  }
+  return 'INACTIVE';
+}
+
 export function PlayerClockBar({
   color,
   formattedTime,
@@ -27,18 +51,9 @@ export function PlayerClockBar({
 }: PlayerClockBarProps): JSX.Element {
   const label = PLAYER_LABELS[color];
   const badgeClass = BADGE_COLOR_CLASSES[color];
-
-  const stateClass = isLowTime && isActive
-    ? 'bg-red-950/80 border-red-500 ring-2 ring-red-500/60 shadow-lg shadow-red-950/50 animate-pulse'
-    : isActive
-    ? 'bg-zinc-900 border-emerald-500 ring-2 ring-emerald-500/50 shadow-lg shadow-emerald-950/30'
-    : 'bg-zinc-900/80 border-zinc-800 opacity-80';
-
-  const timeColorClass = isLowTime && isActive
-    ? 'text-red-300'
-    : isActive
-    ? 'text-emerald-300'
-    : 'text-zinc-300';
+  const visualState = resolveClockVisualState(isActive, isLowTime);
+  const stateClass = CLOCK_BAR_STYLES[visualState];
+  const timeColorClass = CLOCK_TIME_STYLES[visualState];
 
   return (
     <div

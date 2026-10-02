@@ -111,11 +111,11 @@ describe('transcriptionFormatter', () => {
   it('formats a match transcription with clock mode and timeout loss victory', () => {
     const output = formatMatchTranscription({
       modeLabel: 'Humano vs Humano (Con Reloj)',
-      resultLabel: 'Tiempo Agotado — Victoria de Blancas',
+      resultLabel: 'Victoria de Blancas por Tiempo Agotado',
       moveHistory: [],
     });
 
     expect(output).toContain('Modo de Juego: Humano vs Humano (Con Reloj)');
-    expect(output).toContain('Resultado: Tiempo Agotado — Victoria de Blancas');
+    expect(output).toContain('Resultado: Victoria de Blancas por Tiempo Agotado');
   });
 });

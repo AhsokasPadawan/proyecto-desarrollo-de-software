@@ -1,4 +1,5 @@
 import { Color } from '../../../core/pieces/types';
+export { formatClockTime } from './formatClockTime';
 
 export type ClockStatus = 'IDLE' | 'RUNNING' | 'PAUSED' | 'TIMEOUT';
 
@@ -7,44 +8,21 @@ export interface ChessClockControllerOptions {
   readonly onTick?: () => void;
 }
 
-export function formatClockTime(totalSeconds: number): string {
-  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
-  const minutes = Math.floor(safeSeconds / 60);
-  const remainingSeconds = safeSeconds % 60;
-  const paddedMinutes = String(minutes).padStart(2, '0');
-  const paddedSeconds = String(remainingSeconds).padStart(2, '0');
-  return `${paddedMinutes}:${paddedSeconds}`;
-}
-
 export class ChessClockController {
-  private whiteSeconds: number = 600;
-  private blackSeconds: number = 600;
-  private initialWhiteSeconds: number = 600;
-  private initialBlackSeconds: number = 600;
+  private whiteSeconds = 600;
+  private blackSeconds = 600;
+  private initialWhiteSeconds = 600;
+  private initialBlackSeconds = 600;
   private status: ClockStatus = 'IDLE';
   private activeColor: Color = 'WHITE';
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
-  private readonly options: ChessClockControllerOptions;
 
-  constructor(options: ChessClockControllerOptions) {
-    this.options = options;
-  }
+  constructor(private readonly options: ChessClockControllerOptions) {}
 
-  getWhiteSeconds(): number {
-    return this.whiteSeconds;
-  }
-
-  getBlackSeconds(): number {
-    return this.blackSeconds;
-  }
-
-  getStatus(): ClockStatus {
-    return this.status;
-  }
-
-  getActiveColor(): Color {
-    return this.activeColor;
-  }
+  getWhiteSeconds(): number { return this.whiteSeconds; }
+  getBlackSeconds(): number { return this.blackSeconds; }
+  getStatus(): ClockStatus { return this.status; }
+  getActiveColor(): Color { return this.activeColor; }
 
   isLowTime(color: Color): boolean {
     const seconds = color === 'WHITE' ? this.whiteSeconds : this.blackSeconds;
@@ -52,13 +30,8 @@ export class ChessClockController {
   }
 
   setPlayerMinutes(color: Color, minutes: number): void {
-    if (this.status !== 'IDLE') {
-      return;
-    }
-
-    const clampedMinutes = Math.max(1, Math.min(60, Math.floor(minutes)));
-    const totalSeconds = clampedMinutes * 60;
-
+    if (this.status !== 'IDLE') return;
+    const totalSeconds = Math.max(1, Math.min(60, Math.floor(minutes))) * 60;
     if (color === 'WHITE') {
       this.initialWhiteSeconds = totalSeconds;
       this.whiteSeconds = totalSeconds;
@@ -68,6 +41,11 @@ export class ChessClockController {
     }
   }
 
+  setTimeConfig(whiteMinutes: number, blackMinutes: number): void {
+    this.setPlayerMinutes('WHITE', whiteMinutes);
+    this.setPlayerMinutes('BLACK', blackMinutes);
+  }
+
   start(initialTurn: Color = 'WHITE'): void {
     this.activeColor = initialTurn;
     this.status = 'RUNNING';
@@ -75,23 +53,20 @@ export class ChessClockController {
   }
 
   pause(): void {
-    if (this.status !== 'RUNNING') {
-      return;
-    }
+    if (this.status !== 'RUNNING') return;
     this.stopInterval();
     this.status = 'PAUSED';
   }
 
   resume(): void {
-    if (this.status !== 'PAUSED') {
-      return;
-    }
+    if (this.status !== 'PAUSED') return;
     this.status = 'RUNNING';
     this.startInterval();
   }
 
   switchTurn(newTurn: Color): void {
     this.activeColor = newTurn;
+    if (this.status === 'RUNNING') this.startInterval();
   }
 
   stop(): void {
@@ -109,9 +84,7 @@ export class ChessClockController {
 
   private startInterval(): void {
     this.stopInterval();
-    this.timerIntervalId = setInterval(() => {
-      this.tick();
-    }, 1000);
+    this.timerIntervalId = setInterval(() => this.tick(), 1000);
   }
 
   private stopInterval(): void {
@@ -122,26 +95,15 @@ export class ChessClockController {
   }
 
   private tick(): void {
-    if (this.status !== 'RUNNING') {
-      return;
+    if (this.status !== 'RUNNING') return;
+    const isWhite = this.activeColor === 'WHITE';
+    const remaining = isWhite ? --this.whiteSeconds : --this.blackSeconds;
+    if (remaining <= 0) {
+      if (isWhite) this.whiteSeconds = 0;
+      else this.blackSeconds = 0;
+      this.stop();
+      this.options.onTimeout(this.activeColor);
     }
-
-    if (this.activeColor === 'WHITE') {
-      this.whiteSeconds = Math.max(0, this.whiteSeconds - 1);
-      if (this.whiteSeconds === 0) {
-        this.stopInterval();
-        this.status = 'TIMEOUT';
-        this.options.onTimeout('WHITE');
-      }
-    } else {
-      this.blackSeconds = Math.max(0, this.blackSeconds - 1);
-      if (this.blackSeconds === 0) {
-        this.stopInterval();
-        this.status = 'TIMEOUT';
-        this.options.onTimeout('BLACK');
-      }
-    }
-
     this.options.onTick?.();
   }
 }

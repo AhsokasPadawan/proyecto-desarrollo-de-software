@@ -44,8 +44,6 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
   const handleTimeout = useCallback(
     (timedOutColor: Color) => {
       engine.declareTimeout(timedOutColor);
-      const winnerColor = timedOutColor === 'WHITE' ? 'Negras' : 'Blancas';
-      setFeedbackMessage(`¡Tiempo agotado! Victoria para ${winnerColor}.`);
     },
     [engine]
   );
@@ -393,9 +391,9 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
             <PlayerClockBar
               color="BLACK"
               formattedTime={clock.blackFormatted}
-              isActive={clock.activeColor === 'BLACK' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
-              isLowTime={clock.isBlackLowTime}
-              isPaused={clock.clockStatus === 'PAUSED'}
+              isActive={!isReplaying && clock.activeColor === 'BLACK' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
+              isLowTime={!isReplaying && clock.isBlackLowTime}
+              isPaused={!isReplaying && clock.clockStatus === 'PAUSED'}
             />
           )}
 
@@ -412,9 +410,9 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
             <PlayerClockBar
               color="WHITE"
               formattedTime={clock.whiteFormatted}
-              isActive={clock.activeColor === 'WHITE' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
-              isLowTime={clock.isWhiteLowTime}
-              isPaused={clock.clockStatus === 'PAUSED'}
+              isActive={!isReplaying && clock.activeColor === 'WHITE' && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED')}
+              isLowTime={!isReplaying && clock.isWhiteLowTime}
+              isPaused={!isReplaying && clock.clockStatus === 'PAUSED'}
             />
           )}
 
@@ -450,14 +448,16 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
           onGoToEnd={handleGoToEnd}
           onSpeedChange={handleSpeedChange}
           onJumpToMove={handleJumpToMove}
-          isClockEnabled={isClockEnabled}
-          isClockRunning={clock.clockStatus === 'RUNNING'}
-          whiteMinutes={whiteMinutes}
-          blackMinutes={blackMinutes}
-          onToggleClock={handleToggleClock}
-          onWhiteMinutesChange={handleWhiteMinutesChange}
-          onBlackMinutesChange={handleBlackMinutesChange}
-          onStartClockMatch={handleStartClockMatch}
+          clockConfig={{
+            isClockEnabled,
+            isClockRunning: clock.clockStatus === 'RUNNING',
+            whiteMinutes,
+            blackMinutes,
+            onToggleClock: handleToggleClock,
+            onWhiteMinutesChange: handleWhiteMinutesChange,
+            onBlackMinutesChange: handleBlackMinutesChange,
+            onStartMatch: handleStartClockMatch,
+          }}
         />
       </main>
 

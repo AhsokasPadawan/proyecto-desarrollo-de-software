@@ -148,4 +148,12 @@ describe('ChessClockController', () => {
     vi.advanceTimersByTime(5000);
     expect(clock.getWhiteSeconds()).toBe(300);
   });
+
+  it('configures player minutes using setTimeConfig', () => {
+    const clock = new ChessClockController({ onTimeout: () => {} });
+    clock.setTimeConfig(15, 20);
+
+    expect(clock.getWhiteSeconds()).toBe(900);
+    expect(clock.getBlackSeconds()).toBe(1200);
+  });
 });

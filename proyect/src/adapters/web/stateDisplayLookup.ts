@@ -11,8 +11,8 @@ export const STATE_LABELS: Record<GameStateKind, string> = {
 };
 
 export const TIMEOUT_WINNER_LABELS: Record<Color, string> = {
-  WHITE: 'Tiempo Agotado — Victoria de Blancas',
-  BLACK: 'Tiempo Agotado — Victoria de Negras',
+  WHITE: 'Victoria de Blancas por Tiempo Agotado',
+  BLACK: 'Victoria de Negras por Tiempo Agotado',
 };
 
 export const STATE_BADGE_CLASSES: Record<GameStateKind, string> = {

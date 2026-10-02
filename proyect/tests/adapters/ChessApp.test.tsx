@@ -301,7 +301,7 @@ describe('Web Adapter - ChessApp Integration', () => {
         vi.advanceTimersByTime(60000);
       });
 
-      expect(screen.getByTestId('game-state-banner')).toHaveTextContent('Tiempo Agotado — Victoria de Negras');
+      expect(screen.getByTestId('game-state-banner')).toHaveTextContent('Victoria de Negras por Tiempo Agotado');
       expect(screen.getByTestId('review-match-button')).toBeInTheDocument();
       expect(screen.getByTestId('export-match-button')).toBeInTheDocument();
 
@@ -309,6 +309,7 @@ describe('Web Adapter - ChessApp Integration', () => {
       expect(screen.getByTestId('player-clock-white')).toBeInTheDocument();
       expect(screen.getByTestId('player-clock-black')).toBeInTheDocument();
       expect(screen.getByTestId('player-clock-white')).toHaveTextContent('00:00');
+      expect(screen.getByTestId('player-clock-white')).not.toHaveClass('ring-2');
     } finally {
       vi.useRealTimers();
     }
