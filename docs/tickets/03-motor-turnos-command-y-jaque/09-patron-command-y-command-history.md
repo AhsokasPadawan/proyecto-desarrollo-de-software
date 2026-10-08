@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/09-patron-command-y-command-history`
 
-**Status:** ready-for-agent
+**Status:** Done
 
 ## Acceptance Criteria
 
-- [ ] `MoveCommand.execute()` mueve la pieza de `from` a `to` sobre `Board` y guarda la referencia a `capturedPiece` (si existía).
-- [ ] `MoveCommand.undo()` devuelve la pieza movida a `from` y restaura `capturedPiece` en `to`, dejando el `Board` idéntico al estado previo ($\text{State}_{\text{before}} \equiv \text{State}_{\text{Act(Undo)}}$).
-- [ ] `CommandHistory` gestiona `executeCommand(cmd)`, `undo()`, `redo()`, `canUndo` y `canRedo`, vaciando la pila de `redo` cuando se ejecuta un nuevo comando tras haber deshecho jugadas.
-- [ ] Suite de tests unitarios **AAA** en memoria verificando secuencias múltiples de `execute` $\rightarrow$ `undo` $\rightarrow$ `redo` con y sin capturas.
+- [x] `MoveCommand.execute()` mueve la pieza de `from` a `to` sobre `Board` y guarda la referencia a `capturedPiece` (si existía).
+- [x] `MoveCommand.undo()` devuelve la pieza movida a `from` y restaura `capturedPiece` en `to`, dejando el `Board` idéntico al estado previo ($\text{State}_{\text{before}} \equiv \text{State}_{\text{Act(Undo)}}$).
+- [x] `CommandHistory` gestiona `executeCommand(cmd)`, `undo()`, `redo()`, `canUndo` y `canRedo`, vaciando la pila de `redo` cuando se ejecuta un nuevo comando tras haber deshecho jugadas.
+- [x] Suite de tests unitarios **AAA** en memoria verificando secuencias múltiples de `execute` $\rightarrow$ `undo` $\rightarrow$ `redo` con y sin capturas.

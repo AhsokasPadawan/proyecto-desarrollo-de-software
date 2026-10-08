@@ -107,7 +107,37 @@ Structure every automated test method into three marked sections:
 
 ---
 
-## 5. Agent Operational Checklist
+## 5. UI and Driving Adapter Design Standards (React / Modern Web)
+
+Apply these rules when designing, implementing, or refactoring UI adapters:
+
+### 5.1 Single Responsibility (SRP) in UI: Coordinators vs. Atomic Components
+- **Coordinator Views:** Top-level view components (e.g., `ChessBoardView`, `ControlPanelView`) must act strictly as declarative coordinators. They subscribe to domain snapshots, distribute data downward, and delegate user events to callbacks. They must never contain dense inline styling, multi-branch conditional trees, or complex markup structures.
+- **Atomic Components:** Extract focused visual and interactive elements into dedicated, single-purpose components (e.g., `ChessSquare`, `ActionButton`, `ModeSelectorButton`, `AppHeader`).
+
+### 5.2 Structural Wrapper Pattern (Composition over Repetition)
+- **Rule:** When multiple layout sections share common containers, headers, typography, borders, or padding, encapsulate the structural frame in a reusable wrapper component (e.g., `ControlSection`).
+- **Mechanism:** Invert control of markup via composition (`children`), allowing sections to configure titles, dividers, and custom styling while maintaining visual consistency through a single point of change.
+
+### 5.3 Lookup Tables over Extensive Conditionals (Data Polymorphism)
+- **Rule:** Never use `switch` blocks or nested `if/else` ladders for conditional UI rendering, state badges, or component variant styling.
+- **Implementation:** Declare strongly typed mapping objects (`Record<Variant, string>` or `Record<StateKind, BadgeConfig>`). Extend behavior by adding keys to the lookup table rather than modifying rendering logic (OCP).
+
+### 5.4 Event-Driven Unidirectional State Flow (Zero Uncontrolled Effects)
+- **Rule:** Handle state changes, transitions, and command dispatches directly within origin event handlers (`onClick`, `onChange`, callbacks).
+- **Prohibition:** `useEffect` is strictly the last resort. Never use `useEffect` to synchronize local states, trigger navigations, or bridge secondary mutations. Subscribe to engine/observer updates through external store subscription hooks (e.g., `useSyncExternalStore`).
+
+### 5.5 Self-Documenting Code & Zero Explanatory Comments
+- **Rule:** Code must communicate its intent solely through expressive naming, TypeScript types, and physical modularity (< 120 lines per file).
+- **Prohibition:** Do not write explanatory (`// ...`) or organizational section comments in source code. Any code requiring a comment to explain its purpose must be refactored into descriptive functions, types, or subcomponents.
+
+### 5.6 Isolated UI Testing with React Testing Library (AAA Pattern)
+- **Rule:** Test UI components in memory under the AAA pattern (*Arrange, Act, Assert*).
+- **Scope:** Test atomic subcomponents in isolation to verify variants and accessibility. Test coordinator views to verify state binding and callback invocations upon user events, avoiding full-tree end-to-end coupling in unit tests.
+
+---
+
+## 6. Agent Operational Checklist
 
 Run this checklist prior to finalizing any generated or refactored code:
 
@@ -115,4 +145,8 @@ Run this checklist prior to finalizing any generated or refactored code:
 - [ ] **Dependency Inversion:** Are all infrastructure dependencies supplied to classes via constructor arguments using interfaces?
 - [ ] **Anti-Bloat Filter (YAGNI):** Does every added interface, factory, or layer address a present requirement rather than a hypothetical future?
 - [ ] **Test Feasibility:** Can the generated domain logic be verified in a headless test suite executing in under 5 milliseconds?
-- [ ] **Positive Guidance:** If writing UI components (e.g., React), is UI strictly limited to receiving and rendering state, delegating state machines and commands to plain domain models?
+- [ ] **UI Component SRP:** Are coordinator views strictly declarative, delegating granular visual layout to atomic subcomponents?
+- [ ] **Structural Wrappers:** Is repetitive structural layout extracted into reusable wrapper components using composition (`children`)?
+- [ ] **Lookup Tables vs Switches:** Are component variants and conditional styles mapped through strongly typed lookup tables instead of `switch` blocks?
+- [ ] **No Secondary `useEffect`:** Are state updates and command executions driven strictly by origin event handlers rather than reactive `useEffect` hooks?
+- [ ] **Self-Documenting Code:** Is the code free of explanatory and section comments, relying entirely on semantic naming and TypeScript contracts?

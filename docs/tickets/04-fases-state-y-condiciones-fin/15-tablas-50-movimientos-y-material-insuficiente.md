@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/15-tablas-50-movimientos-y-material-insuficiente`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] El contador de medios turnos (`halfMoveClock`) se reinicia a `0` en cada movimiento de `Pawn` o captura, se incrementa en `+1` en cualquier otra jugada y restaura su valor exacto al ejecutar `undo()`.
-- [ ] Al alcanzar 100 medios turnos sin captura ni movimiento de peón, la partida transiciona automáticamente a `DrawState`.
-- [ ] Si tras una captura solo quedan en el tablero combinaciones sin material de mate posible (`K vs K`, `K+B vs K`, `K+N vs K`), la partida transiciona a `DrawState`.
-- [ ] Suite de tests unitarios **AAA** en memoria probando ambos criterios de tablas y su reversión con `undo()`.
+- [x] El contador de medios turnos (`halfMoveClock`) se reinicia a `0` en cada movimiento de `Pawn` o captura, se incrementa en `+1` en cualquier otra jugada y restaura su valor exacto al ejecutar `undo()`.
+- [x] Al alcanzar 100 medios turnos sin captura ni movimiento de peón, la partida transiciona automáticamente a `DrawState`.
+- [x] Si tras una captura solo quedan en el tablero combinaciones sin material de mate posible (`K vs K`, `K+B vs K`, `K+N vs K`), la partida transiciona a `DrawState`.
+- [x] Suite de tests unitarios **AAA** en memoria probando ambos criterios de tablas y su reversión con `undo()`.

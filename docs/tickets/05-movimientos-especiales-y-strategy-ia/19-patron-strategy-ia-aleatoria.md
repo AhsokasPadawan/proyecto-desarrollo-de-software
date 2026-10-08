@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/19-patron-strategy-ia-aleatoria`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] `IAiStrategy` declara `chooseMove(engine: IGameEngine): { from: Position; to: Position } | null`.
-- [ ] `RandomAiStrategy` recopila todas las piezas del color `currentTurn` con al menos un `Legal Move` y selecciona una jugada válida (permitiendo inyectar una función generadora de números aleatorios opcional por constructor para que los tests sean $100\%$ deterministas).
-- [ ] Retorna `null` cuando la partida está en un estado terminal o no existen movimientos legales.
-- [ ] Suite de tests unitarios **AAA** en memoria verificando que la jugada elegida siempre es aceptada por `engine.makeMove` y que bajo jaque solo elige jugadas que salven al `King`.
+- [x] `IAiStrategy` declara `chooseMove(engine: IGameEngine): { from: Position; to: Position } | null`.
+- [x] `RandomAiStrategy` recopila todas las piezas del color `currentTurn` con al menos un `Legal Move` y selecciona una jugada válida (permitiendo inyectar una función generadora de números aleatorios opcional por constructor para que los tests sean $100\%$ deterministas).
+- [x] Retorna `null` cuando la partida está en un estado terminal o no existen movimientos legales.
+- [x] Suite de tests unitarios **AAA** en memoria verificando que la jugada elegida siempre es aceptada por `engine.makeMove` y que bajo jaque solo elige jugadas que salven al `King`.

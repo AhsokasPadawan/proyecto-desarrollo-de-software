@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/10-ejecucion-turnos-capturas-y-moveresult`
 
-**Status:** ready-for-agent
+**Status:** Done
 
 ## Acceptance Criteria
 
-- [ ] `ChessGame` comienza en el turno configurado (por defecto `WHITE`) y alterna el turno mediante *lookup table* (`OPPOSITE_COLOR`) tras cada movimiento válido, `undo()` o `redo()`.
-- [ ] `makeMove` retorna `{ success: false, reason: 'EMPTY_ORIGIN' }` si la casilla origen está vacía, `{ success: false, reason: 'WRONG_TURN' }` si la pieza es del color rival, e `{ success: false, reason: 'ILLEGAL_MOVE' }` si el destino no pertenece a los movimientos válidos de la pieza.
-- [ ] En movimientos válidos, ejecuta el `MoveCommand`, registra la captura si aplica y retorna `{ success: true, capturedPiece, nextState }`.
-- [ ] Suite de tests unitarios **AAA** en memoria sobre el seam `ChessGame` validando alternancia de turnos, capturas, `undo`/`redo` y cada motivo de rechazo.
+- [x] `ChessGame` comienza en el turno configurado (por defecto `WHITE`) y alterna el turno mediante *lookup table* (`OPPOSITE_COLOR`) tras cada movimiento válido, `undo()` o `redo()`.
+- [x] `makeMove` retorna `{ success: false, reason: 'EMPTY_ORIGIN' }` si la casilla origen está vacía, `{ success: false, reason: 'WRONG_TURN' }` si la pieza es del color rival, e `{ success: false, reason: 'ILLEGAL_MOVE' }` si el destino no pertenece a los movimientos válidos de la pieza.
+- [x] En movimientos válidos, ejecuta el `MoveCommand`, registra la captura si aplica y retorna `{ success: true, capturedPiece, nextState }`.
+- [x] Suite de tests unitarios **AAA** en memoria sobre el seam `ChessGame` validando alternancia de turnos, capturas, `undo`/`redo` y cada motivo de rechazo.

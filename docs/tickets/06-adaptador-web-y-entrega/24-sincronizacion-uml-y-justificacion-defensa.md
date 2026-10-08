@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/24-sincronizacion-uml-y-justificacion-defensa`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Cada clase, interfaz, método público y relación en el Diagrama de Clases UML de `docs/architecture.md` coincide exactamente con el código en `proyect/src/core/` (cero *drift*).
-- [ ] Se consolida `docs/design-justification.md` integrando los 12 ADRs bajo la estructura **What / Why / When to Break** exigida por la cátedra.
-- [ ] Toda la suite de tests unitarios en Vitest y el build de producción (`npm run build`) ejecutan al $100\%$ en verde sin advertencias de tipos.
-- [ ] Incluye guía práctica verificada para inyectar una pieza híbrida o alterar las dimensiones del tablero en menos de 5 minutos durante el coloquio individual.
+- [x] Cada clase, interfaz, método público y relación en el Diagrama de Clases UML de `docs/architecture.md` coincide exactamente con el código en `proyect/src/core/` (cero *drift*).
+- [x] Se consolida `docs/design-justification.md` integrando los 12 ADRs bajo la estructura **What / Why / When to Break** exigida por la cátedra.
+- [x] Toda la suite de tests unitarios en Vitest y el build de producción (`npm run build`) ejecutan al $100\%$ en verde sin advertencias de tipos.
+- [x] Incluye guía práctica verificada para inyectar una pieza híbrida o alterar las dimensiones del tablero en menos de 5 minutos durante el coloquio individual.

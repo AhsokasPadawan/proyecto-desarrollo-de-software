@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/23-panel-control-historial-y-selector-ia`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Muestra el turno activo y traduce `snapshot.stateKind` a indicadores visuales claros mediante una *lookup table* de estilos y etiquetas.
-- [ ] Los botones `Undo` y `Redo` se habilitan/deshabilitan según `snapshot.canUndo` y `snapshot.canRedo` e invocan `game.undo()` y `game.redo()` desde sus handlers `onClick`.
-- [ ] Permite elegir entre `Humano vs Humano`, `Humano vs IA (Aleatoria)` y `Humano vs IA (Heurística Material)`, disparando la jugada de la `IAiStrategy` seleccionada directamente tras el movimiento humano sin depender de `useEffect`.
-- [ ] El botón `Reiniciar Partida` restablece el tablero inicial y limpia la selección activa.
+- [x] Muestra el turno activo y traduce `snapshot.stateKind` a indicadores visuales claros mediante una *lookup table* de estilos y etiquetas.
+- [x] Los botones `Undo` y `Redo` se habilitan/deshabilitan según `snapshot.canUndo` y `snapshot.canRedo` e invocan `game.undo()` y `game.redo()` desde sus handlers `onClick`.
+- [x] Permite elegir entre `Humano vs Humano`, `Humano vs IA (Aleatoria)` y `Humano vs IA (Heurística Material)`, disparando la jugada de la `IAiStrategy` seleccionada directamente tras el movimiento humano sin depender de `useEffect`.
+- [x] El botón `Reiniciar Partida` restablece el tablero inicial y limpia la selección activa.

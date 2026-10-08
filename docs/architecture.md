@@ -12,7 +12,8 @@ El sistema se divide estrictamente en dos anillos con dependencia unidireccional
 ┌──────────────────────────────────────────────────────────────────────┐
 │                   DRIVING ADAPTERS (Infraestructura / UI)            │
 │  ┌─────────────────────────┐          ┌───────────────────────────┐  │
-│  │ Vitest In-Memory Suite  │          │ React + TS + Tailwind Web │  │
+│  │ Vitest + RTL Suite      │          │ React + TS + Tailwind Web │  │
+│  │ (Unit & Component AAA)  │          │ (useSyncExternalStore)    │  │
 │  └────────────┬────────────┘          └─────────────┬─────────────┘  │
 └───────────────┼─────────────────────────────────────┼────────────────┘
                 │ Invoca IGameEngine / Seams          │ Invoca IGameEngine + Suscribe IGameObserver
@@ -37,14 +38,16 @@ proyect/
 ├── src/
 │   ├── core/
 │   │   ├── ports/          # IGameEngine, IGameObserver, IBoardQuery, GameSnapshot, MoveResult
-│   │   ├── game/           # ChessGame, estados IGameState, CommandHistory, MoveCommand
+│   │   ├── game/           # ChessGame, estados IGameState, CommandHistory, MoveCommand, PositionHasher
 │   │   ├── board/          # Board, Position, BoardSetupFactory
-│   │   ├── pieces/         # Piece (base), Pawn, Rook, Knight, Bishop, Queen, King
-│   │   └── rules/          # IMovementRule, SlidingMoveRule, LeapMoveRule, PawnForwardRule, PawnCaptureRule, CheckDetector
+│   │   ├── pieces/         # Piece (base), Pawn, Rook, Knight, Bishop, Queen, King, Chancellor
+│   │   ├── rules/          # IMovementRule, Sliding, Leap, Pawn rules, Castling, EnPassant, CheckDetector
+│   │   └── strategy/       # IAiStrategy, RandomAiStrategy, GreedyMaterialAiStrategy
 │   └── adapters/
 │       └── web/            # Componentes React + Vite + Tailwind CSS conectados vía IGameEngine / IGameObserver
 └── tests/
-    └── core/               # Suite unitaria AAA 100% en memoria con Vitest
+    ├── core/               # Suite unitaria de dominio AAA 100% en memoria con Vitest
+    └── adapters/           # Suite de componentes y flujos de UI con React Testing Library y jsdom
 ```
 
 ---
@@ -71,7 +74,7 @@ classDiagram
         <<interface>>
         +getSnapshot() GameSnapshot
         +getLegalMoves(from: Position) Position[]
-        +makeMove(from: Position, to: Position) MoveResult
+        +makeMove(from: Position, to: Position, promotionPiece: PieceType) MoveResult
         +undo() boolean
         +redo() boolean
         +subscribe(observer: IGameObserver) UnsubscribeFn
@@ -90,9 +93,11 @@ classDiagram
         -history: CommandHistory
         -checkDetector: CheckDetector
         -observers: Set~IGameObserver~
+        -halfMoveClock: number
+        -currentPositionSignature: string
         +getSnapshot() GameSnapshot
         +getLegalMoves(from: Position) Position[]
-        +makeMove(from: Position, to: Position) MoveResult
+        +makeMove(from: Position, to: Position, promotionPiece: PieceType) MoveResult
         +undo() boolean
         +redo() boolean
         +subscribe(observer: IGameObserver) UnsubscribeFn
@@ -130,6 +135,12 @@ classDiagram
         +evaluateNextState(context: GameStateContext) IGameState
     }
 
+    class DrawState {
+        +readonly kind = "DRAW"
+        +canAcceptMoves() boolean
+        +evaluateNextState(context: GameStateContext) IGameState
+    }
+
     class ICommand {
         <<interface>>
         +execute() void
@@ -140,10 +151,12 @@ classDiagram
         -board: Board
         -from: Position
         -to: Position
+        -promotionType: PieceType
         -movedPiece: IPiece
-        -capturedPiece: IPiece | null
+        -capturedPiece: IPiece
         +execute() void
         +undo() void
+        +getCapturedPiece() IPiece
     }
 
     class CommandHistory {
@@ -159,18 +172,22 @@ classDiagram
         +readonly rows: number
         +readonly cols: number
         +isWithinBounds(pos: Position) boolean
-        +getPieceAt(pos: Position) IPiece | null
+        +getPieceAt(pos: Position) IPiece
         +isEmpty(pos: Position) boolean
-        +findKingPosition(color: Color) Position | null
+        +findKingPosition(color: Color) Position
+        +getPiecesByColor(color: Color) PiecePlacement[]
+        +getEnPassantTarget() Position
     }
 
     class Board {
         +readonly rows: number
         +readonly cols: number
-        -grid: (IPiece | null)[][]
+        -grid: IPiece[][]
+        -enPassantTarget: Position
         +placePiece(pos: Position, piece: IPiece) void
-        +removePiece(pos: Position) IPiece | null
-        +movePiece(from: Position, to: Position) IPiece | null
+        +removePiece(pos: Position) IPiece
+        +movePiece(from: Position, to: Position) IPiece
+        +setEnPassantTarget(target: Position) void
     }
 
     class Position {
@@ -184,15 +201,19 @@ classDiagram
         <<interface>>
         +readonly color: Color
         +readonly type: PieceType
+        +readonly hasMoved: boolean
         +getPseudoLegalMoves(from: Position, board: IBoardQuery) Position[]
+        +setHasMoved(value: boolean) void
     }
 
     class Piece {
         <<abstract>>
         +readonly color: Color
         +readonly type: PieceType
+        -moved: boolean
         -rules: readonly IMovementRule[]
         +getPseudoLegalMoves(from: Position, board: IBoardQuery) Position[]
+        +setHasMoved(value: boolean) void
     }
 
     class Pawn
@@ -201,6 +222,7 @@ classDiagram
     class Bishop
     class Queen
     class King
+    class Chancellor
 
     class IMovementRule {
         <<interface>>
@@ -225,8 +247,56 @@ classDiagram
         +getPseudoLegalMoves(from: Position, piece: IPiece, board: IBoardQuery) Position[]
     }
 
+    class CastlingMoveRule {
+        -attackDetector: ISquareAttackDetector
+        +getPseudoLegalMoves(from: Position, piece: IPiece, board: IBoardQuery) Position[]
+    }
+
+    class EnPassantCaptureRule {
+        +getPseudoLegalMoves(from: Position, piece: IPiece, board: IBoardQuery) Position[]
+    }
+
+    class ISquareAttackDetector {
+        <<interface>>
+        +isSquareAttacked(board: IBoardQuery, target: Position, byColor: Color) boolean
+    }
+
     class CheckDetector {
+        +isSquareAttacked(board: IBoardQuery, target: Position, byColor: Color) boolean
         +isKingInCheck(board: IBoardQuery, kingColor: Color) boolean
+    }
+
+    class BoardSetupFactory {
+        <<factory>>
+        +createStandardBoard(rows: number, cols: number) Board
+        +populateStandardBoard(board: Board) void
+    }
+
+    class PositionHasher {
+        +computeSignature(board: Board, currentTurn: Color) string
+    }
+
+    class InsufficientMaterialEvaluator {
+        +isInsufficient(board: Board) boolean
+    }
+
+    class IAiStrategy {
+        <<interface>>
+        +chooseMove(engine: IGameEngine) AiMove
+    }
+
+    class RandomAiStrategy {
+        -rng: RandomGenerator
+        +chooseMove(engine: IGameEngine) AiMove
+    }
+
+    class GreedyMaterialAiStrategy {
+        +chooseMove(engine: IGameEngine) AiMove
+    }
+
+    class PromotionFactory {
+        <<factory>>
+        +createPromotedPiece(type: PieceType, color: Color) IPiece
     }
 
     IGameEngine <|.. ChessGame
@@ -235,13 +305,18 @@ classDiagram
     ChessGame *-- CommandHistory
     ChessGame *-- CheckDetector
     ChessGame o-- IGameState
+    ChessGame ..> PositionHasher : computes key
+    ChessGame ..> InsufficientMaterialEvaluator : evaluates
+    BoardSetupFactory ..> Board : creates
     IGameState <|.. NormalPlayState
     IGameState <|.. CheckState
     IGameState <|.. CheckmateState
     IGameState <|.. StalemateState
+    IGameState <|.. DrawState
     CommandHistory o-- ICommand
     ICommand <|.. MoveCommand
     MoveCommand --> Board : mutates/reverts
+    MoveCommand ..> PromotionFactory : uses
     IBoardQuery <|.. Board
     Board o-- IPiece
     Board ..> Position
@@ -252,12 +327,20 @@ classDiagram
     Piece <|-- Bishop
     Piece <|-- Queen
     Piece <|-- King
+    Piece <|-- Chancellor
     Piece *-- IMovementRule : composes
     IMovementRule <|.. SlidingMoveRule
     IMovementRule <|.. LeapMoveRule
     IMovementRule <|.. PawnForwardRule
     IMovementRule <|.. PawnCaptureRule
+    IMovementRule <|.. CastlingMoveRule
+    IMovementRule <|.. EnPassantCaptureRule
+    ISquareAttackDetector <|.. CheckDetector
+    CastlingMoveRule --> ISquareAttackDetector : depends on
     CheckDetector ..> IBoardQuery : queries
+    IAiStrategy <|.. RandomAiStrategy
+    IAiStrategy <|.. GreedyMaterialAiStrategy
+    IAiStrategy ..> IGameEngine : consumes
 ```
 
 ---

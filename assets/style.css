@@ -1,0 +1,218 @@
+/* Chess TPO Teaching Workspace - Shared Stylesheet (Tufte-inspired minimal & readable design) */
+
+:root {
+  --bg-color: #faf9f6;
+  --text-color: #1a1a1a;
+  --muted-text: #555555;
+  --accent-color: #0f4c81;
+  --accent-light: #e8f1f8;
+  --card-bg: #ffffff;
+  --border-color: #e2e2e0;
+  --code-bg: #f4f4f2;
+  --success-color: #1b7340;
+  --warning-color: #b45309;
+  --font-serif: "ETBembo", "Palatino", "Georgia", "Minion Pro", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Fira Code", "JetBrains Mono", Consolas, Menlo, Monaco, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #121316;
+    --text-color: #e6e6e6;
+    --muted-text: #a0a0a0;
+    --accent-color: #64b5f6;
+    --accent-light: #1a2a3a;
+    --card-bg: #1c1d22;
+    --border-color: #2e3038;
+    --code-bg: #24262e;
+    --success-color: #4ade80;
+    --warning-color: #fbbf24;
+  }
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--text-color);
+  margin-top: 2.5rem;
+  margin-bottom: 0.8rem;
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: 2.25rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.6rem;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.4rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+p, ul, ol {
+  margin-bottom: 1.25rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.2s;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background-color: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+}
+
+pre {
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  padding: 1.25rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 1.5rem 0;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.lesson-meta {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--muted-text);
+  margin-bottom: 2rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--accent-light);
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lesson-meta span {
+  font-weight: 500;
+}
+
+.callout {
+  border-left: 4px solid var(--accent-color);
+  background-color: var(--accent-light);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 1rem;
+}
+
+.callout-success {
+  border-left-color: var(--success-color);
+  background-color: rgba(74, 222, 128, 0.1);
+}
+
+.callout-warning {
+  border-left-color: var(--warning-color);
+  background-color: rgba(251, 191, 36, 0.1);
+}
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.quiz-container {
+  border: 2px dashed var(--accent-color);
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.quiz-title {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--accent-color);
+}
+
+.quiz-option {
+  display: block;
+  margin: 0.5rem 0;
+  padding: 0.6rem 0.8rem;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.quiz-option:hover {
+  border-color: var(--accent-color);
+  background-color: var(--accent-light);
+}
+
+.lesson-nav {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-color);
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+}
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background-color: var(--accent-light);
+  color: var(--accent-color);
+  margin-right: 0.4rem;
+}

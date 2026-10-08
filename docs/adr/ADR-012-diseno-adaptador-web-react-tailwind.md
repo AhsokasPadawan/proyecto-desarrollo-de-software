@@ -14,12 +14,16 @@
    * La interfaz presenta en una sola pantalla el tablero y un panel lateral de estado/controles (indicador de turno, banner de fase `IN_PROGRESS / CHECK / CHECKMATE / STALEMATE`, botones `Undo`, `Redo` y `Reiniciar Partida`).
    * El tablero se dimensiona dinámicamente a partir de `snapshot.rows` y `snapshot.cols`.
    * Las piezas se renderizan consultando una *lookup table* de íconos/símbolos para las 6 piezas estándar, incluyendo un **renderizado *fallback* automático** (insignia con las iniciales de `piece.type` estilizada según `piece.color`) para cualquier nueva pieza inyectada durante la defensa oral.
+4. **Estrategia de Testing del Adaptador con React Testing Library y `jsdom`:**
+   * Las vistas y componentes del adaptador web (`ChessApp`, `ChessBoardView`, `ControlPanelView`, `PromotionModal`) se testean exhaustivamente simulando interacciones del usuario en memoria con **React Testing Library** (`@testing-library/react`) y el entorno DOM virtual **`jsdom`**.
+   * Las pruebas cubren la interacción en 2 clics, el flujo de coronación con selección de pieza, la ejecución de movimientos de la IA según el modo configurado y los controles de reversión/reinicio de partida.
 
 ## 2. Why (Por qué lo elegimos)
 
 1. **Foco del Equipo en un Único Adaptador Visual de Alta Calidad:** Concentrar el esfuerzo de interfaz en React + Tailwind CSS evita mantener un parser de texto y renderizador ASCII de terminal que aportaría valor redundante teniendo ya la suite de tests en memoria y la UI web.
 2. **Flujo Unidireccional Limpio en React (Cero `useEffect` para lógica de juego):** La interacción de 2 clics se resuelve íntegramente en los manejadores de eventos `onClick`, mientras la sincronización con `IGameEngine` ocurre a través del contrato `Observer` (`subscribe`/`unsubscribe` + `getSnapshot` vía `useSyncExternalStore`).
 3. **Inmunidad de la UI en la Prueba de Fuego ($< 15\text{ min}$):** Al leer `rows`/`cols` dinámicamente del `GameSnapshot` y proveer un *fallback* visual para tipos de pieza desconocidos, agregar una pieza híbrida o cambiar las dimensiones del tablero en el Core durante la defensa oral se refleja de inmediato en la pantalla sin tocar código de React ni clases de Tailwind.
+4. **Pruebas de Integración de UI Fieles al Usuario sin Infraestructura Pesada:** React Testing Library interactúa con el DOM tal como lo haría un usuario real (buscando por roles, etiquetas accesibles y disparando eventos reales), ejecutándose en Node.js mediante `jsdom` en milisegundos sin requerir navegadores completos (Selenium/Playwright) ni alterar la frontera arquitectónica.
 
 ## 3. When to Break (Cuándo reconsiderar o romper esta decisión)
 

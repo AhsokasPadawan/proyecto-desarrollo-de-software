@@ -6,11 +6,11 @@
 
 **Branch:** `ticket/14-state-jaque-mate-y-ahogado`
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Si el jugador de turno tiene `isKingInCheck === true` y `0` movimientos legales en todo su ejército, `ChessGame` transiciona a `CheckmateState` (`kind: 'CHECKMATE'`) asignando como `winner` al color opuesto.
-- [ ] Si el jugador de turno tiene `isKingInCheck === false` y `0` movimientos legales en todo su ejército, `ChessGame` transiciona a `StalemateState` (`kind: 'STALEMATE'`) con `winner: null`.
-- [ ] En estados terminales (`canAcceptMoves() === false`), cualquier invocación a `makeMove` es rechazada con `{ success: false, reason: 'GAME_OVER' }`, mientras que `undo()` restaura el estado activo previo.
-- [ ] Suite de tests unitarios **AAA** en memoria (incluyendo Mate del Loco / Mate del Pastor y escenarios de Rey ahogado) y reversión de Jaque Mate mediante `undo()`.
+- [x] Si el jugador de turno tiene `isKingInCheck === true` y `0` movimientos legales en todo su ejército, `ChessGame` transiciona a `CheckmateState` (`kind: 'CHECKMATE'`) asignando como `winner` al color opuesto.
+- [x] Si el jugador de turno tiene `isKingInCheck === false` y `0` movimientos legales en todo su ejército, `ChessGame` transiciona a `StalemateState` (`kind: 'STALEMATE'`) con `winner: null`.
+- [x] En estados terminales (`canAcceptMoves() === false`), cualquier invocación a `makeMove` es rechazada con `{ success: false, reason: 'GAME_OVER' }`, mientras que `undo()` restaura el estado activo previo.
+- [x] Suite de tests unitarios **AAA** en memoria (incluyendo Mate del Loco / Mate del Pastor y escenarios de Rey ahogado) y reversión de Jaque Mate mediante `undo()`.
