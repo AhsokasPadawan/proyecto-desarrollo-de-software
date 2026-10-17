@@ -1,4 +1,5 @@
 import { Color } from '../../../core/pieces/types';
+import { PLAYER_DISPLAY_CONFIG } from '../pieceDisplay';
 
 export interface PlayerTimePickerProps {
   readonly color: Color;
@@ -10,6 +11,30 @@ export interface PlayerTimePickerProps {
 
 const PRESET_OPTIONS = [3, 5, 10, 15] as const;
 
+function StepAdjustButton({
+  symbol,
+  disabled,
+  onClick,
+  testId,
+}: {
+  readonly symbol: '-' | '+';
+  readonly disabled: boolean;
+  readonly onClick: () => void;
+  readonly testId: string;
+}): JSX.Element {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      data-testid={testId}
+      className="w-6 py-0.5 rounded text-[10px] bg-zinc-800 text-zinc-300 border border-zinc-700 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {symbol}
+    </button>
+  );
+}
+
 export function PlayerTimePicker({
   color,
   label,
@@ -18,7 +43,7 @@ export function PlayerTimePicker({
   onChange,
 }: PlayerTimePickerProps): JSX.Element {
   const colorId = color.toLowerCase();
-  const labelColorClass = color === 'WHITE' ? 'text-amber-200' : 'text-zinc-400';
+  const { labelColorClass } = PLAYER_DISPLAY_CONFIG[color];
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -43,24 +68,18 @@ export function PlayerTimePicker({
             {preset}m
           </button>
         ))}
-        <button
-          type="button"
+        <StepAdjustButton
+          symbol="-"
           disabled={isClockRunning}
           onClick={() => onChange(Math.max(1, minutes - 1))}
-          data-testid={`${colorId}-minus-button`}
-          className="w-6 py-0.5 rounded text-[10px] bg-zinc-800 text-zinc-300 border border-zinc-700 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          -
-        </button>
-        <button
-          type="button"
+          testId={`${colorId}-minus-button`}
+        />
+        <StepAdjustButton
+          symbol="+"
           disabled={isClockRunning}
           onClick={() => onChange(Math.min(60, minutes + 1))}
-          data-testid={`${colorId}-plus-button`}
-          className="w-6 py-0.5 rounded text-[10px] bg-zinc-800 text-zinc-300 border border-zinc-700 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          +
-        </button>
+          testId={`${colorId}-plus-button`}
+        />
       </div>
     </div>
   );

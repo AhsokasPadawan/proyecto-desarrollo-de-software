@@ -2,14 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MoveRecord } from '../../src/core/ports/GameSnapshot';
-import { MoveHistoryPanel } from '../../src/adapters/web/components/MoveHistoryPanel';
+import { MoveHistoryTable } from '../../src/adapters/web/components/MoveHistoryTable';
 
-describe('Web Adapter - MoveHistoryPanel', () => {
-  it('renders panel title and empty state message when move history is empty', () => {
-    render(<MoveHistoryPanel moveHistory={[]} currentMoveIndex={0} />);
+describe('Web Adapter - MoveHistoryTable', () => {
+  it('renders empty state message when move history is empty', () => {
+    render(<MoveHistoryTable moveHistory={[]} currentMoveIndex={0} />);
 
-    expect(screen.getByText('Historial de Jugadas')).toBeInTheDocument();
-    expect(screen.getByTestId('move-count-badge')).toHaveTextContent('0');
     expect(screen.getByTestId('no-moves-message')).toHaveTextContent('Aún no se realizaron jugadas.');
   });
 
@@ -35,9 +33,8 @@ describe('Web Adapter - MoveHistoryPanel', () => {
       },
     ];
 
-    render(<MoveHistoryPanel moveHistory={mockMoves} currentMoveIndex={1} />);
+    render(<MoveHistoryTable moveHistory={mockMoves} currentMoveIndex={1} />);
 
-    expect(screen.getByTestId('move-count-badge')).toHaveTextContent('2');
     expect(screen.getByTestId('replay-move-item-0')).toBeInTheDocument();
     expect(screen.getByTestId('replay-move-item-1')).toBeInTheDocument();
 
@@ -74,11 +71,10 @@ describe('Web Adapter - MoveHistoryPanel', () => {
     ];
 
     render(
-      <MoveHistoryPanel
+      <MoveHistoryTable
         moveHistory={mockMoves}
         currentMoveIndex={2}
         onJumpToMove={handleJumpToMove}
-        isReplaying={true}
       />
     );
 
@@ -125,7 +121,7 @@ describe('Web Adapter - MoveHistoryPanel', () => {
       },
     ];
 
-    render(<MoveHistoryPanel moveHistory={specialMoves} currentMoveIndex={3} />);
+    render(<MoveHistoryTable moveHistory={specialMoves} currentMoveIndex={3} />);
 
     expect(screen.getByText('Enroque')).toBeInTheDocument();
     expect(screen.getByText('Coronación')).toBeInTheDocument();

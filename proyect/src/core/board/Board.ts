@@ -8,6 +8,7 @@ export class Board implements IBoardQuery {
   readonly cols: number;
   private readonly grid: (IPiece | null)[][];
   private enPassantTarget: Position | null = null;
+  private readonly movedPieces: Set<IPiece> = new Set();
 
   constructor(rows: number = 8, cols: number = 8) {
     if (!Number.isInteger(rows) || !Number.isInteger(cols) || rows <= 0 || cols <= 0) {
@@ -36,7 +37,7 @@ export class Board implements IBoardQuery {
     return this.grid[position.row][position.col];
   }
 
-  isEmpty(position: Position): boolean {
+  isSquareEmpty(position: Position): boolean {
     return this.isWithinBounds(position) && this.grid[position.row][position.col] === null;
   }
 
@@ -117,5 +118,17 @@ export class Board implements IBoardQuery {
 
   setEnPassantTarget(target: Position | null): void {
     this.enPassantTarget = target;
+  }
+
+  hasPieceMoved(piece: IPiece): boolean {
+    return this.movedPieces.has(piece);
+  }
+
+  setPieceMoved(piece: IPiece, moved: boolean): void {
+    if (moved) {
+      this.movedPieces.add(piece);
+    } else {
+      this.movedPieces.delete(piece);
+    }
   }
 }

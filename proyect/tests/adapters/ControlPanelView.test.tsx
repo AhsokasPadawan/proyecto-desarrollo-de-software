@@ -216,13 +216,15 @@ describe('Web Adapter - ControlPanelView', () => {
         currentGameMode="HUMAN_VS_HUMAN"
         feedbackMessage={null}
         onModeChange={() => {}}
-        isClockEnabled={true}
-        whiteMinutes={10}
-        blackMinutes={10}
-        onToggleClock={handleToggleClock}
-        onWhiteMinutesChange={handleWhiteMinutesChange}
-        onBlackMinutesChange={handleBlackMinutesChange}
-        onStartClockMatch={handleStartClockMatch}
+        clockConfig={{
+          isClockEnabled: true,
+          whiteMinutes: 10,
+          blackMinutes: 10,
+          onToggleClock: handleToggleClock,
+          onWhiteMinutesChange: handleWhiteMinutesChange,
+          onBlackMinutesChange: handleBlackMinutesChange,
+          onStartMatch: handleStartClockMatch,
+        }}
       />
     );
 

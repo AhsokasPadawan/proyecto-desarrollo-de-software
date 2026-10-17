@@ -152,8 +152,8 @@ describe('Castling & En Passant', () => {
     expect(board.getPieceAt(new Position(0, 7))).toBe(whiteRook);
     expect(board.getPieceAt(new Position(0, 6))).toBeNull();
     expect(board.getPieceAt(new Position(0, 5))).toBeNull();
-    expect(whiteKing.hasMoved).toBe(false);
-    expect(whiteRook.hasMoved).toBe(false);
+    expect(board.hasPieceMoved(whiteKing)).toBe(false);
+    expect(board.hasPieceMoved(whiteRook)).toBe(false);
   });
 
   it('executes valid en passant capture capturing double-advanced enemy pawn', () => {

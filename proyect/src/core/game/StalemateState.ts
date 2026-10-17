@@ -1,9 +1,9 @@
 import { Color } from '../pieces/types';
-import { GameStateKind } from '../ports/MoveResult';
+import { GameStateType } from '../ports/MoveResult';
 import { GameStateContext, IGameState } from './IGameState';
 
 export class StalemateState implements IGameState {
-  readonly kind: GameStateKind = 'STALEMATE';
+  readonly type: GameStateType = 'STALEMATE';
 
   canAcceptMoves(): boolean {
     return false;

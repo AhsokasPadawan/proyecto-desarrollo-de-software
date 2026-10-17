@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess TPO — Discutiendo con la IA (31 Decisiones de Refactoring)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased p-4 md:p-8">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <header class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
+          <span>Ingeniería de Software</span>
+          <span>•</span>
+          <span>Bitácora de Code Review Archivo por Archivo</span>
+        </div>
+        <h1 class="text-2xl md:text-3xl font-bold mt-1">💬 Discutiendo con la IA — 31 Decisiones de Diseño y Refactoring</h1>
+        <p class="text-sm text-slate-400 mt-1">
+          Registro completo de los planteos del desarrollador, el análisis arquitectónico y las refactorizaciones aplicadas sobre los 85 archivos de <code>src/core</code> y <code>src/adapters</code>.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-center">
+          <div class="text-lg font-bold text-indigo-400">31</div>
+          <div class="text-[11px] text-slate-400">Discusiones</div>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-center">
+          <div class="text-lg font-bold text-emerald-400">85</div>
+          <div class="text-[11px] text-slate-400">Archivos Revisados</div>
+        </div>
+        <a href="./ejemplos_de_la_teoria_estudiada.html" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-3 rounded-xl transition shadow-md">
+          ← Ver Ejemplos de la Teoría Estudiada
+        </a>
+      </div>
+    </header>
+
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-3 items-center justify-between sticky top-2 z-30 backdrop-blur-md bg-slate-900/95 shadow-lg">
+      <div class="flex flex-wrap gap-1.5 w-full md:w-auto" id="group-filters">
+        <button data-group="all" class="grp-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Todas (31)</button>
+        <button data-group="pieces-rules" class="grp-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">Piezas y Reglas (1–6)</button>
+        <button data-group="board-ports" class="grp-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">Board y Ports (7–10)</button>
+        <button data-group="game-state" class="grp-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">Motor y State (11–21)</button>
+        <button data-group="strategy" class="grp-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">Strategy IA (22–23)</button>
+        <button data-group="adapters" class="grp-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">Adaptador Web React (24–31)</button>
+      </div>
+      <div class="w-full md:w-72">
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Buscar por discusión, archivo o patrón..."
+          class="w-full px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+        />
+      </div>
+    </div>
+
+    <div id="discussions-container" class="space-y-4"></div>
+  </div>
+
+  <script>
+    const DISCUSSIONS = [
+      {
+        id: 1,
+        group: 'pieces-rules',
+        tag: 'YAGNI & Type Safety',
+        title: '¿Es sobreingeniería tener StandardPieceType y Chancellor antes del examen?',
+        files: 'src/core/pieces/types.ts',
+        prompt: 'Dado que aún no estamos en el examen con el profesor, ¿no es sobreingeniería tener StandardPieceType y Chancellor pre-creados? Si en el examen lo piden, podemos seguir el camino inverso en el momento.',
+        analysis: '100% acertado bajo YAGNI: StandardPieceType no tenía consumidores y abrir PieceType con | (string & {}) hacía que TypeScript perdiera el control de exhaustividad estática en todos los Record<PieceType, ...> (como FenSerializer o GreedyMaterialAiStrategy).',
+        decision: 'Se eliminó StandardPieceType, el escape | (string & {}) y Chancellor.ts, cerrando PieceType estrictamente sobre PIECE_TYPES.'
+      },
+      {
+        id: 2,
+        group: 'pieces-rules',
+        tag: 'SOLID — ISP & Inmutabilidad',
+        title: '¿Por qué hasMoved y setHasMoved son opcionales (?) en IPiece? ¿Viola ISP?',
+        files: 'src/core/pieces/IPiece.ts, Board.ts, IBoardQuery.ts',
+        prompt: 'El hecho de que hasMoved? y setHasMoved? sean opcionales en IPiece hace pensar que rompemos el Principio de Segregación de Interfaces (ISP). Además, si los hiciéramos obligatorios, obligaríamos a Knight, Bishop o Queen a implementar estado que solo usan King y Rook.',
+        analysis: 'El diagnóstico da en el clavo: "haberse movido en la partida" no es un atributo intrínseco de la pieza sino del estado histórico del tablero (igual que enPassantTarget). Al mover ese registro a un Set<IPiece> dentro de Board, las piezas quedan 100% inmutables (stateless), se respeta ISP sin type guards y IBoardQuery segrega lectura (hasPieceMoved) de mutación (setPieceMoved).',
+        decision: 'Se quitaron hasMoved? y setHasMoved? de IPiece y Piece; se agregaron hasPieceMoved(piece) en IBoardQuery y setPieceMoved(piece, moved) en Board.'
+      },
+      {
+        id: 3,
+        group: 'pieces-rules',
+        tag: 'YAGNI & GRASP Creator',
+        title: '¿Realmente necesitamos PromotionFactory o conviene aplicar YAGNI y GRASP Creator?',
+        files: 'src/core/pieces/PromotionFactory.ts (eliminado), MoveCommand.ts',
+        prompt: 'No tiene sentido tener una clase PromotionFactory separada para un único consumidor (MoveCommand). Además, por GRASP Creator, el lugar natural para instanciar una clase es quien posee los datos de inicialización, la registra y la usa estrechamente.',
+        analysis: 'MoveCommand cumple tres condiciones de GRASP Creator simultáneamente: tiene promotionType y color, almacena promotedPiece para poder hacer undo() y la coloca en el tablero. Posteriormente, al revisar GreedyMaterialAiStrategy (Discusión 23), cuando apareció un segundo consumidor real, se formalizó la función pura createPiece en pieceFactory.ts.',
+        decision: 'Se eliminó la clase estática PromotionFactory.ts y se utilizó un Lookup Table tipado de constructores.'
+      },
+      {
+        id: 4,
+        group: 'pieces-rules',
+        tag: 'Programación Estructurada & DRY',
+        title: 'Reescritura del bucle while en SlidingMoveRule sin break y sin duplicar push()',
+        files: 'src/core/rules/SlidingMoveRule.ts, LeapMoveRule.ts, PawnCaptureRule.ts',
+        prompt: '¿Se puede reescribir el while de SlidingMoveRule sin usar break y sin repetir legalMoves.push(currentPosition) adentro y afuera del if?',
+        analysis: 'En un deslizamiento por rayos existe dependencia secuencial (una pieza bloquea las casillas posteriores). Incorporando la bandera explícita isRayUnblocked = pieceAtTarget === null en la condición del while y unificando la condición de inserción (pieceAtTarget?.color !== piece.color), desaparece el break y queda un único push(). En LeapMoveRule y PawnCaptureRule (donde cada salto es independiente) se reemplazó el for imperativo por .map().filter().',
+        decision: 'Se refactorizó SlidingMoveRule con while (board.isWithinBounds(currentPosition) && isRayUnblocked) y LeapMoveRule/PawnCaptureRule con .map().filter().'
+      },
+      {
+        id: 5,
+        group: 'pieces-rules',
+        tag: 'SRP & Extract Method',
+        title: 'Aislar el paso simple y el doble paso inicial en funciones separadas en PawnForwardRule',
+        files: 'src/core/rules/PawnForwardRule.ts',
+        prompt: 'Dividir el paso simple hacia adelante y el doble paso inicial en dos funciones privadas llamadas desde getPseudoLegalMoves para que cada responsabilidad quede aislada.',
+        analysis: 'Aplicar Extract Method permite que getPseudoLegalMoves exprese la regla de alto nivel (si el paso simple está bloqueado no hay avances posibles; si está libre, se evalúa el doble paso inicial) sin mutar arreglos temporales.',
+        decision: 'Se extrajeron getSingleStepMove y getDoubleStepMove en PawnForwardRule.ts.'
+      },
+      {
+        id: 6,
+        group: 'pieces-rules',
+        tag: 'Arquitectura — Pseudo-Legal vs. Legal',
+        title: '¿Tiene sentido que CastlingMoveRule evalúe jaques con CheckDetector o pertenece a ChessGame?',
+        files: 'src/core/rules/CastlingMoveRule.ts, ChessGame.ts, CheckDetector.ts',
+        prompt: '¿Tiene sentido que CastlingMoveRule detecte si las casillas están bajo ataque para el enroque? En las demás reglas esa validación global de jaque no está en la pieza sino en el motor.',
+        analysis: 'Inyectar CheckDetector en CastlingMoveRule violaba la frontera entre Movimiento Pseudo-Legal (geometría/ocupación en rules/) y Movimiento Legal (filtrado de jaque en ChessGame), obligando además a usar un flag mutable isEvaluating contra recursión infinita.',
+        decision: 'CastlingMoveRule quedó 100% stateless y geométrico; la verificación de que el Rey no esté en jaque ni cruce casilla atacada (isCastlingOriginOrTransitAttacked) se trasladó a ChessGame.ts.'
+      },
+      {
+        id: 7,
+        group: 'board-ports',
+        tag: 'DDD — Lenguaje Ubicuo',
+        title: 'Claridad semántica en Board: renombrar isEmpty(position) a isSquareEmpty(position)',
+        files: 'src/core/board/Board.ts, src/core/ports/IBoardQuery.ts',
+        prompt: 'Leer board.isEmpty(pos) parece preguntar si el tablero entero está vacío. Debería tener un nombre explícitamente referido a la casilla.',
+        analysis: 'En el Lenguaje Ubicuo del ajedrez cada celda es un Square (escaque). Renombrar a isSquareEmpty(position) elimina toda ambigüedad en IBoardQuery, Board y todas las reglas.',
+        decision: 'Se renombró isEmpty a isSquareEmpty en IBoardQuery.ts, Board.ts, reglas y tests.'
+      },
+      {
+        id: 8,
+        group: 'board-ports',
+        tag: 'YAGNI & Funciones Puras',
+        title: 'Reemplazo de la clase estática BoardSetupFactory por funciones en boardSetup.ts',
+        files: 'src/core/board/boardSetup.ts, Board.ts',
+        prompt: '¿No es sobreingeniería tener una clase BoardSetupFactory con métodos estáticos? Además, createStandardBoard() no debería pedir dimensiones por parámetro porque un tablero estándar es de 8x8 por definición (mientras que Board sí conserva rows y cols parametrizables).',
+        analysis: 'En TypeScript las funciones exportadas de primer orden son más simples e idiomáticas que clases con solo métodos estáticos. Además, dejar createStandardBoard() sin parámetros refleja la definición FIDE mientras Board(rows, cols) mantiene el soporte de tableros NxM.',
+        decision: 'Se reemplazó BoardSetupFactory.ts por boardSetup.ts con createStandardBoard() y populateStandardBoard().'
+      },
+      {
+        id: 9,
+        group: 'board-ports',
+        tag: 'Hexagonal Architecture — Flat DTO',
+        title: 'Propiedades opcionales en MoveRecord: ¿cuándo separar interfaces vs. mantener un DTO plano?',
+        files: 'src/core/ports/GameSnapshot.ts',
+        prompt: '¿Por qué capturedPiece, isCastling, isPromotion y promotionPiece son opcionales en MoveRecord? ¿Conviene separarlos en dos interfaces?',
+        analysis: 'En ajedrez el 80% de las jugadas son desplazamientos simples, y eventos como captura y coronación pueden ocurrir simultáneamente (e7xd8=Q). Mantener un DTO plano e inmutable en la frontera del puerto evita anidamientos y facilita el consumo en MoveHistoryTable y transcriptionFormatter.',
+        decision: 'Se conserva MoveRecord como DTO plano inmutable aplicando KISS y YAGNI.'
+      },
+      {
+        id: 10,
+        group: 'board-ports',
+        tag: 'Patrón Observer & React 18',
+        title: 'Integración de IGameObserver con React vía useSyncExternalStore (Cero useEffect)',
+        files: 'src/core/ports/IGameEngine.ts, IGameObserver.ts, src/adapters/web/ChessApp.tsx',
+        prompt: 'Análisis de cómo se conecta el patrón Observer del Core con React prescindiendo por completo de useEffect.',
+        analysis: 'Suscribirse con useSyncExternalStore(engine.subscribe, engine.getSnapshot) permite que React lea el GameSnapshot inmutable de forma síncrona ante cada notificación del Core, evitando dobles renders, tearing y el abuso de useEffect.',
+        decision: 'Arquitectura validada con cero llamadas a useEffect para sincronizar el estado de la partida.'
+      },
+      {
+        id: 11,
+        group: 'game-state',
+        tag: 'Code Smell — Data Clumps',
+        title: 'Eliminación de Data Clumps y flags booleanos redundantes en MoveCommand.ts',
+        files: 'src/core/game/MoveCommand.ts',
+        prompt: 'Las 11 variables privadas de MoveCommand forman grupos que siempre van juntos (enroque, coronación, captura). ¿No conviene agruparlos en objetos cohesivos?',
+        analysis: 'Agrupar el estado previo en CapturedPieceRecord y CastlingRecord reduce las variables de instancia de 11 a 6, elimina los booleanos redundantes isCastling e isPromotion (la existencia del registro indica el evento) y suprime múltiples null-checks defensivos en undo().',
+        decision: 'Se crearon CapturedPieceRecord y CastlingRecord dentro de MoveCommand.ts.'
+      },
+      {
+        id: 12,
+        group: 'game-state',
+        tag: 'Patrón State & Simetría',
+        title: 'Eliminación de la palabra kind en IGameState: alineación con type: GameStateType',
+        files: 'src/core/game/IGameState.ts, MoveResult.ts y las 6 clases de estado',
+        prompt: 'La propiedad kind no es representativa del dominio. Conviene mantener los nombres canónicos del Patrón State de GoF pero reemplazar kind por type: GameStateType en simetría con IPiece.type.',
+        analysis: 'Unifica el vocabulario de discriminadores en todo el Core (piece.type: PieceType y state.type: GameStateType) manteniendo intacta la trazabilidad con el patrón State de la bibliografía.',
+        decision: 'Se reemplazó kind por readonly type: GameStateType en IGameState y en las 6 clases de estado.'
+      },
+      {
+        id: 13,
+        group: 'game-state',
+        tag: 'Clean Code — Magic Strings',
+        title: 'Eliminación de Magic Strings en activeStateTransition.ts mediante constantes tipadas',
+        files: 'src/core/game/activeStateTransition.ts',
+        prompt: 'Reemplazar los literales sueltos "hasMoves", "noMoves", "inCheck", "safe" por constantes explícitas usadas tanto en los tipos como en la tabla NEXT_STATE_FACTORIES.',
+        analysis: 'Derivar los tipos con typeof HAS_MOVES | typeof NO_MOVES elimina la duplicación de literales y centraliza las claves de la matriz de transición.',
+        decision: 'Se definieron las constantes HAS_MOVES, NO_MOVES, IN_CHECK y SAFE en activeStateTransition.ts.'
+      },
+      {
+        id: 14,
+        group: 'game-state',
+        tag: 'SOLID — LSP & Polimorfismo State',
+        title: '¿Por qué getWinner() retorna null en NormalPlayState? Polimorfismo vs. condicionales',
+        files: 'src/core/game/NormalPlayState.ts, IGameState.ts',
+        prompt: '¿Es necesario que NormalPlayState implemente getWinner() retornando null?',
+        analysis: 'Gracias a que todos los estados implementan getWinner(): Color | null (cumpliendo LSP), ChessGame puede consultar this.currentState.getWinner(this.currentTurn) polimórficamente sin hacer if (state.type === "CHECKMATE").',
+        decision: 'Se mantiene getWinner() en el contrato polimórfico de IGameState.'
+      },
+      {
+        id: 15,
+        group: 'game-state',
+        tag: 'SOLID — DIP & ISP',
+        title: 'Desacoplamiento de InsufficientMaterialEvaluator a función pura sobre IBoardQuery',
+        files: 'src/core/game/InsufficientMaterialEvaluator.ts',
+        prompt: 'Reemplazar el parámetro concreto Board por la interfaz de solo lectura IBoardQuery, transformar la clase estática en función pura y simplificar helpers de una línea.',
+        analysis: 'Recibir IBoardQuery garantiza por compilación que el evaluador de material insuficiente jamás pueda mutar el tablero (ISP/DIP), y extraer collectRemainingPieces elimina repetición.',
+        decision: 'Se transformó en export function isInsufficientMaterial(board: IBoardQuery): boolean.'
+      },
+      {
+        id: 16,
+        group: 'game-state',
+        tag: 'SOLID — DIP & Lookup Table',
+        title: 'Desacoplamiento de PositionHasher y FenSerializer con Lookup Tables tipadas',
+        files: 'src/core/game/PositionHasher.ts, FenSerializer.ts',
+        prompt: 'Aplicar IBoardQuery en PositionHasher y usar una tabla de búsqueda anidada Record<PieceType, Record<Color, string>> en FenSerializer.',
+        analysis: 'PositionHasher pasa a ser la función pura computePositionSignature(board: IBoardQuery, currentTurn: Color), y FenSerializer reemplaza la conversión manual por FEN_PIECE_SYMBOLS[piece.type][piece.color] en O(1).',
+        decision: 'Ambos servicios de dominio quedaron como funciones puras desacopladas y gobernadas por Lookup Tables.'
+      },
+      {
+        id: 17,
+        group: 'game-state',
+        tag: 'YAGNI en Constructor',
+        title: 'Inicialización determinista del estado en ChessGame (new NormalPlayState())',
+        files: 'src/core/game/ChessGame.ts',
+        prompt: 'En el constructor de ChessGame se evaluaba si la partida arrancaba en jaque. Como toda partida dentro del alcance comienza en estado normal, esa evaluación inicial es YAGNI.',
+        analysis: 'Suprimir la comprobación en el constructor elimina el acoplamiento directo de ChessGame con CheckState y delega todas las transiciones a activeStateTransition.ts.',
+        decision: 'Se inicializa directamente this.currentState = new NormalPlayState() en el constructor.'
+      },
+      {
+        id: 18,
+        group: 'game-state',
+        tag: 'Patrón Composed Method',
+        title: 'Descomposición de makeMove() en métodos privados auto-documentados',
+        files: 'src/core/game/ChessGame.ts',
+        prompt: 'Subdividir makeMove en métodos privados pequeños cuyos nombres expliquen cada paso (incluyendo addSnapshotToTurnHistory) sin usar comentarios.',
+        analysis: 'Aplicando el patrón Composed Method (SLAP), makeMove lee como un índice ejecutivo: validateMove -> executeCommand -> recordMove -> addSnapshotToTurnHistory -> updateHalfMoveClock -> switchTurn -> trackPositionRepetition -> updateGameState -> notifyObservers.',
+        decision: 'Se extrajeron los 7 métodos privados de coordinación en ChessGame.ts.'
+      },
+      {
+        id: 19,
+        group: 'game-state',
+        tag: 'Principio DRY en Historial',
+        title: 'Unificación DRY y simetría entre undo(), redo() y addSnapshotToTurnHistory()',
+        files: 'src/core/game/ChessGame.ts',
+        prompt: 'undo() y redo() hacen operaciones simétricas sobre el snapshot de turno y el cambio de turno. ¿Podemos extraer la lógica común?',
+        analysis: 'Se extrajeron createCurrentTurnRecord() y restoreTurnRecord(record) y se reutilizó this.switchTurn(), eliminando la construcción y asignación manual repetida de TurnRecord.',
+        decision: 'Refactorizados undo(), redo(), addSnapshotToTurnHistory() y declareTimeout() en ChessGame.ts.'
+      },
+      {
+        id: 20,
+        group: 'game-state',
+        tag: 'Cohesión de Parámetros',
+        title: 'Simplificación de hasAnyLegalMove() eliminando parámetro acoplado',
+        files: 'src/core/game/ChessGame.ts',
+        prompt: 'hasAnyLegalMove(color) recibía un color pero internamente llamaba a getLegalMoves que filtra por this.currentTurn.',
+        analysis: 'El parámetro inducía a error porque getLegalMoves solo devuelve jugadas para el jugador activo. Al quitar el parámetro y luego extraer la evaluación pura en legalMoveEvaluator.ts (Discusión 23), el diseño quedó consistente.',
+        decision: 'Se simplificó hasAnyLegalMove() en ChessGame.ts.'
+      },
+      {
+        id: 21,
+        group: 'game-state',
+        tag: 'DDD — Aggregate Root & Facade',
+        title: '¿ChessGame hace demasiado? Justificación como Aggregate Root y Fachada Orquestadora',
+        files: 'src/core/game/ChessGame.ts',
+        prompt: 'ChessGame mantiene múltiples variables de estado y métodos. ¿Viola SRP o es un God Object?',
+        analysis: 'Bajo DDD, ChessGame es el Aggregate Root de la partida: el tablero, el turno, los relojes y el estado no pueden mutar por separado sin romper las invariantes FIDE. Además, no implementa algoritmos de bajo nivel sino que actúa como Facade delegando en Board, MoveCommand, CommandHistory, CheckDetector, IGameState y los servicios de dominio.',
+        decision: 'Se ratifica la arquitectura de ChessGame como Aggregate Root y Facade del Core.'
+      },
+      {
+        id: 22,
+        group: 'strategy',
+        tag: 'Clean Architecture — Dependency Rule',
+        title: 'Centralización de isTerminalState en el Dominio (core/ports/MoveResult.ts)',
+        files: 'src/core/ports/MoveResult.ts, IAiStrategy.ts, stateDisplayLookup.ts',
+        prompt: 'La comprobación de si un estado es terminal se repite en varios lugares (y en la estrategia faltaba TIMEOUT). ¿No debería declararse en un único lugar del dominio?',
+        analysis: 'isTerminalState estaba definida en adapters/web/stateDisplayLookup.ts, por lo que el Core no podía importarla sin violar la Regla de Dependencia. Moverla a core/ports/MoveResult.ts permitió que tanto el Core (collectAllCandidateMoves) como la UI usen la misma fuente de verdad.',
+        decision: 'Se movió TERMINAL_GAME_STATES e isTerminalState(stateKind) a src/core/ports/MoveResult.ts.'
+      },
+      {
+        id: 23,
+        group: 'strategy',
+        tag: 'SRP, Factory & DRY en Core',
+        title: 'Desacoplamiento de GreedyMaterialAiStrategy: pieceFactory, createBoardFromSnapshot y legalMoveEvaluator',
+        files: 'pieceFactory.ts, boardSetup.ts, legalMoveEvaluator.ts, collectAllCandidateMoves.ts, GreedyMaterialAiStrategy.ts',
+        prompt: '¿Por qué GreedyMaterialAiStrategy reconstruye tableros, define una fábrica de piezas propia y duplica hasAnyLegalMove y la recolección de movimientos?',
+        analysis: 'Se extrajeron 4 módulos cohesivos en el Core: createPiece en pieceFactory.ts, createBoardFromSnapshot en boardSetup.ts, hasAnyLegalMove en legalMoveEvaluator.ts y collectAllCandidateMoves en strategy/. Así GreedyMaterialAiStrategy pasó de 128 a 65 líneas dedicadas 100% a su heurística.',
+        decision: 'Creados pieceFactory.ts, legalMoveEvaluator.ts y collectAllCandidateMoves.ts; limpiado GreedyMaterialAiStrategy.ts.'
+      },
+      {
+        id: 24,
+        group: 'adapters',
+        tag: 'Threshold Lookup Table',
+        title: 'Reemplazo de cascada if por Tabla de Umbrales Declarativa en moveQualityEvaluator.ts',
+        files: 'src/adapters/web/moveQualityEvaluator.ts',
+        prompt: '¿Se puede reemplazar la cadena de if (normalizedLoss <= ...) en classifyMoveQuality por una tabla declarativa?',
+        analysis: 'Al tratarse de intervalos continuos de pérdida de ventaja, el patrón Threshold Lookup Table (QUALITY_THRESHOLDS recorrido con .find()) elimina la cascada imperativa de condicionales.',
+        decision: 'Se introdujo QUALITY_THRESHOLDS en moveQualityEvaluator.ts.'
+      },
+      {
+        id: 25,
+        group: 'adapters',
+        tag: 'React SRP & Facade Component',
+        title: 'Transformación de renderPieceContent en componentes StandardPieceGlyph, FallbackPieceBadge y PieceDisplay',
+        files: 'src/adapters/web/pieceDisplay.tsx, ChessSquare.tsx',
+        prompt: 'En lugar de una función helper renderPieceContent con dos return distintos, ¿no es más limpio tener componentes separados y evaluar quién toma la decisión?',
+        analysis: 'Extraer StandardPieceGlyph y FallbackPieceBadge separa las vistas, y mantener el componente fachada PieceDisplay evita que ChessSquare se acople a los detalles de cómo se dibuja cada pieza.',
+        decision: 'Creados StandardPieceGlyph, FallbackPieceBadge y PieceDisplay en pieceDisplay.tsx.'
+      },
+      {
+        id: 26,
+        group: 'adapters',
+        tag: 'React — Composed Component Pattern',
+        title: 'Subcomponentes privados semánticos en ApiKeyModal, AppHeader, ChessSquare, GameActionBar y ReplayControlSection',
+        files: 'ApiKeyModal.tsx, AppHeader.tsx, ChessSquare.tsx, GameActionBar.tsx, MoveHighlightLegend.tsx, PlayerTimePicker.tsx, ReplayControlSection.tsx, ChessBoardView.tsx',
+        prompt: 'Descomponer los bloques JSX extensos en subcomponentes privados al archivo para que el componente principal sea conciso y auto-documentado sin comentarios.',
+        analysis: 'Aplicar Composed Component en toda la capa de componentes permitió reemplazar JSX anidado por subcomponentes con nombres de dominio claros, además de extraer constantes estáticas fuera del ciclo de renderizado y usar Set<string> en ChessBoardView.',
+        decision: 'Refactorizados los 8 componentes de vista aplicando subcomponentes privados y Lookup Tables.'
+      },
+      {
+        id: 27,
+        group: 'adapters',
+        tag: 'TypeScript Type Narrowing vs. Lookup Table',
+        title: 'Cláusulas de Guarda y Type Narrowing vs. Lookup Table forzada en CoachFeedbackCard.tsx',
+        files: 'src/adapters/web/components/CoachFeedbackCard.tsx',
+        prompt: 'Comparación práctica entre usar un objeto de mapeo o mantener las 5 cláusulas if que retornan los subcomponentes privados en CoachFeedbackCard.',
+        analysis: 'Cuando las entradas son props opcionales independientes con orden de prioridad, un objeto obliga a escribir ternarios repetitivos en cada clave. En cambio, 5 cláusulas de guarda de una línea aprovechan el Control Flow Type Narrowing nativo de TypeScript.',
+        decision: 'Se extrajeron los 5 subcomponentes de tarjeta manteniendo las cláusulas de guarda tempranas.'
+      },
+      {
+        id: 28,
+        group: 'adapters',
+        tag: 'Dead Code Elimination',
+        title: 'Eliminación del componente muerto MoveHistoryPanel.tsx y consolidación en MoveHistoryTable.tsx',
+        files: 'MoveHistoryPanel.tsx (eliminado), MoveHistoryTable.tsx, MoveHistoryTable.test.tsx',
+        prompt: 'Si MoveHistoryPanel solo existe por su propio archivo de test y no es usado en ningún lugar de la aplicación, deberíamos borrarlo y llevar lo útil a MoveHistoryTable.',
+        analysis: 'Se integró la columna Detalle (Enroque, Coronación, Captura) y los subcomponentes privados en MoveHistoryTable.tsx, se migraron los tests a MoveHistoryTable.test.tsx y se eliminó el componente muerto.',
+        decision: 'Eliminado MoveHistoryPanel.tsx y consolidado el historial en MoveHistoryTable.tsx.'
+      },
+      {
+        id: 29,
+        group: 'adapters',
+        tag: 'Cohesive Lookup Objects & Props',
+        title: 'Unificación de Lookup Tables paralelas en objetos cohesivos en PlayerClockBar y ControlPanelView',
+        files: 'src/adapters/web/components/PlayerClockBar.tsx, ControlPanelView.tsx',
+        prompt: 'Unificar diccionarios paralelos que comparten las mismas claves (WHITE/BLACK y estados del reloj) en un solo objeto por dominio donde cada clave agrupe sus propiedades.',
+        analysis: 'Agrupar { tag, badgeStyle, dotStyle } por Color y { clockBarStyles, clockTimeStyles } por ClockVisualState aumenta la cohesión de datos. Además, en ControlPanelView se eliminaron 8 props sueltas de reloj en favor del objeto clockConfig.',
+        decision: 'Unificadas las tablas en objetos cohesivos y simplificada la interfaz de ControlPanelView.tsx.'
+      },
+      {
+        id: 30,
+        group: 'adapters',
+        tag: 'Custom Hooks & Layout Lookup Table',
+        title: 'Modularización de ChessApp.tsx: BOARD_LAYOUT_DIMENSIONS, useMatchReplay y BoardColumnArea',
+        files: 'src/adapters/web/ChessApp.tsx',
+        prompt: 'En ChessApp.tsx: unificar el setInterval repetido, reemplazar los ternarios anidados de dimensiones por una Lookup Table y extraer useMatchReplay y BoardColumnArea.',
+        analysis: 'Extraer useMatchReplay(engine) encapsuló todo el transporte de reproducción y unificó el timer en startPlaybackInterval; BOARD_LAYOUT_DIMENSIONS eliminó los ternarios anidados; y BoardColumnArea despejó el JSX principal.',
+        decision: 'Aplicadas las 3 mejoras en ChessApp.tsx manteniendo cero llamadas a useEffect.'
+      },
+      {
+        id: 31,
+        group: 'adapters',
+        tag: 'Contenedores {children} & Cohesión Funcional',
+        title: 'Extracción de ModalDialog.tsx, CoachCardShell y constantes compartidas en pieceDisplay.tsx',
+        files: 'ModalDialog.tsx, pieceDisplay.tsx, ApiKeyModal.tsx, PromotionModal.tsx, CoachFeedbackCard.tsx',
+        prompt: '¿Hay estilos compartidos extraíbles a un componente con {children}? ¿Y constantes compartidas que tenga sentido centralizar sin caer en un archivo bolsa de gatos?',
+        analysis: 'Se creó ModalDialog.tsx para compartir el backdrop y cuadro de diálogo entre ApiKeyModal y PromotionModal, y CoachCardShell en CoachFeedbackCard. Además, se centralizaron PLAYER_DISPLAY_CONFIG y PIECE_NAMES_LOOKUP en pieceDisplay.tsx eliminando importaciones cruzadas entre componentes hermanos.',
+        decision: 'Creado ModalDialog.tsx y centralizadas las constantes de jugador y pieza en pieceDisplay.tsx.'
+      }
+    ];
+
+    const container = document.getElementById('discussions-container');
+    const groupButtons = document.querySelectorAll('.grp-btn');
+    const searchInput = document.getElementById('search-input');
+    let activeGroup = 'all';
+
+    function renderDiscussions() {
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = DISCUSSIONS.filter((d) => {
+        const matchesGroup = activeGroup === 'all' || d.group === activeGroup;
+        const matchesQuery =
+          !query ||
+          d.title.toLowerCase().includes(query) ||
+          d.tag.toLowerCase().includes(query) ||
+          d.files.toLowerCase().includes(query) ||
+          d.prompt.toLowerCase().includes(query) ||
+          d.analysis.toLowerCase().includes(query) ||
+          d.decision.toLowerCase().includes(query) ||
+          `discusión ${d.id}`.includes(query);
+        return matchesGroup && matchesQuery;
+      });
+
+      container.innerHTML = filtered
+        .map(
+          (d) => `
+        <article class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-mono font-bold">
+                Discusión #${d.id}
+              </span>
+              <h2 class="text-base md:text-lg font-bold text-slate-100">${d.title}</h2>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold">
+                ${d.tag}
+              </span>
+              <span class="px-2.5 py-0.5 rounded-md bg-slate-950 text-slate-400 border border-slate-800 text-[11px] font-mono">
+                ${d.files}
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 text-xs">
+            <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 space-y-1.5">
+              <div class="font-bold uppercase tracking-wider text-amber-400 text-[11px]">1. Planteo del Desarrollador</div>
+              <p class="text-slate-300 leading-relaxed">${d.prompt}</p>
+            </div>
+            <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 space-y-1.5">
+              <div class="font-bold uppercase tracking-wider text-sky-400 text-[11px]">2. Análisis Técnico y Teórico</div>
+              <p class="text-slate-300 leading-relaxed">${d.analysis}</p>
+            </div>
+            <div class="bg-slate-950/70 border border-emerald-900/40 rounded-xl p-3.5 space-y-1.5">
+              <div class="font-bold uppercase tracking-wider text-emerald-400 text-[11px]">3. Decisión y Refactoring Aplicado</div>
+              <p class="text-slate-200 leading-relaxed">${d.decision}</p>
+            </div>
+          </div>
+        </article>
+      `
+        )
+        .join('');
+    }
+
+    groupButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeGroup = btn.getAttribute('data-group');
+        groupButtons.forEach((b) => {
+          b.className = 'grp-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition';
+        });
+        btn.className = 'grp-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition';
+        renderDiscussions();
+      });
+    });
+
+    searchInput.addEventListener('input', renderDiscussions);
+    renderDiscussions();
+  </script>
+</body>
+</html>

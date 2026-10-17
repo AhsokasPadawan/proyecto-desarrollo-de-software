@@ -12,8 +12,9 @@ export interface IBoardQuery {
   readonly cols: number;
   isWithinBounds(position: Position): boolean;
   getPieceAt(position: Position): IPiece | null;
-  isEmpty(position: Position): boolean;
+  isSquareEmpty(position: Position): boolean;
   findKingPosition(color: Color): Position | null;
   getPiecesByColor(color: Color): readonly PiecePlacement[];
   getEnPassantTarget(): Position | null;
+  hasPieceMoved(piece: IPiece): boolean;
 }

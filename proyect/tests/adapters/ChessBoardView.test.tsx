@@ -7,8 +7,6 @@ import { ChessBoardView, getFileLabel, getRankLabel } from '../../src/adapters/w
 import { getStateBadgeClass, getStateLabel } from '../../src/adapters/web/stateDisplayLookup';
 import { ChessGame } from '../../src/core/game/ChessGame';
 import { Board } from '../../src/core/board/Board';
-import { Chancellor } from '../../src/core/pieces/Chancellor';
-import { King } from '../../src/core/pieces/King';
 import { Pawn } from '../../src/core/pieces/Pawn';
 
 describe('Web Adapter - ChessBoardView', () => {
@@ -78,31 +76,6 @@ describe('Web Adapter - ChessBoardView', () => {
     expect(screen.getByTestId('chess-grid')).toHaveStyle({
       gridTemplateColumns: 'repeat(10, minmax(0, 1fr))',
     });
-  });
-
-  it('renders automatic fallback badge with initials for custom fairy chess piece', () => {
-    const board = new Board(8, 8);
-    const whiteKing = new King('WHITE');
-    const blackKing = new King('BLACK');
-    const blackChancellor = new Chancellor('BLACK');
-    board.placePiece(new Position(0, 4), whiteKing);
-    board.placePiece(new Position(7, 4), blackKing);
-    board.placePiece(new Position(4, 4), blackChancellor);
-    const game = new ChessGame(board, 'WHITE');
-    const snapshot = game.getSnapshot();
-
-    render(
-      <ChessBoardView
-        snapshot={snapshot}
-        selectedPosition={null}
-        legalMoves={[]}
-        onSquareClick={() => {}}
-      />
-    );
-
-    const fallbackBadge = screen.getByTestId('piece-fallback-black-chancellor');
-    expect(fallbackBadge).toBeInTheDocument();
-    expect(fallbackBadge).toHaveTextContent('CH');
   });
 
   it('maps column indices to algebraic file letters', () => {
@@ -216,5 +189,31 @@ describe('Web Adapter - ChessBoardView', () => {
     expect(inProgressClass).toContain('bg-emerald-950');
     expect(checkClass).toContain('animate-pulse');
     expect(checkmateClass).toContain('bg-red-950');
+  });
+
+  it('highlights played move and engine suggested move simultaneously with distinct roles', () => {
+    const game = new ChessGame();
+    const snapshot = game.getSnapshot();
+
+    render(
+      <ChessBoardView
+        snapshot={snapshot}
+        selectedPosition={null}
+        legalMoves={[]}
+        onSquareClick={() => {}}
+        activeMoveSquares={{ from: 'e2', to: 'e4' }}
+        suggestedMoveSquares={{ from: 'd2', to: 'd4' }}
+      />
+    );
+
+    const playedOrigin = screen.getByTestId('square-1-4');
+    const playedDest = screen.getByTestId('square-3-4');
+    const suggestedOrigin = screen.getByTestId('square-1-3');
+    const suggestedDest = screen.getByTestId('square-3-3');
+
+    expect(playedOrigin).toHaveAttribute('data-highlight-role', 'origin');
+    expect(playedDest).toHaveAttribute('data-highlight-role', 'destination');
+    expect(suggestedOrigin).toHaveAttribute('data-highlight-role', 'suggestion-origin');
+    expect(suggestedDest).toHaveAttribute('data-highlight-role', 'suggestion-destination');
   });
 });

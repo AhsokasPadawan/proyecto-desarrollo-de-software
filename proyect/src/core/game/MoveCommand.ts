@@ -1,9 +1,21 @@
 import { Board } from '../board/Board';
 import { Position } from '../board/Position';
 import { IPiece } from '../pieces/IPiece';
-import { PromotionFactory } from '../pieces/PromotionFactory';
-import { PieceType } from '../pieces/types';
+import { createPiece } from '../pieces/pieceFactory';
+import { Color, PieceType } from '../pieces/types';
 import { ICommand } from './ICommand';
+
+interface CapturedPieceRecord {
+  readonly piece: IPiece;
+  readonly position: Position;
+}
+
+interface CastlingRecord {
+  readonly rook: IPiece;
+  readonly from: Position;
+  readonly to: Position;
+  readonly wasMovedBefore: boolean;
+}
 
 export class MoveCommand implements ICommand {
   private readonly board: Board;
@@ -12,19 +24,11 @@ export class MoveCommand implements ICommand {
   private readonly promotionType?: PieceType;
 
   private movedPiece: IPiece | null = null;
-  private capturedPiece: IPiece | null = null;
-  private capturedPiecePosition: Position | null = null;
-
   private wasPieceMovedBefore: boolean = false;
   private previousEnPassantTarget: Position | null = null;
 
-  private isCastling: boolean = false;
-  private castlingRook: IPiece | null = null;
-  private castlingRookFrom: Position | null = null;
-  private castlingRookTo: Position | null = null;
-  private wasRookMovedBefore: boolean = false;
-
-  private isPromotion: boolean = false;
+  private captureRecord: CapturedPieceRecord | null = null;
+  private castlingRecord: CastlingRecord | null = null;
   private promotedPiece: IPiece | null = null;
 
   constructor(board: Board, from: Position, to: Position, promotionType?: PieceType) {
@@ -35,7 +39,7 @@ export class MoveCommand implements ICommand {
   }
 
   getCapturedPiece(): IPiece | null {
-    return this.capturedPiece;
+    return this.captureRecord?.piece ?? null;
   }
 
   execute(): void {
@@ -44,7 +48,7 @@ export class MoveCommand implements ICommand {
       return;
     }
 
-    this.wasPieceMovedBefore = Boolean(this.movedPiece.hasMoved);
+    this.wasPieceMovedBefore = this.board.hasPieceMoved(this.movedPiece);
     this.previousEnPassantTarget = this.board.getEnPassantTarget();
 
     let nextEnPassantTarget: Position | null = null;
@@ -56,7 +60,7 @@ export class MoveCommand implements ICommand {
       this.previousEnPassantTarget &&
       this.to.equals(this.previousEnPassantTarget) &&
       this.from.col !== this.to.col &&
-      this.board.isEmpty(this.to)
+      this.board.isSquareEmpty(this.to)
     ) {
       this.executeEnPassantCapture();
     } else {
@@ -69,16 +73,12 @@ export class MoveCommand implements ICommand {
     }
 
     this.board.setEnPassantTarget(nextEnPassantTarget);
-    this.movedPiece.setHasMoved?.(true);
+    this.board.setPieceMoved(this.movedPiece, true);
 
     const promotionRow = this.movedPiece.color === 'WHITE' ? this.board.rows - 1 : 0;
     if (this.movedPiece.type === 'PAWN' && this.to.row === promotionRow) {
-      this.isPromotion = true;
-      this.promotedPiece = PromotionFactory.createPromotedPiece(
-        this.promotionType,
-        this.movedPiece.color
-      );
-      this.promotedPiece.setHasMoved?.(true);
+      this.promotedPiece = this.createPromotedPiece(this.movedPiece.color);
+      this.board.setPieceMoved(this.promotedPiece, true);
       this.board.placePiece(this.to, this.promotedPiece);
     }
   }
@@ -88,56 +88,77 @@ export class MoveCommand implements ICommand {
       return;
     }
 
-    if (this.isPromotion) {
+    if (this.promotedPiece) {
+      this.board.setPieceMoved(this.promotedPiece, false);
       this.board.removePiece(this.to);
       this.board.placePiece(this.from, this.movedPiece);
-      if (this.capturedPiece && this.capturedPiecePosition) {
-        this.board.placePiece(this.capturedPiecePosition, this.capturedPiece);
+      if (this.captureRecord) {
+        this.board.placePiece(this.captureRecord.position, this.captureRecord.piece);
       }
-    } else if (this.isCastling) {
+    } else if (this.castlingRecord) {
       this.board.movePiece(this.to, this.from);
-      if (this.castlingRook && this.castlingRookFrom && this.castlingRookTo) {
-        this.board.movePiece(this.castlingRookTo, this.castlingRookFrom);
-        this.castlingRook.setHasMoved?.(this.wasRookMovedBefore);
-      }
+      this.board.movePiece(this.castlingRecord.to, this.castlingRecord.from);
+      this.board.setPieceMoved(this.castlingRecord.rook, this.castlingRecord.wasMovedBefore);
     } else {
       this.board.movePiece(this.to, this.from);
-      if (this.capturedPiece && this.capturedPiecePosition) {
-        this.board.placePiece(this.capturedPiecePosition, this.capturedPiece);
+      if (this.captureRecord) {
+        this.board.placePiece(this.captureRecord.position, this.captureRecord.piece);
       }
     }
 
-    this.movedPiece.setHasMoved?.(this.wasPieceMovedBefore);
+    this.board.setPieceMoved(this.movedPiece, this.wasPieceMovedBefore);
     this.board.setEnPassantTarget(this.previousEnPassantTarget);
   }
 
+  private createPromotedPiece(color: Color): IPiece {
+    return createPiece(this.promotionType ?? 'QUEEN', color);
+  }
+
   private executeStandardMove(): void {
-    this.capturedPiece = this.board.movePiece(this.from, this.to);
-    this.capturedPiecePosition = this.to;
+    const capturedPiece = this.board.movePiece(this.from, this.to);
+    if (capturedPiece) {
+      this.captureRecord = {
+        piece: capturedPiece,
+        position: this.to,
+      };
+    }
   }
 
   private executeEnPassantCapture(): void {
     const enemyPawnPosition = new Position(this.from.row, this.to.col);
-    this.capturedPiece = this.board.removePiece(enemyPawnPosition);
-    this.capturedPiecePosition = enemyPawnPosition;
+    const capturedPiece = this.board.removePiece(enemyPawnPosition);
+    if (capturedPiece) {
+      this.captureRecord = {
+        piece: capturedPiece,
+        position: enemyPawnPosition,
+      };
+    }
     this.board.movePiece(this.from, this.to);
   }
 
   private executeCastling(): void {
-    this.isCastling = true;
     const isKingside = this.to.col > this.from.col;
 
     const rookOriginCol = isKingside ? this.board.cols - 1 : 0;
     const rookTargetCol = isKingside ? this.from.col + 1 : this.from.col - 1;
 
-    this.castlingRookFrom = new Position(this.from.row, rookOriginCol);
-    this.castlingRookTo = new Position(this.from.row, rookTargetCol);
+    const castlingRookFrom = new Position(this.from.row, rookOriginCol);
+    const castlingRookTo = new Position(this.from.row, rookTargetCol);
 
-    this.castlingRook = this.board.getPieceAt(this.castlingRookFrom);
-    this.wasRookMovedBefore = Boolean(this.castlingRook?.hasMoved);
+    const rook = this.board.getPieceAt(castlingRookFrom);
+    if (rook) {
+      this.castlingRecord = {
+        rook,
+        from: castlingRookFrom,
+        to: castlingRookTo,
+        wasMovedBefore: this.board.hasPieceMoved(rook),
+      };
+    }
 
     this.board.movePiece(this.from, this.to);
-    this.board.movePiece(this.castlingRookFrom, this.castlingRookTo);
-    this.castlingRook?.setHasMoved?.(true);
+    this.board.movePiece(castlingRookFrom, castlingRookTo);
+    if (rook) {
+      this.board.setPieceMoved(rook, true);
+    }
   }
 }

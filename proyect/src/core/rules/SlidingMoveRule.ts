@@ -31,18 +31,16 @@ export class SlidingMoveRule implements IMovementRule {
 
     for (const [deltaRow, deltaCol] of this.directions) {
       let currentPosition = from.offset(deltaRow, deltaCol);
+      let isRayUnblocked = true;
 
-      while (board.isWithinBounds(currentPosition)) {
+      while (board.isWithinBounds(currentPosition) && isRayUnblocked) {
         const pieceAtTarget = board.getPieceAt(currentPosition);
 
-        if (pieceAtTarget) {
-          if (pieceAtTarget.color !== piece.color) {
-            legalMoves.push(currentPosition);
-          }
-          break;
+        if (pieceAtTarget?.color !== piece.color) {
+          legalMoves.push(currentPosition);
         }
 
-        legalMoves.push(currentPosition);
+        isRayUnblocked = pieceAtTarget === null;
         currentPosition = currentPosition.offset(deltaRow, deltaCol);
       }
     }

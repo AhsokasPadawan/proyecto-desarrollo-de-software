@@ -1,6 +1,36 @@
-import type { ReactNode } from 'react';
-import { Color } from '../../core/pieces/types';
+import { Color, PieceType } from '../../core/pieces/types';
 import { PieceSnapshot } from '../../core/ports/GameSnapshot';
+
+export const PIECE_NAMES_LOOKUP: Record<PieceType, string> = {
+  PAWN: 'PEÓN',
+  ROOK: 'TORRE',
+  KNIGHT: 'CABALLO',
+  BISHOP: 'ALFIL',
+  QUEEN: 'DAMA',
+  KING: 'REY',
+};
+
+export interface PlayerDisplayConfig {
+  readonly tag: string;
+  readonly badgeStyle: string;
+  readonly dotStyle: string;
+  readonly labelColorClass: string;
+}
+
+export const PLAYER_DISPLAY_CONFIG: Record<Color, PlayerDisplayConfig> = {
+  WHITE: {
+    tag: 'Blancas',
+    badgeStyle: 'bg-amber-100 text-amber-950 border-amber-300 font-bold',
+    dotStyle: 'bg-amber-400',
+    labelColorClass: 'text-amber-200',
+  },
+  BLACK: {
+    tag: 'Negras',
+    badgeStyle: 'bg-zinc-950 text-zinc-100 border-zinc-700 font-bold',
+    dotStyle: 'bg-zinc-400',
+    labelColorClass: 'text-zinc-400',
+  },
+};
 
 export const STANDARD_PIECE_SYMBOLS: Record<Color, Record<string, string>> = {
   WHITE: {
@@ -31,21 +61,28 @@ export const FALLBACK_BADGE_CLASSES: Record<Color, string> = {
   BLACK: 'bg-zinc-900 text-zinc-100 border border-zinc-600 shadow font-extrabold',
 };
 
-export function renderPieceContent(piece: PieceSnapshot): ReactNode {
-  const symbol = STANDARD_PIECE_SYMBOLS[piece.color]?.[piece.type];
+interface StandardPieceGlyphProps {
+  readonly piece: PieceSnapshot;
+  readonly symbol: string;
+}
 
-  if (symbol) {
-    return (
-      <span
-        className={`text-4xl md:text-5xl select-none leading-none font-serif ${COLOR_TEXT_CLASSES[piece.color]}`}
-        aria-label={`${piece.color} ${piece.type}`}
-        data-testid={`piece-${piece.color.toLowerCase()}-${piece.type.toLowerCase()}`}
-      >
-        {symbol}
-      </span>
-    );
-  }
+export function StandardPieceGlyph({ piece, symbol }: StandardPieceGlyphProps): JSX.Element {
+  return (
+    <span
+      className={`text-4xl md:text-5xl select-none leading-none font-serif ${COLOR_TEXT_CLASSES[piece.color]}`}
+      aria-label={`${piece.color} ${piece.type}`}
+      data-testid={`piece-${piece.color.toLowerCase()}-${piece.type.toLowerCase()}`}
+    >
+      {symbol}
+    </span>
+  );
+}
 
+interface FallbackPieceBadgeProps {
+  readonly piece: PieceSnapshot;
+}
+
+export function FallbackPieceBadge({ piece }: FallbackPieceBadgeProps): JSX.Element {
   const initials = piece.type.slice(0, 2).toUpperCase();
   return (
     <span
@@ -56,5 +93,14 @@ export function renderPieceContent(piece: PieceSnapshot): ReactNode {
     >
       {initials}
     </span>
+  );
+}
+
+export function PieceDisplay({ piece }: { readonly piece: PieceSnapshot }): JSX.Element {
+  const symbol = STANDARD_PIECE_SYMBOLS[piece.color]?.[piece.type];
+  return symbol ? (
+    <StandardPieceGlyph piece={piece} symbol={symbol} />
+  ) : (
+    <FallbackPieceBadge piece={piece} />
   );
 }
