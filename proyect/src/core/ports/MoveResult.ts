@@ -1,6 +1,18 @@
 import { IPiece } from '../pieces/IPiece';
 
-export type GameStateKind = 'IN_PROGRESS' | 'CHECK' | 'CHECKMATE' | 'STALEMATE' | 'DRAW' | 'TIMEOUT';
+export type GameStateType = 'IN_PROGRESS' | 'CHECK' | 'CHECKMATE' | 'STALEMATE' | 'DRAW' | 'TIMEOUT';
+export type GameStateKind = GameStateType;
+
+export const TERMINAL_GAME_STATES: ReadonlySet<GameStateType> = new Set([
+  'CHECKMATE',
+  'STALEMATE',
+  'DRAW',
+  'TIMEOUT',
+]);
+
+export function isTerminalState(stateKind: GameStateKind): boolean {
+  return TERMINAL_GAME_STATES.has(stateKind);
+}
 
 export type MoveRejectionReason =
   | 'GAME_OVER'

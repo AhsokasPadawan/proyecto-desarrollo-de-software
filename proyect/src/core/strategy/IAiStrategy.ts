@@ -1,5 +1,6 @@
 import { Position } from '../board/Position';
 import { IGameEngine } from '../ports/IGameEngine';
+import { isTerminalState } from '../ports/MoveResult';
 
 export interface AiMove {
   readonly from: Position;
@@ -12,12 +13,7 @@ export interface IAiStrategy {
 
 export function collectCandidateMoves(engine: IGameEngine): AiMove[] {
   const snapshot = engine.getSnapshot();
-  const isTerminal =
-    snapshot.stateKind === 'CHECKMATE' ||
-    snapshot.stateKind === 'STALEMATE' ||
-    snapshot.stateKind === 'DRAW';
-
-  if (isTerminal) {
+  if (isTerminalState(snapshot.stateKind)) {
     return [];
   }
 

@@ -1,5 +1,5 @@
 import { Color } from '../pieces/types';
-import { GameStateKind } from '../ports/MoveResult';
+import { GameStateType } from '../ports/MoveResult';
 
 export interface GameStateContext {
   readonly isKingInCheck: boolean;
@@ -10,7 +10,7 @@ export interface GameStateContext {
 }
 
 export interface IGameState {
-  readonly kind: GameStateKind;
+  readonly type: GameStateType;
   canAcceptMoves(): boolean;
   getWinner(currentTurn: Color): Color | null;
   evaluateNextState(context: GameStateContext): IGameState;

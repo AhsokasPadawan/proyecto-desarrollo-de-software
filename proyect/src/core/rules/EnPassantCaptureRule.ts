@@ -2,6 +2,7 @@ import { Position } from '../board/Position';
 import { IPiece } from '../pieces/IPiece';
 import { IBoardQuery } from '../ports/IBoardQuery';
 import { IMovementRule } from './IMovementRule';
+import { PAWN_FORWARD_DELTAS } from './PawnForwardRule';
 
 export class EnPassantCaptureRule implements IMovementRule {
   getPseudoLegalMoves(from: Position, piece: IPiece, board: IBoardQuery): Position[] {
@@ -10,14 +11,10 @@ export class EnPassantCaptureRule implements IMovementRule {
       return [];
     }
 
-    const forwardDelta = piece.color === 'WHITE' ? 1 : -1;
+    const forwardDelta = PAWN_FORWARD_DELTAS[piece.color];
     const isAdjacentTargetRow = from.row + forwardDelta === target.row;
     const isAdjacentCol = Math.abs(from.col - target.col) === 1;
 
-    if (isAdjacentTargetRow && isAdjacentCol) {
-      return [target];
-    }
-
-    return [];
+    return isAdjacentTargetRow && isAdjacentCol ? [target] : [];
   }
 }

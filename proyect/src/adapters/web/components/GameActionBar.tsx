@@ -13,6 +13,10 @@ export interface GameActionBarProps {
   readonly isClockRunning?: boolean;
   readonly isClockPaused?: boolean;
   readonly onToggleClockPause?: () => void;
+  readonly onAskHint?: () => void;
+  readonly isHintLoading?: boolean;
+  readonly onAnalyzeGame?: () => void;
+  readonly isAnalyzingGame?: boolean;
 }
 
 function CurvedArrowBackIcon(): JSX.Element {
@@ -45,6 +49,91 @@ function CurvedArrowForwardIcon(): JSX.Element {
   );
 }
 
+function UndoRedoButtons({
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
+}: {
+  readonly canUndo: boolean;
+  readonly canRedo: boolean;
+  readonly onUndo: () => void;
+  readonly onRedo: () => void;
+}): JSX.Element {
+  return (
+    <>
+      <ActionButton
+        onClick={onUndo}
+        disabled={!canUndo}
+        testId="undo-button"
+        className="px-3 py-1.5 text-xs flex items-center justify-center font-medium"
+      >
+        <CurvedArrowBackIcon />
+        <span>Deshacer</span>
+      </ActionButton>
+
+      <ActionButton
+        onClick={onRedo}
+        disabled={!canRedo}
+        testId="redo-button"
+        className="px-3 py-1.5 text-xs flex items-center justify-center font-medium"
+      >
+        <span>Rehacer</span>
+        <CurvedArrowForwardIcon />
+      </ActionButton>
+    </>
+  );
+}
+
+function PostMatchButtons({
+  onAnalyzeGame,
+  isAnalyzingGame,
+  onStartReplay,
+  onExportMatch,
+}: {
+  readonly onAnalyzeGame?: () => void;
+  readonly isAnalyzingGame: boolean;
+  readonly onStartReplay?: () => void;
+  readonly onExportMatch?: () => void;
+}): JSX.Element {
+  return (
+    <>
+      {onAnalyzeGame && (
+        <ActionButton
+          onClick={onAnalyzeGame}
+          disabled={isAnalyzingGame}
+          testId="analyze-game-button"
+          className="px-3 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 shadow-md shadow-emerald-900/40"
+        >
+          <span>✨</span>
+          <span>{isAnalyzingGame ? 'Analizando...' : 'Analizar Partida (IA)'}</span>
+        </ActionButton>
+      )}
+
+      {onStartReplay && (
+        <ActionButton
+          onClick={onStartReplay}
+          variant="primary"
+          testId="review-match-button"
+          className="px-3 py-1.5 text-xs font-semibold"
+        >
+          Revisar Partida
+        </ActionButton>
+      )}
+
+      {onExportMatch && (
+        <ActionButton
+          onClick={onExportMatch}
+          testId="export-match-button"
+          className="px-3 py-1.5 text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700"
+        >
+          Exportar Partida
+        </ActionButton>
+      )}
+    </>
+  );
+}
+
 export function GameActionBar({
   canUndo,
   canRedo,
@@ -58,7 +147,14 @@ export function GameActionBar({
   isClockRunning = false,
   isClockPaused = false,
   onToggleClockPause,
+  onAskHint,
+  isHintLoading = false,
+  onAnalyzeGame,
+  isAnalyzingGame = false,
 }: GameActionBarProps): JSX.Element {
+  const showClockPauseButton =
+    isClockEnabled && !isTerminalState && onToggleClockPause && (isClockRunning || isClockPaused);
+
   return (
     <nav
       className="w-full flex flex-wrap items-center justify-center gap-2 p-3 bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-xl backdrop-blur-md"
@@ -66,30 +162,10 @@ export function GameActionBar({
       data-testid="game-action-bar"
     >
       {!isClockEnabled && (
-        <>
-          <ActionButton
-            onClick={onUndo}
-            disabled={!canUndo}
-            testId="undo-button"
-            className="px-3 py-1.5 text-xs flex items-center justify-center font-medium"
-          >
-            <CurvedArrowBackIcon />
-            <span>Deshacer</span>
-          </ActionButton>
-
-          <ActionButton
-            onClick={onRedo}
-            disabled={!canRedo}
-            testId="redo-button"
-            className="px-3 py-1.5 text-xs flex items-center justify-center font-medium"
-          >
-            <span>Rehacer</span>
-            <CurvedArrowForwardIcon />
-          </ActionButton>
-        </>
+        <UndoRedoButtons canUndo={canUndo} canRedo={canRedo} onUndo={onUndo} onRedo={onRedo} />
       )}
 
-      {isClockEnabled && !isTerminalState && onToggleClockPause && (isClockRunning || isClockPaused) && (
+      {showClockPauseButton && (
         <ActionButton
           onClick={onToggleClockPause}
           variant={isClockPaused ? 'primary' : 'default'}
@@ -97,6 +173,18 @@ export function GameActionBar({
           className="px-3 py-1.5 text-xs font-semibold"
         >
           {isClockPaused ? 'Reanudar Tiempo' : 'Pausar Tiempo'}
+        </ActionButton>
+      )}
+
+      {!isTerminalState && onAskHint && (
+        <ActionButton
+          onClick={onAskHint}
+          disabled={isHintLoading}
+          testId="ask-hint-button"
+          className="px-3 py-1.5 text-xs font-semibold bg-sky-700 hover:bg-sky-600 text-white flex items-center gap-1.5"
+        >
+          <span>💡</span>
+          <span>{isHintLoading ? 'Consultando Coach...' : 'Pedir sugerencia'}</span>
         </ActionButton>
       )}
 
@@ -109,25 +197,13 @@ export function GameActionBar({
         Reiniciar Partida
       </ActionButton>
 
-      {isTerminalState && onStartReplay && (
-        <ActionButton
-          onClick={onStartReplay}
-          variant="primary"
-          testId="review-match-button"
-          className="px-3 py-1.5 text-xs font-semibold"
-        >
-          Revisar Partida
-        </ActionButton>
-      )}
-
-      {isTerminalState && onExportMatch && (
-        <ActionButton
-          onClick={onExportMatch}
-          testId="export-match-button"
-          className="px-3 py-1.5 text-xs font-semibold bg-emerald-700 hover:bg-emerald-600 text-white"
-        >
-          Exportar Partida
-        </ActionButton>
+      {isTerminalState && (
+        <PostMatchButtons
+          onAnalyzeGame={onAnalyzeGame}
+          isAnalyzingGame={isAnalyzingGame}
+          onStartReplay={onStartReplay}
+          onExportMatch={onExportMatch}
+        />
       )}
     </nav>
   );

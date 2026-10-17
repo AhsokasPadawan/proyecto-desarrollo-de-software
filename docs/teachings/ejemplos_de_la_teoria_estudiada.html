@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess TPO — Ejemplos de la Teoría Estudiada en el Proyecto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased p-4 md:p-8">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <header class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+          <span>Ingeniería de Software</span>
+          <span>•</span>
+          <span>Guía de Estudio y Defensa Oral</span>
+        </div>
+        <h1 class="text-2xl md:text-3xl font-bold mt-1">📚 Ejemplos de la Teoría Estudiada en el Proyecto</h1>
+        <p class="text-sm text-slate-400 mt-1">
+          Vinculación directa entre cada principio teórico y nuestro código fuente. <strong>Hacé clic en cualquier archivo</strong> para inspeccionar su snippet real del proyecto.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-center">
+          <div class="text-lg font-bold text-indigo-400">6</div>
+          <div class="text-[11px] text-slate-400">Bloques Teóricos</div>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-center">
+          <div class="text-lg font-bold text-emerald-400">35</div>
+          <div class="text-[11px] text-slate-400">Conceptos Aplicados</div>
+        </div>
+        <a href="./discutiendo_con_la_ia.html" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-3 rounded-xl transition shadow-md">
+          Ver las 31 Discusiones con la IA →
+        </a>
+      </div>
+    </header>
+
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-3 items-center justify-between sticky top-2 z-30 backdrop-blur-md bg-slate-900/95 shadow-lg">
+      <div class="flex flex-wrap gap-1.5 w-full md:w-auto" id="category-filters">
+        <button data-cat="all" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition">Todos (6)</button>
+        <button data-cat="sec-1" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">1. Arquitectura &amp; DDD</button>
+        <button data-cat="sec-2" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">2. GRASP</button>
+        <button data-cat="sec-3" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">3. SOLID</button>
+        <button data-cat="sec-4" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">4. Patrones GoF</button>
+        <button data-cat="sec-5" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">5. Code Smells &amp; UI</button>
+        <button data-cat="sec-6" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">6. Testing &amp; TDD</button>
+      </div>
+      <div class="w-full md:w-72">
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Buscar concepto, patrón o archivo..."
+          class="w-full px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+        />
+      </div>
+    </div>
+
+    <section data-section="sec-1" class="theory-section space-y-4">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
+        <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-mono font-bold">SECCIÓN 1</span>
+        <h2 class="text-xl font-bold text-slate-100">Principios Estructurales, Arquitectónicos y DDD</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="Piece.ts,Pawn.ts,Queen.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.1 Composición sobre Herencia (Composition over Inheritance)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Favorecer la construcción de objetos ensamblando comportamientos modulares (<em>"tiene-un"</em> / <code>has-a</code>) en lugar de crear árboles profundos y rígidos de herencia (<em>"es-un"</em> / <code>is-a</code>).
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            En lugar de que <code>Pawn</code>, <code>Queen</code> o <code>King</code> hereden de subclases intermedias (<code>SlidingPiece</code>, <code>DiagonalPiece</code>), la clase base <code>Piece.ts</code> mantiene una colección <code>protected readonly rules: readonly IMovementRule[]</code>. Así <code>Queen.ts</code> reutiliza las reglas de <code>Rook</code> y <code>Bishop</code> sin sufrir el problema del diamante.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="types.ts,MoveCommand.ts,boardSetup.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.2 Principio YAGNI (You Aren't Gonna Need It)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> No agregar abstracciones, tipos o clases para escenarios hipotéticos futuros que aún no son requeridos, ya que aumentan la complejidad y degradan las garantías estáticas del compilador.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><strong>Caso 1 — <code>types.ts</code> (Discusión 1):</strong> Se eliminó el tipo intermedio <code>StandardPieceType</code> y la unión abierta <code>| (string &amp; {})</code>, recuperando el control de exhaustividad de TypeScript en todas las tablas <code>Record&lt;PieceType, ...&gt;</code>.</li>
+            <li><strong>Caso 2 — Eliminación de <code>PromotionFactory.ts</code> (Discusión 3):</strong> Su único consumidor era <code>MoveCommand.ts</code>. Se integró el Lookup Table directamente en <code>MoveCommand.ts</code> aplicando YAGNI + GRASP Creator.</li>
+            <li><strong>Caso 3 — <code>boardSetup.ts</code> (Discusión 8):</strong> Se reemplazó la clase estática <code>BoardSetupFactory</code> por funciones utilitarias puras y se simplificó <code>createStandardBoard()</code> sin argumentos innecesarios.</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="types.ts,MoveCommand.ts,activeStateTransition.ts,FenSerializer.ts,GreedyMaterialAiStrategy.ts,pieceDisplay.tsx,PlayerClockBar.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.3 Tablas de Búsqueda (Lookup Tables) en lugar de switch</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Reemplazar estructuras condicionales <code>switch</code>/<code>if-else</code> por diccionarios clave-valor tipados (<em>Polimorfismo de Datos</em>), mejorando la legibilidad y extensibilidad en O(1).
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><code>types.ts</code>: <code>OPPOSITE_COLOR: Record&lt;Color, Color&gt; = { WHITE: 'BLACK', BLACK: 'WHITE' }</code>.</li>
+            <li><code>MoveCommand.ts</code>: <code>PROMOTION_PIECE_CONSTRUCTORS</code> mapea cada tipo de pieza a su constructor.</li>
+            <li><code>activeStateTransition.ts</code>: <code>TERMINAL_DRAW_RULES</code> y <code>ACTIVE_STATE_FACTORIES</code>.</li>
+            <li><code>FenSerializer.ts</code>: <code>FEN_PIECE_SYMBOLS: Record&lt;PieceType, Record&lt;Color, string&gt;&gt;</code>.</li>
+            <li><code>GreedyMaterialAiStrategy.ts</code>: <code>PIECE_MATERIAL_VALUES: Record&lt;PieceType, number&gt;</code>.</li>
+            <li><code>pieceDisplay.tsx</code> y <code>PlayerClockBar.tsx</code>: <code>PLAYER_DISPLAY_CONFIG</code> y <code>CLOCK_VISUAL_STATE_STYLES</code> (Discusiones 29, 30 y 31).</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="IGameEngine.ts,IGameObserver.ts,IBoardQuery.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.4 Arquitectura Hexagonal (Ports &amp; Adapters)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Aislar la lógica de negocio central (el <em>Hexágono</em>) de los mecanismos de entrega (UI, APIs, tests) mediante puertos e implementaciones concretas. Las dependencias apuntan siempre hacia adentro.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><strong>Driving Port (<code>IGameEngine.ts</code>):</strong> Contrato de entrada implementado por <code>ChessGame.ts</code> y consumido por React (<code>ChessApp.tsx</code>), la IA (<code>IAiStrategy.ts</code>) y Vitest.</li>
+            <li><strong>Driven Port (<code>IGameObserver.ts</code>):</strong> Contrato de salida por el cual el Core emite <code>GameSnapshot.ts</code> sin conocer a React ni al DOM.</li>
+            <li><strong>Puerto Interno de Consulta (<code>IBoardQuery.ts</code>):</strong> Segrega el acceso de solo lectura al tablero para reglas y piezas.</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="Position.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.5 Objetos de Valor (Value Objects — DDD)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Objeto inmutable cuya identidad está determinada exclusivamente por el valor de sus atributos, ofreciendo igualdad estructural (<code>equals</code>) y operaciones libres de efectos secundarios (<em>side-effect free</em>).
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li>En <code>Position.ts</code>, las propiedades <code>readonly row: number</code> y <code>readonly col: number</code> se validan como enteros en el constructor.</li>
+            <li><code>offset(deltaRow, deltaCol)</code> devuelve un <code>new Position(...)</code> sin mutar la instancia actual.</li>
+            <li><code>equals(other: Position)</code> compara igualdad estructural por valor.</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="MoveResult.ts,rejectionMessages.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.6 Patrón Result / Unión Discriminada vs. Excepciones</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Los rechazos esperados del dominio (jugada ilegal) no deben usar <code>throw Error</code> sino uniones discriminadas con verificación estática en tiempo de compilación.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li>En <code>MoveResult.ts</code>, <code>makeMove()</code> retorna <code>{ success: true, capturedPiece, nextState } | { success: false, reason: MoveRejectionReason }</code>.</li>
+            <li>La UI traduce <code>result.reason</code> mediante la tabla <code>REJECTION_MESSAGES[result.reason]</code> en <code>rejectionMessages.ts</code> sin <code>try/catch</code> ni <code>switch</code>.</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="GameSnapshot.ts,MoveHistoryTable.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.7 DTOs Planos (Flat DTOs) en Límites de Puertos</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Los DTOs que cruzan fronteras arquitectónicas deben privilegiar la inmutabilidad y simplicidad de serialización y consumo (KISS / YAGNI).
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            En <code>GameSnapshot.ts</code>, <code>MoveRecord</code> mantiene una estructura plana inmutable (<code>moveIndex</code>, <code>turn</code>, <code>piece</code>, <code>from</code>, <code>to</code> + indicadores opcionales <code>capturedPiece?</code>, <code>isCastling?</code>, <code>isPromotion?</code>, <code>promotionPiece?</code>) consumida directamente por <code>MoveHistoryTable.tsx</code> (Discusión 7).
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="Board.ts,Piece.ts,ChessGame.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.8 Entidades y Raíz de Agregado (Entities &amp; Aggregate Root — DDD)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Una <strong>Entidad</strong> posee identidad continua en el tiempo; una <strong>Raíz de Agregado</strong> gobierna el acceso transaccional al clúster de entidades garantizando sus invariantes.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><strong>Entidades (<code>Board.ts</code>, <code>Piece.ts</code>):</strong> Cada instancia de <code>King</code> o <code>Rook</code> conserva su identidad a lo largo de la partida, permitiendo rastrear en <code>movedPieces: Set&lt;IPiece&gt;</code> si esa pieza específica se movió para validar el enroque.</li>
+            <li><strong>Aggregate Root (<code>ChessGame.ts</code>):</strong> Ningún adaptador externo puede mutar <code>Board.ts</code> directamente; todo comando pasa por <code>ChessGame.ts</code> y hacia afuera solo salen copias inmutables (<code>GameSnapshot.ts</code>).</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="CheckDetector.ts,InsufficientMaterialEvaluator.ts,PositionHasher.ts,FenSerializer.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.9 Servicios de Dominio sin Estado (Stateless Domain Services — DDD)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Operaciones del dominio que involucran múltiples entidades y no pertenecen naturalmente a una sola entidad se modelan como servicios sin estado.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><code>CheckDetector.ts</code>: Evalúa amenazas de todas las piezas enemigas hacia el Rey sobre <code>IBoardQuery.ts</code>.</li>
+            <li><code>InsufficientMaterialEvaluator.ts</code>: Audita el inventario global de piezas remanentes para detectar tablas FIDE.</li>
+            <li><code>PositionHasher.ts</code> y <code>FenSerializer.ts</code>: Proyectan el estado completo de la partida en claves de triple repetición y notación FEN.</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="types.ts,IGameState.ts,Position.ts,ChessGame.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-indigo-300">1.10 Lenguaje Ubicuo (Ubiquitous Language — DDD)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Los nombres en el código deben reflejar fielmente el vocabulario de los expertos del dominio y de los patrones arquitectónicos.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li>Distinción rigurosa entre <code>getPseudoLegalMoves</code> (geometría pura) y <code>getLegalMoves</code> (filtrado de jaque al propio Rey en <code>ChessGame.ts</code>).</li>
+            <li>Términos FIDE exactos: <code>enPassantTarget</code>, <code>halfMoveClock</code>, <code>isThreefoldRepetition</code>, <code>isInsufficientMaterial</code>, <code>toAlgebraic()</code> en <code>Position.ts</code>.</li>
+            <li>Alineación simétrica: <code>piece.type: PieceType</code> y <code>state.type: GameStateType</code> en <code>IGameState.ts</code> (Discusión 12).</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section data-section="sec-2" class="theory-section space-y-4">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
+        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-mono font-bold">SECCIÓN 2</span>
+        <h2 class="text-xl font-bold text-slate-100">Principios GRASP (General Responsibility Assignment Software Patterns)</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="MoveCommand.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-emerald-300">2.1 Creator (Creador) e Information Expert (Experto en Información)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Asignar la responsabilidad de instanciar <code>A</code> a la clase <code>B</code> si <code>B</code> posee los datos de inicialización (<em>Information Expert</em>), registra la instancia creada o la utiliza estrechamente.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            En la coronación de peón (Discusión 3), <code>MoveCommand.ts</code> posee <code>this.promotionType</code> y <code>this.movedPiece.color</code>, guarda <code>this.promotedPiece</code> para revertirla en <code>undo()</code> y la coloca en el tablero mediante <code>PROMOTION_PIECE_CONSTRUCTORS</code>.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="IGameState.ts,ChessClockController.ts,pieceDisplay.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-emerald-300">2.2 Low Coupling (Bajo Acoplamiento) y High Cohesion (Alta Cohesión)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Clases con responsabilidades estrechamente enfocadas y mínimas dependencias hacia otras clases concretas.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><code>IGameState.ts</code>: Las clases de estado no se acoplan a <code>Board.ts</code> ni a <code>ChessGame.ts</code>; solo reciben 5 booleanos pre-calculados en <code>GameStateContext</code>.</li>
+            <li><code>ChessClockController.ts</code>: Lógica de reloj en TypeScript puro desacoplada de React.</li>
+            <li><strong>Cohesión Funcional vs. Coincidental (Discusión 31):</strong> Configuración compartida de jugador/pieza agrupada en <code>pieceDisplay.tsx</code> en lugar de un archivo global <code>constants.ts</code> "bolsa de gatos".</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="ChessGame.ts,AnalysisService.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-emerald-300">2.3 Controller (Controlador)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Asignar la coordinación de eventos del sistema a una clase que represente el sistema o el caso de uso, fuera de la interfaz gráfica.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><code>ChessGame.ts</code>: Recibe y coordina los eventos del dominio (<code>makeMove</code>, <code>undo</code>, <code>redo</code>, <code>declareTimeout</code>).</li>
+            <li><code>AnalysisService.ts</code>: Orquesta el caso de uso de análisis de partida coordinando <code>ChessGame.ts</code>, <code>FenSerializer.ts</code>, Stockfish y Gemini.</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="CommandHistory.ts,CheckDetector.ts,PositionHasher.ts,IGameState.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-emerald-300">2.4 Polymorphism, Pure Fabrication e Indirection</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Resolver variaciones por tipo mediante métodos polimórficos (<em>Polymorphism</em>) y crear clases artificiales que no existen en el mundo físico para preservar la cohesión de las entidades (<em>Pure Fabrication</em> &amp; <em>Indirection</em>).
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><strong>Polimorfismo:</strong> <code>currentState.canAcceptMoves()</code> y <code>currentState.getWinner(turn)</code> en <code>IGameState.ts</code>.</li>
+            <li><strong>Fabricación Pura:</strong> <code>CommandHistory.ts</code>, <code>CheckDetector.ts</code> y <code>PositionHasher.ts</code> no son objetos físicos de una caja de ajedrez, pero evitan sobrecargar a <code>Board.ts</code>.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section data-section="sec-3" class="theory-section space-y-4">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
+        <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold">SECCIÓN 3</span>
+        <h2 class="text-xl font-bold text-slate-100">Principios SOLID</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="Piece.ts,PawnForwardRule.ts,Board.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-amber-300">3.1 S — Single Responsibility Principle (SRP)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Una clase o módulo debe tener una única razón para cambiar, encapsulando una sola responsabilidad cohesiva.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <code>Piece.ts</code> solo coordina sus reglas y deduplica posiciones; cada regla de <code>Pawn.ts</code> (como <code>PawnForwardRule.ts</code>) tiene una única razón para cambiar; y el registro de piezas movidas se delegó a <code>Board.ts</code>.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="Piece.ts,SlidingMoveRule.ts,LeapMoveRule.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-amber-300">3.2 O — Open/Closed Principle (OCP)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Las entidades de software deben estar abiertas para su extensión pero cerradas para su modificación.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            En <code>Piece.ts</code>, <code>getPseudoLegalMoves()</code> está cerrado a la modificación pero abierto a la extensión: agregar una pieza de <em>Fairy Chess</em> (ej. <code>Chancellor</code> = Torre + Caballo) toma 5 líneas componiendo <code>SlidingMoveRule.ts</code> y <code>LeapMoveRule.ts</code> sin tocar código existente.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="IPiece.ts,Piece.ts,Pawn.ts,Queen.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-amber-300">3.3 L — Liskov Substitution Principle (LSP)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Los subtipos deben poder sustituir a sus tipos base sin alterar el correcto funcionamiento del programa ni violar el contrato esperado.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Todas las subclases de <code>Piece.ts</code> (<code>Pawn.ts</code>, <code>Queen.ts</code>, etc.) cumplen íntegramente el contrato de <code>IPiece.ts</code> sin lanzar excepciones de métodos no soportados ni alterar pre/postcondiciones.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="IPiece.ts,IBoardQuery.ts,Board.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-amber-300">3.4 I — Interface Segregation Principle (ISP)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Ningún cliente debe verse forzado a depender de métodos que no utiliza; es preferible tener interfaces pequeñas y específicas.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Se eliminaron los métodos opcionales <code>hasMoved?</code> y <code>setHasMoved?</code> de <code>IPiece.ts</code> (Discusión 2), y <code>IBoardQuery.ts</code> segrega las consultas de lectura respecto de los métodos de mutación de <code>Board.ts</code>.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="IMovementRule.ts,IBoardQuery.ts,IGameEngine.ts,AnalysisService.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-amber-300">3.5 D — Dependency Inversion Principle (DIP)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Los módulos de alto nivel no deben depender de implementaciones concretas de bajo nivel; ambos deben depender de abstracciones (interfaces).
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <code>Piece.ts</code> depende de las abstracciones <code>IMovementRule.ts</code> e <code>IBoardQuery.ts</code>; <code>AnalysisService.ts</code> depende de <code>IChessEngine</code> e <code>IAiCoachEngine</code>; y <code>ChessApp.tsx</code> depende de <code>IGameEngine.ts</code>.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section data-section="sec-4" class="theory-section space-y-4">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
+        <span class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-mono font-bold">SECCIÓN 4</span>
+        <h2 class="text-xl font-bold text-slate-100">Patrones de Diseño GoF (Gang of Four)</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="IMovementRule.ts,SlidingMoveRule.ts,IAiStrategy.ts,GreedyMaterialAiStrategy.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-sky-300">4.1 Patrón Strategy</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Define una familia de algoritmos, encapsula cada uno detrás de una interfaz común y los hace intercambiables para quien los consume.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><strong>Estrategias Geométricas (<code>IMovementRule.ts</code>):</strong> <code>SlidingMoveRule.ts</code>, <code>LeapMoveRule.ts</code>, <code>PawnForwardRule.ts</code>, etc.</li>
+            <li><strong>Estrategias de IA (<code>IAiStrategy.ts</code>):</strong> <code>GreedyMaterialAiStrategy.ts</code> y <code>RandomAiStrategy</code> comparten <code>collectAllCandidateMoves.ts</code> (Discusión 18) y se intercambian en tiempo de ejecución.</li>
+          </ul>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="pieceFactory.ts,boardSetup.ts,Board.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-sky-300">4.2 Patrones Creacionales: Factory y Prototype</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Encapsula la lógica de instanciación polimórfica (<em>Factory</em>) o clona el estado exacto de un objeto existente para simular escenarios aislados (<em>Prototype</em>).
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Se centralizó la creación polimórfica de piezas en <code>pieceFactory.ts</code> (<code>createPiece(type, color)</code> apoyado en un Lookup Table de constructores), la construcción de tableros en <code>boardSetup.ts</code>, y la clonación en <code>Board.ts</code> mediante <code>board.clone()</code> para simular jugadas sin contaminar la partida.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="ICommand.ts,MoveCommand.ts,CommandHistory.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-sky-300">4.3 Patrón Command</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Encapsula una petición u operación como un objeto independiente que contiene toda la información necesaria para ejecutarla y revertirla (<em>undo/redo</em>).
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            En <code>ICommand.ts</code> y <code>MoveCommand.ts</code> se encapsula cada jugada con <code>execute()</code> y <code>undo()</code>. Mediante registros cohesivos (<code>CapturedPieceRecord</code>, <code>CastlingRecord</code>, <code>promotedPiece</code>), revierte jugadas en O(1) administrado por <code>CommandHistory.ts</code> (Discusión 11).
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="IGameState.ts,activeStateTransition.ts,NormalPlayState.ts,CheckmateState.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-sky-300">4.4 Patrón State y Template Method</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Permite a un objeto alterar su comportamiento cuando su estado interno cambia, reemplazando condicionales complejos por clases polimórficas para cada fase.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Modela polimórficamente las fases activas (<code>NormalPlayState.ts</code>, <code>CheckState</code>) y terminales (<code>CheckmateState.ts</code>, <code>StalemateState</code>, <code>DrawState</code>, <code>TimeoutState</code>) con el esqueleto común de transición en <code>activeStateTransition.ts</code> (Discusiones 12 y 13).
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="IGameObserver.ts,ChessGame.ts,ChessApp.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-sky-300">4.5 Patrón Observer</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Define una dependencia uno-a-muchos de modo que cuando un sujeto cambia de estado, todos sus suscriptores son notificados automáticamente sin acoplamiento.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <code>ChessGame.ts</code> notifica cambios de estado emitiendo un <code>GameSnapshot.ts</code> inmutable a sus suscriptores (<code>IGameObserver.ts</code>). En React, <code>ChessApp.tsx</code> se suscribe mediante <code>useSyncExternalStore</code>, eliminando por completo el uso de <code>useEffect</code> para sincronizar la partida.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3" data-files="ChessGame.ts,AnalysisService.ts,pieceDisplay.tsx,ChessApiService.ts,GeminiCoachService.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-sky-300">4.6 Patrones Estructurales: Facade y Adapter</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> <em>Facade</em> ofrece una interfaz unificada y simple hacia un subsistema complejo; <em>Adapter</em> convierte la interfaz de un servicio externo al contrato que el dominio o cliente espera.
+          </p>
+          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
+            <li><strong>Facade:</strong> <code>ChessGame.ts</code> (fachada del Core), <code>AnalysisService.ts</code> (fachada sobre Stockfish + Gemini + FEN) y <code>pieceDisplay.tsx</code> (fachada sobre <code>StandardPieceGlyph</code> y <code>FallbackPieceBadge</code>, Discusión 25).</li>
+            <li><strong>Adapter:</strong> <code>ChessApiService.ts</code> (adapta HTTP de chess-api.com a <code>IChessEngine</code>) y <code>GeminiCoachService.ts</code> (adapta REST de Gemini a <code>IAiCoachEngine</code>).</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section data-section="sec-5" class="theory-section space-y-4">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
+        <span class="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-mono font-bold">SECCIÓN 5</span>
+        <h2 class="text-xl font-bold text-slate-100">Code Smells, Refactorización y Buenas Prácticas en UI</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="MoveCommand.ts,ControlPanelView.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-purple-300">5.1 Data Clumps (Grupos de Datos Dispersos)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Variables o parámetros que siempre viajan y se manipulan juntos pero están sueltos, pidiendo agruparse en un objeto o estructura cohesiva.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Refactorizado en <code>MoveCommand.ts</code> (agrupando campos sueltos en <code>CapturedPieceRecord</code> y <code>CastlingRecord</code>, Discusión 11) y en <code>ControlPanelView.tsx</code> (eliminando 8 props planas de reloj a favor del objeto cohesivo <code>clockConfig</code>, Discusión 29).
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="MoveHistoryTable.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-purple-300">5.2 Dead Code (Código Muerto)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Código o componentes que nunca son invocados en el flujo real de producción y que solo agregan ruido cognitivo y costo de mantenimiento.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Se detectó que <code>MoveHistoryPanel.tsx</code> duplicaba el 90% de <code>MoveHistoryTable.tsx</code> y solo existía por su propio test unitario. Se consolidó la columna <em>Detalle</em> en <code>MoveHistoryTable.tsx</code> y se eliminó el código muerto (Discusión 28).
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="collectAllCandidateMoves.ts,ChessApp.tsx,ModalDialog.tsx,pieceDisplay.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-purple-300">5.3 Principio DRY (Don't Repeat Yourself)</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Cada pieza de conocimiento o lógica dentro de un sistema debe tener una representación única, inequívoca y autoritativa.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Extracción de <code>collectAllCandidateMoves.ts</code> entre estrategias de IA (Discusión 18), unificación del timer <code>startPlaybackInterval</code> en <code>ChessApp.tsx</code> (Discusión 30), y creación de <code>ModalDialog.tsx</code> y constantes compartidas en <code>pieceDisplay.tsx</code> (Discusión 31).
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="CoachFeedbackCard.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-purple-300">5.4 Guard Clauses &amp; Type Narrowing</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Retornar tempranamente ante casos prioritarios o bordes permite aplanar condicionales anidados y aprovechar el estrechamiento estático de tipos del compilador.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            En <code>CoachFeedbackCard.tsx</code> (Discusión 27), el uso de 5 cláusulas de guarda tempranas permite que TypeScript estreche automáticamente los tipos opcionales sin necesidad de aserciones <code>!</code> ni diccionarios forzados con ternarios.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="ModalDialog.tsx,ApiKeyModal.tsx,ReplayControlSection.tsx,CoachFeedbackCard.tsx,ChessApp.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-purple-300">5.5 Patrón Composed Component en React</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Descomponer vistas o métodos extensos en unidades pequeñas del mismo nivel de abstracción cuyos nombres semánticos explican qué hace el código sin comentarios.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Subcomponentes privados semánticos en <code>ApiKeyModal.tsx</code>, <code>ReplayControlSection.tsx</code>, <code>CoachFeedbackCard.tsx</code> y <code>ChessApp.tsx</code>, junto con contenedores reutilizables con <code>{children}</code> como <code>ModalDialog.tsx</code> (Discusiones 26, 30 y 31).
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section data-section="sec-6" class="theory-section space-y-4">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
+        <span class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-mono font-bold">SECCIÓN 6</span>
+        <h2 class="text-xl font-bold text-slate-100">Estrategias de Testing, Seams y TDD</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="ChessGame.ts,ChessApp.tsx">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-rose-300">6.1 Testing Seams e Inyección</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Un <em>Seam</em> (punto de costura) es un lugar donde se puede inyectar estado o reemplazar dependencias para testear sin modificar el código fuente de producción.
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <code>new ChessGame(board?, initialTurn?)</code> en <code>ChessGame.ts</code> y las props <code>engineFactory</code> y <code>analysisServiceFactory</code> en <code>ChessApp.tsx</code> actúan como <em>Seams</em> para inyectar tableros a medida o servicios mockeados en 3 líneas.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="CommandHistory.test.ts,MoveCommand.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-rose-300">6.2 Patrón AAA e Invariantes</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Organizar cada test en tres etapas explícitas: preparar el estado inicial (<em>Arrange</em>), ejecutar la operación bajo prueba (<em>Act</em>) y comprobar el resultado (<em>Assert</em>).
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            En <code>CommandHistory.test.ts</code>, los tests siguen la estructura <strong>Arrange - Act - Assert</strong> y verifican la invariante de reversibilidad exacta de <code>MoveCommand.ts</code>: <code>State_before === State_after(execute + undo)</code>.
+          </p>
+        </article>
+
+        <article class="theory-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2.5" data-files="AnalysisService.test.ts,ChessClock.test.ts">
+          <div class="space-y-2">
+            <h3 class="font-bold text-base text-rose-300">6.3 Test Doubles: Stubs, Spies y Fake Timers</h3>
+            <div class="file-chips flex flex-wrap gap-1.5"></div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>Concepto teórico:</strong> Un <strong>Stub</strong> provee respuestas predefinidas ("enlatadas") a las llamadas realizadas durante el test, aislando al sistema bajo prueba de colaboradores lentos o no deterministas (red, APIs o reloj del sistema).
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Uso de <strong>Stubs</strong> (<code>vi.fn().mockResolvedValue(...)</code>) y <em>Spies</em> para <code>IChessEngine</code> e <code>IAiCoachEngine</code> en <code>AnalysisService.test.ts</code> (cero llamadas HTTP en tests) y reloj sintético con <code>vi.useFakeTimers()</code> en <code>ChessClock.test.ts</code>.
+          </p>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <div
+    id="snippet-modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden flex flex-col max-h-[88vh]">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800 bg-slate-950/60">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono font-bold" id="modal-file-name"></span>
+            <span class="text-xs font-mono text-slate-400" id="modal-file-path"></span>
+          </div>
+          <p class="text-xs text-slate-300 mt-1" id="modal-file-desc"></p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            id="copy-snippet-btn"
+            class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition border border-slate-700"
+          >
+            Copiar snippet
+          </button>
+          <button
+            id="close-modal-btn"
+            class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-semibold transition"
+          >
+            ✕ Cerrar (Esc)
+          </button>
+        </div>
+      </div>
+      <div class="p-5 overflow-y-auto">
+        <pre class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-emerald-300 overflow-x-auto leading-relaxed"><code id="modal-file-code"></code></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const FILE_SNIPPETS = {
+      'Piece.ts': {
+        path: 'proyect/src/core/pieces/Piece.ts',
+        desc: 'Clase base abstracta de las entidades de pieza: compone IMovementRule[] y deduplica destinos candidatos.',
+        code: `export abstract class Piece implements IPiece {
+  public readonly color: Color;
+  public readonly type: PieceType;
+  protected readonly rules: readonly IMovementRule[];
+
+  protected constructor(
+    color: Color,
+    type: PieceType,
+    rules: readonly IMovementRule[]
+  ) {
+    this.color = color;
+    this.type = type;
+    this.rules = rules;
+  }
+
+  public getPseudoLegalMoves(from: Position, board: IBoardQuery): Position[] {
+    const seenKeys = new Set<string>();
+    const uniqueMoves: Position[] = [];
+
+    for (const rule of this.rules) {
+      const candidates = rule.getCandidatePositions(from, this.color, board);
+      for (const candidate of candidates) {
+        const key = \`\${candidate.row},\${candidate.col}\`;
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          uniqueMoves.push(candidate);
+        }
+      }
+    }
+    return uniqueMoves;
+  }
+}`
+      },
+      'Pawn.ts': {
+        path: 'proyect/src/core/pieces/Pawn.ts',
+        desc: 'Subclase de Piece que ensambla las tres reglas de movimiento del peón (avance, captura diagonal y captura al paso).',
+        code: `export class Pawn extends Piece {
+  constructor(
+    color: Color,
+    rules: readonly IMovementRule[] = [
+      new PawnForwardRule(),
+      new PawnCaptureRule(),
+      new EnPassantCaptureRule(),
+    ]
+  ) {
+    super(color, 'PAWN', rules);
+  }
+}`
+      },
+      'Queen.ts': {
+        path: 'proyect/src/core/pieces/Queen.ts',
+        desc: 'Composición pura sobre herencia: la Dama combina SlidingMoveRule ortogonal y diagonal sin herencia múltiple.',
+        code: `export class Queen extends Piece {
+  constructor(
+    color: Color,
+    rules: readonly IMovementRule[] = [
+      new SlidingMoveRule(ORTHOGONAL_DIRECTIONS),
+      new SlidingMoveRule(DIAGONAL_DIRECTIONS),
+    ]
+  ) {
+    super(color, 'QUEEN', rules);
+  }
+}`
+      },
+      'types.ts': {
+        path: 'proyect/src/core/types.ts',
+        desc: 'Tipos cerrados del dominio y tabla de búsqueda OPPOSITE_COLOR con verificación exhaustiva del compilador.',
+        code: `export type Color = 'WHITE' | 'BLACK';
+
+export const OPPOSITE_COLOR: Record<Color, Color> = {
+  WHITE: 'BLACK',
+  BLACK: 'WHITE',
+};
+
+export type PromotablePieceType = 'QUEEN' | 'ROOK' | 'BISHOP' | 'KNIGHT';
+
+export type PieceType = 'PAWN' | PromotablePieceType | 'KING';`
+      },
+      'MoveCommand.ts': {
+        path: 'proyect/src/core/game/MoveCommand.ts',
+        desc: 'Patrón Command + GRASP Creator + refactorización de Data Clumps en registros cohesivos para execute() y undo() en O(1).',
+        code: `const PROMOTION_PIECE_CONSTRUCTORS: Record<
+  PromotablePieceType,
+  new (color: Color) => IPiece
+> = {
+  QUEEN: Queen,
+  ROOK: Rook,
+  BISHOP: Bishop,
+  KNIGHT: Knight,
+};
+
+interface CapturedPieceRecord {
+  readonly piece: IPiece;
+  readonly position: Position;
+  readonly wasMovedBefore: boolean;
+}
+
+interface CastlingRecord {
+  readonly rook: IPiece;
+  readonly rookOrigin: Position;
+  readonly rookTarget: Position;
+  readonly wasRookMovedBefore: boolean;
+}
+
+export class MoveCommand implements ICommand {
+  private capturedRecord: CapturedPieceRecord | null = null;
+  private castlingRecord: CastlingRecord | null = null;
+  private promotedPiece: IPiece | null = null;
+  // execute() aplica el movimiento y guarda el Memento incremental;
+  // undo() restaura exactamente las piezas, movedPieces y enPassantTarget.
+}`
+      },
+      'boardSetup.ts': {
+        path: 'proyect/src/core/board/boardSetup.ts',
+        desc: 'Funciones puras de inicialización del tablero estándar 8x8 usando createPiece.',
+        code: `const BACK_RANK_SEQUENCE: readonly PieceType[] = [
+  'ROOK', 'KNIGHT', 'BISHOP', 'QUEEN', 'KING', 'BISHOP', 'KNIGHT', 'ROOK',
+];
+
+export function setupStandardPieces(board: Board): void {
+  for (let col = 0; col < 8; col++) {
+    board.placePiece(new Position(0, col), createPiece(BACK_RANK_SEQUENCE[col], 'BLACK'));
+    board.placePiece(new Position(1, col), createPiece('PAWN', 'BLACK'));
+    board.placePiece(new Position(6, col), createPiece('PAWN', 'WHITE'));
+    board.placePiece(new Position(7, col), createPiece(BACK_RANK_SEQUENCE[col], 'WHITE'));
+  }
+}
+
+export function createStandardBoard(): Board {
+  const board = new Board(8, 8);
+  setupStandardPieces(board);
+  return board;
+}`
+      },
+      'activeStateTransition.ts': {
+        path: 'proyect/src/core/state/activeStateTransition.ts',
+        desc: 'Transición compartida entre estados activos mediante Lookup Tables declarativas sin bloques switch.',
+        code: `const TERMINAL_DRAW_RULES: readonly DrawRuleEvaluation[] = [
+  {
+    matches: (ctx) => !ctx.hasLegalMoves && !ctx.isCheck,
+    createState: () => new StalemateState(),
+  },
+  {
+    matches: (ctx) => ctx.isFiftyMoveRule,
+    createState: () => new DrawState('FIFTY_MOVE_RULE'),
+  },
+  {
+    matches: (ctx) => ctx.isThreefoldRepetition,
+    createState: () => new DrawState('THREEFOLD_REPETITION'),
+  },
+  {
+    matches: (ctx) => ctx.isInsufficientMaterial,
+    createState: () => new DrawState('INSUFFICIENT_MATERIAL'),
+  },
+];
+
+const ACTIVE_STATE_FACTORIES: Record<'CHECK' | 'NORMAL', () => IGameState> = {
+  CHECK: () => new CheckState(),
+  NORMAL: () => new NormalPlayState(),
+};`
+      },
+      'FenSerializer.ts': {
+        path: 'proyect/src/core/game/FenSerializer.ts',
+        desc: 'Servicio de dominio sin estado que serializa cualquier snapshot del tablero a notación estándar FEN.',
+        code: `const FEN_PIECE_SYMBOLS: Record<PieceType, Record<Color, string>> = {
+  KING:   { WHITE: 'K', BLACK: 'k' },
+  QUEEN:  { WHITE: 'Q', BLACK: 'q' },
+  ROOK:   { WHITE: 'R', BLACK: 'r' },
+  BISHOP: { WHITE: 'B', BLACK: 'b' },
+  KNIGHT: { WHITE: 'N', BLACK: 'n' },
+  PAWN:   { WHITE: 'P', BLACK: 'p' },
+};`
+      },
+      'GreedyMaterialAiStrategy.ts': {
+        path: 'proyect/src/core/strategy/GreedyMaterialAiStrategy.ts',
+        desc: 'Estrategia de IA que evalúa capturas y coronaciones usando una tabla de valores materiales y desempate aleatorio.',
+        code: `const PIECE_MATERIAL_VALUES: Record<PieceType, number> = {
+  PAWN: 1,
+  KNIGHT: 3,
+  BISHOP: 3,
+  ROOK: 5,
+  QUEEN: 9,
+  KING: 100,
+};
+
+export class GreedyMaterialAiStrategy implements IAiStrategy {
+  public chooseMove(engine: IGameEngine): AiMoveDecision | null {
+    const candidates = collectAllCandidateMoves(engine);
+    if (candidates.length === 0) return null;
+    // Selecciona las jugadas de mayor ganancia material inmediata
+  }
+}`
+      },
+      'pieceDisplay.tsx': {
+        path: 'proyect/src/adapters/web/pieceDisplay.tsx',
+        desc: 'Módulo cohesivo de presentación de piezas y jugadores: centraliza PIECE_NAMES_LOOKUP, PLAYER_DISPLAY_CONFIG y el componente fachada PieceDisplay.',
+        code: `export const PIECE_NAMES_LOOKUP: Record<PieceType, string> = {
+  KING: 'Rey',
+  QUEEN: 'Dama',
+  ROOK: 'Torre',
+  BISHOP: 'Alfil',
+  KNIGHT: 'Caballo',
+  PAWN: 'Peón',
+};
+
+export const PLAYER_DISPLAY_CONFIG: Record<Color, PlayerDisplayMetadata> = {
+  WHITE: {
+    tag: 'Blancas',
+    badgeStyle: 'bg-slate-100 text-slate-900 border-slate-300',
+    dotStyle: 'bg-white border-slate-400',
+    labelColorClass: 'text-slate-200',
+  },
+  BLACK: {
+    tag: 'Negras',
+    badgeStyle: 'bg-slate-800 text-slate-100 border-slate-600',
+    dotStyle: 'bg-slate-950 border-slate-500',
+    labelColorClass: 'text-slate-400',
+  },
+};`
+      },
+      'PlayerClockBar.tsx': {
+        path: 'proyect/src/adapters/web/components/PlayerClockBar.tsx',
+        desc: 'Componente de reloj por jugador que reemplaza mapas paralelos por una única tabla cohesiva CLOCK_VISUAL_STATE_STYLES.',
+        code: `type ClockVisualState = 'TIMEOUT' | 'LOW_TIME_ACTIVE' | 'ACTIVE' | 'INACTIVE';
+
+const CLOCK_VISUAL_STATE_STYLES: Record<ClockVisualState, ClockVisualStyleConfig> = {
+  TIMEOUT: {
+    containerStyle: 'border-rose-500/80 bg-rose-950/60 text-rose-200 shadow-lg',
+    timerTextStyle: 'text-rose-400 animate-pulse',
+  },
+  LOW_TIME_ACTIVE: {
+    containerStyle: 'border-amber-500/80 bg-amber-950/40 text-amber-100 shadow-md',
+    timerTextStyle: 'text-amber-300',
+  },
+  ACTIVE: {
+    containerStyle: 'border-emerald-500/70 bg-slate-900 text-white shadow-md',
+    timerTextStyle: 'text-emerald-300',
+  },
+  INACTIVE: {
+    containerStyle: 'border-slate-800 bg-slate-900/50 text-slate-400',
+    timerTextStyle: 'text-slate-400',
+  },
+};`
+      },
+      'ChessApp.tsx': {
+        path: 'proyect/src/adapters/web/ChessApp.tsx',
+        desc: 'Adaptador primario en React: se suscribe a IGameEngine con useSyncExternalStore, expone Seams de inyección y descompone hooks y subcomponentes.',
+        code: `export interface ChessAppProps {
+  readonly engineFactory?: () => IGameEngine;
+  readonly analysisServiceFactory?: () => IAnalysisService;
+}
+
+export function ChessApp({
+  engineFactory = () => new ChessGame(),
+  analysisServiceFactory = () => new AnalysisService(),
+}: ChessAppProps = {}): React.ReactElement {
+  const [engine] = useState<IGameEngine>(engineFactory);
+  const snapshot: GameSnapshot = useSyncExternalStore(
+    (onStoreChange) => engine.subscribe({ onGameStateChanged: () => onStoreChange() }),
+    () => engine.getSnapshot()
+  );
+  // Cero useEffect para sincronizar el estado del motor con React
+}`
+      },
+      'IGameEngine.ts': {
+        path: 'proyect/src/core/ports/IGameEngine.ts',
+        desc: 'Driving Port (Puerto Primario) de nuestra Arquitectura Hexagonal consumido por React, las IAs y la suite de tests.',
+        code: `export interface IGameEngine {
+  getSnapshot(): GameSnapshot;
+  getLegalMoves(from: Position): Position[];
+  makeMove(
+    from: Position,
+    to: Position,
+    promotionPiece?: PromotablePieceType
+  ): MoveResult;
+  undo(): boolean;
+  redo(): boolean;
+  reset(): void;
+  declareTimeout(loserColor: Color): void;
+  subscribe(observer: IGameObserver): () => void;
+}`
+      },
+      'IGameObserver.ts': {
+        path: 'proyect/src/core/ports/IGameObserver.ts',
+        desc: 'Driven Port (Puerto Secundario) para notificar snapshots inmutables a cualquier suscriptor externo.',
+        code: `export interface IGameObserver {
+  onGameStateChanged(snapshot: GameSnapshot): void;
+}`
+      },
+      'IBoardQuery.ts': {
+        path: 'proyect/src/core/ports/IBoardQuery.ts',
+        desc: 'Interfaz segregada de solo lectura sobre el tablero (ISP): impide que las reglas geométricas muten las casillas.',
+        code: `export interface IBoardQuery {
+  readonly rows: number;
+  readonly cols: number;
+  readonly enPassantTarget: Position | null;
+  isWithinBounds(position: Position): boolean;
+  getPieceAt(position: Position): IPiece | null;
+  hasPieceMoved(piece: IPiece): boolean;
+}`
+      },
+      'Position.ts': {
+        path: 'proyect/src/core/board/Position.ts',
+        desc: 'Value Object (DDD) inmutable con validación de enteros, igualdad por valor (equals) y conversión algebraica.',
+        code: `export class Position {
+  public readonly row: number;
+  public readonly col: number;
+
+  constructor(row: number, col: number) {
+    if (!Number.isInteger(row) || !Number.isInteger(col)) {
+      throw new Error(\`Position coordinates must be integers. Received: (\${row}, \${col})\`);
+    }
+    this.row = row;
+    this.col = col;
+  }
+
+  public offset(deltaRow: number, deltaCol: number): Position {
+    return new Position(this.row + deltaRow, this.col + deltaCol);
+  }
+
+  public equals(other: Position): boolean {
+    return this.row === other.row && this.col === other.col;
+  }
+}`
+      },
+      'MoveResult.ts': {
+        path: 'proyect/src/core/MoveResult.ts',
+        desc: 'Patrón Result implementado mediante una unión discriminada por el campo literal booleano success.',
+        code: `export type MoveRejectionReason =
+  | 'GAME_ALREADY_OVER'
+  | 'NO_PIECE_AT_ORIGIN'
+  | 'NOT_YOUR_TURN'
+  | 'OUT_OF_BOUNDS'
+  | 'NOT_PSEUDO_LEGAL'
+  | 'LEAVES_KING_IN_CHECK'
+  | 'PROMOTION_REQUIRED'
+  | 'INVALID_PROMOTION_PIECE';
+
+export type MoveResult =
+  | {
+      readonly success: true;
+      readonly capturedPiece: IPiece | null;
+      readonly nextState: GameStateType;
+    }
+  | {
+      readonly success: false;
+      readonly reason: MoveRejectionReason;
+    };`
+      },
+      'rejectionMessages.ts': {
+        path: 'proyect/src/adapters/web/rejectionMessages.ts',
+        desc: 'Lookup Table exhaustiva que traduce cada MoveRejectionReason del dominio a un mensaje claro en español para la UI.',
+        code: `export const REJECTION_MESSAGES: Record<MoveRejectionReason, string> = {
+  GAME_ALREADY_OVER: 'La partida ya ha finalizado.',
+  NO_PIECE_AT_ORIGIN: 'No hay ninguna pieza en la casilla de origen.',
+  NOT_YOUR_TURN: 'No es el turno de ese color.',
+  OUT_OF_BOUNDS: 'La casilla seleccionada está fuera del tablero.',
+  NOT_PSEUDO_LEGAL: 'Movimiento inválido según las reglas de la pieza.',
+  LEAVES_KING_IN_CHECK: 'Movimiento ilegal: dejaría a tu propio Rey en jaque.',
+  PROMOTION_REQUIRED: 'Debes elegir una pieza para coronar el peón.',
+  INVALID_PROMOTION_PIECE: 'La pieza elegida para coronar no es válida.',
+};`
+      },
+      'GameSnapshot.ts': {
+        path: 'proyect/src/core/GameSnapshot.ts',
+        desc: 'DTO inmutable que cruza el límite entre el Hexágono (Core) y los adaptadores externos.',
+        code: `export interface MoveRecord {
+  readonly moveIndex: number;
+  readonly turn: Color;
+  readonly piece: PieceType;
+  readonly from: Position;
+  readonly to: Position;
+  readonly capturedPiece?: PieceType;
+  readonly isCastling?: boolean;
+  readonly isPromotion?: boolean;
+  readonly promotionPiece?: PromotablePieceType;
+}
+
+export interface GameSnapshot {
+  readonly board: readonly (readonly (PieceDescriptor | null)[])[];
+  readonly turn: Color;
+  readonly state: GameStateType;
+  readonly winner: Color | null;
+  readonly moveHistory: readonly MoveRecord[];
+}`
+      },
+      'Board.ts': {
+        path: 'proyect/src/core/board/Board.ts',
+        desc: 'Entidad contenedora de la grilla de piezas, registro movedPieces (Set<IPiece>) y clonación Prototype.',
+        code: `export class Board implements IBoardQuery {
+  private readonly grid: (IPiece | null)[][];
+  private readonly movedPieces: Set<IPiece> = new Set();
+  public enPassantTarget: Position | null = null;
+
+  public hasPieceMoved(piece: IPiece): boolean {
+    return this.movedPieces.has(piece);
+  }
+
+  public clone(): Board {
+    const copy = new Board(this.rows, this.cols);
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        copy.grid[r][c] = this.grid[r][c];
+      }
+    }
+    for (const moved of this.movedPieces) copy.movedPieces.add(moved);
+    copy.enPassantTarget = this.enPassantTarget;
+    return copy;
+  }
+}`
+      },
+      'ChessGame.ts': {
+        path: 'proyect/src/core/game/ChessGame.ts',
+        desc: 'Aggregate Root (DDD), Facade del Core y GRASP Controller que valida jugadas, filtra jaques y notifica snapshots.',
+        code: `export class ChessGame implements IGameEngine {
+  private readonly board: Board;
+  private currentTurn: Color;
+  private currentState: IGameState;
+  private readonly history: CommandHistory = new CommandHistory();
+
+  constructor(board?: Board, initialTurn: Color = 'WHITE') {
+    this.board = board ? board.clone() : createStandardBoard();
+    this.currentTurn = initialTurn;
+    this.currentState = this.computeInitialState();
+  }
+
+  public getLegalMoves(from: Position): Position[] {
+    if (!this.currentState.canAcceptMoves()) return [];
+    const piece = this.board.getPieceAt(from);
+    if (!piece || piece.color !== this.currentTurn) return [];
+    return piece
+      .getPseudoLegalMoves(from, this.board)
+      .filter((to) => !this.wouldLeaveKingInCheck(from, to));
+  }
+}`
+      },
+      'CheckDetector.ts': {
+        path: 'proyect/src/core/game/CheckDetector.ts',
+        desc: 'Servicio de Dominio sin estado (DDD) y Pure Fabrication (GRASP) para detectar amenazas sobre el Rey o cualquier casilla.',
+        code: `export class CheckDetector {
+  public static isSquareAttacked(
+    board: IBoardQuery,
+    targetSquare: Position,
+    attackerColor: Color
+  ): boolean {
+    for (let r = 0; r < board.rows; r++) {
+      for (let c = 0; c < board.cols; c++) {
+        const pos = new Position(r, c);
+        const piece = board.getPieceAt(pos);
+        if (piece && piece.color === attackerColor) {
+          const moves = piece.getPseudoLegalMoves(pos, board);
+          if (moves.some((m) => m.equals(targetSquare))) return true;
+        }
+      }
+    }
+    return false;
+  }
+}`
+      },
+      'InsufficientMaterialEvaluator.ts': {
+        path: 'proyect/src/core/game/InsufficientMaterialEvaluator.ts',
+        desc: 'Servicio de Dominio sin estado que evalúa las combinaciones FIDE de material insuficiente (K vs K, K+N vs K, K+B vs K, alfiles del mismo color).',
+        code: `export class InsufficientMaterialEvaluator {
+  public static isInsufficientMaterial(board: IBoardQuery): boolean {
+    const pieces = this.collectRemainingPieces(board);
+    if (pieces.length === 2) return true; // Rey vs Rey
+    if (pieces.length === 3) {
+      return pieces.some(
+        (p) => p.piece.type === 'KNIGHT' || p.piece.type === 'BISHOP'
+      );
+    }
+    return this.areOnlyKingsAndSameColorSquareBishops(pieces);
+  }
+}`
+      },
+      'PositionHasher.ts': {
+        path: 'proyect/src/core/game/PositionHasher.ts',
+        desc: 'Servicio de Dominio sin estado que genera claves canónicas de posición para la regla FIDE de triple repetición.',
+        code: `export class PositionHasher {
+  public static computeKey(board: IBoardQuery, turn: Color): string {
+    const gridKey = this.serializeGrid(board);
+    const castlingKey = this.serializeCastlingRights(board);
+    const enPassantKey = this.serializeEffectiveEnPassant(board, turn);
+    return \`\${gridKey}|\${turn}|\${castlingKey}|\${enPassantKey}\`;
+  }
+}`
+      },
+      'IGameState.ts': {
+        path: 'proyect/src/core/state/IGameState.ts',
+        desc: 'Contrato del patrón State con bajo acoplamiento mediante el DTO pre-calculado GameStateContext.',
+        code: `export interface GameStateContext {
+  readonly isCheck: boolean;
+  readonly hasLegalMoves: boolean;
+  readonly isFiftyMoveRule: boolean;
+  readonly isThreefoldRepetition: boolean;
+  readonly isInsufficientMaterial: boolean;
+}
+
+export interface IGameState {
+  readonly type: GameStateType;
+  canAcceptMoves(): boolean;
+  getWinner(currentTurn: Color): Color | null;
+  evaluateNextState(context: GameStateContext): IGameState;
+}`
+      },
+      'ChessClockController.ts': {
+        path: 'proyect/src/adapters/web/clock/ChessClockController.ts',
+        desc: 'Controlador de reloj de ajedrez en TypeScript puro (sin dependencia de React), testeable con Fake Timers.',
+        code: `export class ChessClockController {
+  private whiteSeconds = 600;
+  private blackSeconds = 600;
+  private activeColor: Color = 'WHITE';
+  private status: ClockStatus = 'IDLE';
+
+  public switchTurn(nextTurnColor: Color): void {
+    this.activeColor = nextTurnColor;
+    this.notifyChange();
+  }
+}`
+      },
+      'AnalysisService.ts': {
+        path: 'proyect/src/adapters/services/AnalysisService.ts',
+        desc: 'Fachada y Controlador de caso de uso que coordina la reconstrucción de FENs, Stockfish (IChessEngine) y Gemini (IAiCoachEngine).',
+        code: `export class AnalysisService implements IAnalysisService {
+  constructor(
+    private readonly chessEngine: IChessEngine = new ChessApiService(),
+    private readonly aiCoach: IAiCoachEngine = new GeminiCoachService()
+  ) {}
+
+  public async analyzeFullGame(snapshot: GameSnapshot): Promise<GameAnalysisReport> {
+    // Reconstruye la secuencia de tableros, consulta Stockfish y solicita consejos a Gemini
+  }
+}`
+      },
+      'CommandHistory.ts': {
+        path: 'proyect/src/core/game/CommandHistory.ts',
+        desc: 'Pure Fabrication que administra las pilas undoStack y redoStack de objetos ICommand.',
+        code: `export class CommandHistory {
+  private readonly undoStack: ICommand[] = [];
+  private readonly redoStack: ICommand[] = [];
+
+  public executeCommand(command: ICommand): void {
+    command.execute();
+    this.undoStack.push(command);
+    this.redoStack.length = 0;
+  }
+
+  public undo(): ICommand | null {
+    const command = this.undoStack.pop();
+    if (!command) return null;
+    command.undo();
+    this.redoStack.push(command);
+    return command;
+  }
+}`
+      },
+      'PawnForwardRule.ts': {
+        path: 'proyect/src/core/rules/PawnForwardRule.ts',
+        desc: 'Regla cohesiva (SRP) dedicada únicamente al avance frontal simple y doble del peón.',
+        code: `export class PawnForwardRule implements IMovementRule {
+  public getCandidatePositions(
+    from: Position,
+    color: Color,
+    board: IBoardQuery
+  ): Position[] {
+    const direction = color === 'WHITE' ? -1 : 1;
+    const oneStep = from.offset(direction, 0);
+    if (!board.isWithinBounds(oneStep) || board.getPieceAt(oneStep) !== null) {
+      return [];
+    }
+    const moves: Position[] = [oneStep];
+    const twoSteps = from.offset(direction * 2, 0);
+    if (!board.hasPieceMoved(board.getPieceAt(from)!) && board.getPieceAt(twoSteps) === null) {
+      moves.push(twoSteps);
+    }
+    return moves;
+  }
+}`
+      },
+      'SlidingMoveRule.ts': {
+        path: 'proyect/src/core/rules/SlidingMoveRule.ts',
+        desc: 'Estrategia geométrica reutilizable para piezas deslizantes (Torre, Alfil y Dama) parametrizada por vectores de dirección.',
+        code: `export class SlidingMoveRule implements IMovementRule {
+  constructor(private readonly directions: readonly DirectionVector[]) {}
+
+  public getCandidatePositions(
+    from: Position,
+    color: Color,
+    board: IBoardQuery
+  ): Position[] {
+    const positions: Position[] = [];
+    for (const [dRow, dCol] of this.directions) {
+      let current = from.offset(dRow, dCol);
+      while (board.isWithinBounds(current)) {
+        const occupant = board.getPieceAt(current);
+        if (occupant === null) {
+          positions.push(current);
+        } else {
+          if (occupant.color !== color) positions.push(current);
+          break;
+        }
+        current = current.offset(dRow, dCol);
+      }
+    }
+    return positions;
+  }
+}`
+      },
+      'LeapMoveRule.ts': {
+        path: 'proyect/src/core/rules/LeapMoveRule.ts',
+        desc: 'Estrategia geométrica para piezas de salto fijo (Caballo y Rey) sin obstrucción intermedia.',
+        code: `export class LeapMoveRule implements IMovementRule {
+  constructor(private readonly offsets: readonly DirectionVector[]) {}
+
+  public getCandidatePositions(
+    from: Position,
+    color: Color,
+    board: IBoardQuery
+  ): Position[] {
+    return this.offsets
+      .map(([dRow, dCol]) => from.offset(dRow, dCol))
+      .filter((target) => {
+        if (!board.isWithinBounds(target)) return false;
+        const occupant = board.getPieceAt(target);
+        return occupant === null || occupant.color !== color;
+      });
+  }
+}`
+      },
+      'IPiece.ts': {
+        path: 'proyect/src/core/pieces/IPiece.ts',
+        desc: 'Contrato esbelto y segregado (ISP + LSP) cumplido por todas las piezas del dominio.',
+        code: `export interface IPiece {
+  readonly color: Color;
+  readonly type: PieceType;
+  getPseudoLegalMoves(from: Position, board: IBoardQuery): Position[];
+}`
+      },
+      'IMovementRule.ts': {
+        path: 'proyect/src/core/rules/IMovementRule.ts',
+        desc: 'Interfaz del patrón Strategy para todas las reglas de movimiento geométrico del tablero.',
+        code: `export interface IMovementRule {
+  getCandidatePositions(
+    from: Position,
+    color: Color,
+    board: IBoardQuery
+  ): Position[];
+}`
+      },
+      'IAiStrategy.ts': {
+        path: 'proyect/src/core/strategy/IAiStrategy.ts',
+        desc: 'Interfaz del patrón Strategy para motores de decisión de IA que consumen IGameEngine.',
+        code: `export interface AiMoveDecision {
+  readonly from: Position;
+  readonly to: Position;
+  readonly promotionPiece?: PromotablePieceType;
+}
+
+export interface IAiStrategy {
+  readonly name: string;
+  chooseMove(engine: IGameEngine): AiMoveDecision | null;
+}`
+      },
+      'collectAllCandidateMoves.ts': {
+        path: 'proyect/src/core/strategy/collectAllCandidateMoves.ts',
+        desc: 'Función compartida (DRY) que recolecta todas las jugadas legales del turno actual para cualquier estrategia de IA.',
+        code: `export function collectAllCandidateMoves(engine: IGameEngine): CandidateMove[] {
+  const snapshot = engine.getSnapshot();
+  const candidates: CandidateMove[] = [];
+
+  for (let row = 0; row < snapshot.rows; row++) {
+    for (let col = 0; col < snapshot.cols; col++) {
+      const cell = snapshot.board[row][col];
+      if (cell && cell.color === snapshot.turn) {
+        const from = new Position(row, col);
+        for (const to of engine.getLegalMoves(from)) {
+          candidates.push({ from, to, movedPieceType: cell.type });
+        }
+      }
+    }
+  }
+  return candidates;
+}`
+      },
+      'pieceFactory.ts': {
+        path: 'proyect/src/core/pieces/pieceFactory.ts',
+        desc: 'Fábrica polimórfica de piezas basada en un Lookup Table de constructores tipados.',
+        code: `const PIECE_CONSTRUCTORS: Record<PieceType, new (color: Color) => IPiece> = {
+  PAWN: Pawn,
+  ROOK: Rook,
+  KNIGHT: Knight,
+  BISHOP: Bishop,
+  QUEEN: Queen,
+  KING: King,
+};
+
+export function createPiece(type: PieceType, color: Color): IPiece {
+  const PieceConstructor = PIECE_CONSTRUCTORS[type];
+  return new PieceConstructor(color);
+}`
+      },
+      'ICommand.ts': {
+        path: 'proyect/src/core/game/ICommand.ts',
+        desc: 'Interfaz del patrón Command con operaciones simétricas execute() y undo().',
+        code: `export interface ICommand {
+  execute(): void;
+  undo(): void;
+}`
+      },
+      'NormalPlayState.ts': {
+        path: 'proyect/src/core/state/NormalPlayState.ts',
+        desc: 'Estado concreto activo cuando ningún Rey se encuentra en jaque.',
+        code: `export class NormalPlayState implements IGameState {
+  public readonly type: GameStateType = 'NORMAL_PLAY';
+
+  public canAcceptMoves(): boolean {
+    return true;
+  }
+
+  public getWinner(): Color | null {
+    return null;
+  }
+
+  public evaluateNextState(context: GameStateContext): IGameState {
+    return evaluateActiveStateTransition(context);
+  }
+}`
+      },
+      'CheckmateState.ts': {
+        path: 'proyect/src/core/state/CheckmateState.ts',
+        desc: 'Estado terminal de Jaque Mate: bloquea nuevas jugadas y determina al ganador mediante OPPOSITE_COLOR.',
+        code: `export class CheckmateState implements IGameState {
+  public readonly type: GameStateType = 'CHECKMATE';
+
+  public canAcceptMoves(): boolean {
+    return false;
+  }
+
+  public getWinner(currentTurn: Color): Color | null {
+    return OPPOSITE_COLOR[currentTurn];
+  }
+
+  public evaluateNextState(): IGameState {
+    return this;
+  }
+}`
+      },
+      'ChessApiService.ts': {
+        path: 'proyect/src/adapters/services/ChessApiService.ts',
+        desc: 'Adaptador secundario (Adapter Pattern) que traduce las respuestas JSON de chess-api.com (Stockfish) al puerto IChessEngine.',
+        code: `export class ChessApiService implements IChessEngine {
+  public async evaluatePosition(fen: string): Promise<EngineEvaluation | null> {
+    const response = await fetch('https://chess-api.com/v1', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fen, depth: 12 }),
+    });
+    // Adapta el payload externo al contrato EngineEvaluation de nuestra aplicación
+  }
+}`
+      },
+      'GeminiCoachService.ts': {
+        path: 'proyect/src/adapters/services/GeminiCoachService.ts',
+        desc: 'Adaptador secundario que encapsula la API REST de Google Gemini detrás del puerto IAiCoachEngine.',
+        code: `export class GeminiCoachService implements IAiCoachEngine {
+  public hasApiKey(): boolean {
+    return Boolean(this.getApiKey());
+  }
+
+  public async requestBatchReview(
+    movesSummary: readonly MoveEvaluationInput[]
+  ): Promise<BatchCoachReview> {
+    // Construye el prompt pedagógico, invoca Gemini y parsea la respuesta JSON
+  }
+}`
+      },
+      'ControlPanelView.tsx': {
+        path: 'proyect/src/adapters/web/ControlPanelView.tsx',
+        desc: 'Vista del panel de control refactorizada para recibir clockConfig cohesivo (eliminando el Data Clump de 8 props sueltas).',
+        code: `export interface ControlPanelViewProps {
+  readonly state: GameStateType;
+  readonly turn: Color;
+  readonly winner: Color | null;
+  readonly clockConfig: ClockConfigSectionProps;
+  readonly onUndo: () => void;
+  readonly onRedo: () => void;
+  readonly onReset: () => void;
+}`
+      },
+      'MoveHistoryTable.tsx': {
+        path: 'proyect/src/adapters/web/components/MoveHistoryTable.tsx',
+        desc: 'Componente unificado de historial de jugadas (consolidado tras eliminar el código muerto MoveHistoryPanel.tsx).',
+        code: `function formatMoveSpecialDetail(move: MoveRecord): string {
+  if (move.isCastling) return 'Enroque';
+  if (move.isPromotion && move.promotionPiece) {
+    return \`Corona \${PIECE_NAMES_LOOKUP[move.promotionPiece]}\`;
+  }
+  if (move.capturedPiece) {
+    return \`Captura \${PIECE_NAMES_LOOKUP[move.capturedPiece]}\`;
+  }
+  return '—';
+}`
+      },
+      'ModalDialog.tsx': {
+        path: 'proyect/src/adapters/web/components/ModalDialog.tsx',
+        desc: 'Componente contenedor reutilizable con {children} que centraliza el overlay y la caja visual de los modales.',
+        code: `export interface ModalDialogProps {
+  readonly isOpen: boolean;
+  readonly maxWidthClass?: string;
+  readonly ariaLabelledBy?: string;
+  readonly children: React.ReactNode;
+}
+
+export function ModalDialog({
+  isOpen,
+  maxWidthClass = 'max-w-md',
+  ariaLabelledBy,
+  children,
+}: ModalDialogProps): React.ReactElement | null {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={ariaLabelledBy}
+        className={\`bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl \${maxWidthClass} w-full space-y-4\`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}`
+      },
+      'CoachFeedbackCard.tsx': {
+        path: 'proyect/src/adapters/web/components/CoachFeedbackCard.tsx',
+        desc: 'Combina Guard Clauses con estrechamiento de tipos (Type Narrowing) y el contenedor estilizado CoachCardShell.',
+        code: `export function CoachFeedbackCard(props: CoachFeedbackCardProps): React.ReactElement {
+  if (props.isHintLoading) return <CoachHintLoadingCard />;
+  if (props.liveHint) {
+    return <CoachLiveHintCard liveHint={props.liveHint} onDismiss={props.onDismissHint} />;
+  }
+  if (props.analyzedMove) {
+    return <CoachMoveAnalysisCard analyzedMove={props.analyzedMove} />;
+  }
+  if (props.overallSummary) {
+    return <CoachOverallSummaryCard overallSummary={props.overallSummary} />;
+  }
+  return <CoachIdlePromptCard onRequestHint={props.onRequestHint} />;
+}`
+      },
+      'ApiKeyModal.tsx': {
+        path: 'proyect/src/adapters/web/components/ApiKeyModal.tsx',
+        desc: 'Ejemplo de Composed Component que utiliza ModalDialog y subcomponentes privados semánticos.',
+        code: `export function ApiKeyModal({ isOpen, onClose, onSaveKey }: ApiKeyModalProps): React.ReactElement | null {
+  // ...
+  return (
+    <ModalDialog isOpen={isOpen} ariaLabelledBy="api-key-modal-title">
+      <ModalHeader onClose={onClose} />
+      <ModalDescription />
+      <ApiKeyInputField value={inputValue} onChange={setInputValue} />
+      {savedSuccess && <SavedSuccessBanner />}
+      <ModalFooterActions onClose={onClose} onSave={handleSave} />
+    </ModalDialog>
+  );
+}`
+      },
+      'ReplayControlSection.tsx': {
+        path: 'proyect/src/adapters/web/components/ReplayControlSection.tsx',
+        desc: 'Sección de reproducción post-partida descompuesta en subcomponentes declarativos del mismo nivel de abstracción.',
+        code: `export function ReplayControlSection(props: ReplayControlSectionProps): React.ReactElement {
+  return (
+    <div className="bg-slate-900/90 border border-indigo-500/30 rounded-xl p-4 space-y-3">
+      <ReplayHeaderBar currentPly={props.currentPly} totalPlies={props.totalPlies} />
+      <ReplayTransportControls {...props} />
+      <PlaybackSpeedSelector speedMs={props.speedMs} onChangeSpeed={props.onChangeSpeed} />
+      <ReplayFooterActions onAnalyze={props.onAnalyze} onExit={props.onExit} />
+    </div>
+  );
+}`
+      },
+      'CommandHistory.test.ts': {
+        path: 'proyect/tests/core/CommandHistory.test.ts',
+        desc: 'Test unitario con estructura AAA (Arrange, Act, Assert) verificando la invariante de reversibilidad de MoveCommand.',
+        code: `it('restores moved piece and captured piece to their original positions upon undo', () => {
+  // Arrange
+  const board = new Board(8, 8);
+  const whiteRook = new Rook('WHITE');
+  const blackPawn = new Pawn('BLACK');
+  const origin = new Position(0, 0);
+  const target = new Position(0, 4);
+  board.placePiece(origin, whiteRook);
+  board.placePiece(target, blackPawn);
+  const command = new MoveCommand(board, origin, target);
+  command.execute();
+
+  // Act
+  command.undo();
+
+  // Assert
+  expect(board.getPieceAt(origin)).toBe(whiteRook);
+  expect(board.getPieceAt(target)).toBe(blackPawn);
+});`
+      },
+      'AnalysisService.test.ts': {
+        path: 'proyect/tests/adapters/AnalysisService.test.ts',
+        desc: 'Test unitario con Stubs (respuestas predefinidas con vi.fn().mockResolvedValue) para IChessEngine e IAiCoachEngine sin tráfico de red real.',
+        code: `const mockChessEngine: IChessEngine = {
+  evaluatePosition: vi.fn().mockResolvedValue({
+    from: 'e2', to: 'e4', san: 'e4', eval: 0.2, mate: null, winChance: 52, continuation: [], rawText: '',
+  }),
+  evaluateSequence: vi.fn().mockResolvedValue([
+    { from: 'e2', to: 'e4', eval: 0.2, san: '', mate: null, winChance: 50, continuation: [], rawText: '' },
+    { from: 'e7', to: 'e5', eval: 0.15, san: '', mate: null, winChance: 50, continuation: [], rawText: '' },
+  ]),
+};
+
+const service = new AnalysisService(mockChessEngine, mockAiCoachEngine);
+const result = await service.analyzeFullGame(game.getSnapshot());
+expect(result.analyzedMoves[0].quality.quality).toBe('BEST');`
+      },
+      'ChessClock.test.ts': {
+        path: 'proyect/tests/adapters/ChessClock.test.ts',
+        desc: 'Test determinista del reloj de ajedrez utilizando reloj sintético (vi.useFakeTimers y vi.advanceTimersByTime).',
+        code: `beforeEach(() => {
+  vi.useFakeTimers();
+});
+
+it('decrements only the active player time when running', () => {
+  const clock = new ChessClockController({ onTimeout: () => {} });
+
+  clock.start('WHITE');
+  vi.advanceTimersByTime(3000);
+
+  expect(clock.getWhiteSeconds()).toBe(597);
+  expect(clock.getBlackSeconds()).toBe(600);
+});`
+      }
+    };
+
+    const modal = document.getElementById('snippet-modal');
+    const modalFileName = document.getElementById('modal-file-name');
+    const modalFilePath = document.getElementById('modal-file-path');
+    const modalFileDesc = document.getElementById('modal-file-desc');
+    const modalFileCode = document.getElementById('modal-file-code');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const copySnippetBtn = document.getElementById('copy-snippet-btn');
+
+    function openFileSnippet(fileName) {
+      const entry = FILE_SNIPPETS[fileName];
+      if (!entry) return;
+      modalFileName.textContent = fileName;
+      modalFilePath.textContent = entry.path;
+      modalFileDesc.textContent = entry.desc;
+      modalFileCode.textContent = entry.code;
+      copySnippetBtn.textContent = 'Copiar snippet';
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeFileSnippet() {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    closeModalBtn.addEventListener('click', closeFileSnippet);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeFileSnippet();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeFileSnippet();
+    });
+
+    copySnippetBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(modalFileCode.textContent || '');
+      copySnippetBtn.textContent = '✓ ¡Copiado!';
+      setTimeout(() => {
+        copySnippetBtn.textContent = 'Copiar snippet';
+      }, 1600);
+    });
+
+    document.querySelectorAll('.theory-card').forEach((card) => {
+      const filesAttr = card.getAttribute('data-files') || '';
+      const chipContainer = card.querySelector('.file-chips');
+      const fileNames = filesAttr.split(',').map((f) => f.trim()).filter(Boolean);
+
+      if (chipContainer && fileNames.length > 0) {
+        fileNames.forEach((fileName) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className =
+            'inline-flex items-center gap-1 text-[11px] font-mono px-2.5 py-1 rounded-md bg-slate-800 hover:bg-emerald-500/20 text-emerald-300 hover:text-emerald-200 border border-slate-700 hover:border-emerald-500/40 transition cursor-pointer shadow-sm';
+          btn.innerHTML = `<span>📄</span><span>${fileName}</span>`;
+          btn.title = `Ver snippet de ${fileName}`;
+          btn.addEventListener('click', () => openFileSnippet(fileName));
+          chipContainer.appendChild(btn);
+        });
+      }
+
+      card.querySelectorAll('code').forEach((codeEl) => {
+        const text = codeEl.textContent.trim();
+        if (FILE_SNIPPETS[text]) {
+          codeEl.classList.add(
+            'cursor-pointer',
+            'underline',
+            'decoration-emerald-500/50',
+            'hover:text-emerald-300',
+            'transition'
+          );
+          codeEl.title = `Hacé clic para ver el snippet de ${text}`;
+          codeEl.addEventListener('click', () => openFileSnippet(text));
+        }
+      });
+    });
+
+    const filterButtons = document.querySelectorAll('.cat-btn');
+    const sections = document.querySelectorAll('.theory-section');
+    const searchInput = document.getElementById('search-input');
+    let activeCategory = 'all';
+
+    function applyFilters() {
+      const query = searchInput.value.trim().toLowerCase();
+      sections.forEach((section) => {
+        const secId = section.getAttribute('data-section');
+        const matchesCat = activeCategory === 'all' || activeCategory === secId;
+        if (!matchesCat) {
+          section.classList.add('hidden');
+          return;
+        }
+        let visibleCardsInSection = 0;
+        section.querySelectorAll('.theory-card').forEach((card) => {
+          const text = card.textContent.toLowerCase();
+          const files = (card.getAttribute('data-files') || '').toLowerCase();
+          const matchesQuery = !query || text.includes(query) || files.includes(query);
+          card.classList.toggle('hidden', !matchesQuery);
+          if (matchesQuery) visibleCardsInSection++;
+        });
+        section.classList.toggle('hidden', visibleCardsInSection === 0);
+      });
+    }
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeCategory = btn.getAttribute('data-cat');
+        filterButtons.forEach((b) => {
+          const isActive = b === btn;
+          b.className = isActive
+            ? 'cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white transition'
+            : 'cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition';
+        });
+        applyFilters();
+      });
+    });
+
+    searchInput.addEventListener('input', applyFilters);
+  </script>
+</body>
+</html>

@@ -1,19 +1,19 @@
 import { Board } from '../board/Board';
-import { BoardSetupFactory } from '../board/BoardSetupFactory';
+import { createStandardBoard } from '../board/boardSetup';
 import { Position } from '../board/Position';
+import { IPiece } from '../pieces/IPiece';
 import { Color, OPPOSITE_COLOR, PieceType } from '../pieces/types';
 import { GameSnapshot, MoveRecord, PieceSnapshot } from '../ports/GameSnapshot';
 import { IGameEngine } from '../ports/IGameEngine';
 import { IGameObserver, UnsubscribeFn } from '../ports/IGameObserver';
-import { MoveResult } from '../ports/MoveResult';
+import { MoveRejectionReason, MoveResult } from '../ports/MoveResult';
 import { CheckDetector } from '../rules/CheckDetector';
-import { CheckState } from './CheckState';
 import { CommandHistory } from './CommandHistory';
 import { IGameState } from './IGameState';
-import { InsufficientMaterialEvaluator } from './InsufficientMaterialEvaluator';
+import { isInsufficientMaterial } from './InsufficientMaterialEvaluator';
 import { MoveCommand } from './MoveCommand';
 import { NormalPlayState } from './NormalPlayState';
-import { PositionHasher } from './PositionHasher';
+import { computePositionSignature } from './PositionHasher';
 import { TimeoutState } from './TimeoutState';
 
 interface TurnRecord {
@@ -41,7 +41,7 @@ export class ChessGame implements IGameEngine {
   private cachedSnapshot: GameSnapshot | null = null;
 
   constructor(
-    board: Board = BoardSetupFactory.createStandardBoard(),
+    board: Board = createStandardBoard(),
     initialTurn: Color = 'WHITE',
     history: CommandHistory = new CommandHistory(),
     checkDetector: CheckDetector = new CheckDetector()
@@ -52,10 +52,9 @@ export class ChessGame implements IGameEngine {
     this.checkDetector = checkDetector;
     this.observers = new Set<IGameObserver>();
 
-    const inCheck = this.checkDetector.isKingInCheck(this.board, this.currentTurn);
-    this.currentState = inCheck ? new CheckState() : new NormalPlayState();
+    this.currentState = new NormalPlayState();
 
-    this.currentPositionSignature = PositionHasher.computeSignature(this.board, this.currentTurn);
+    this.currentPositionSignature = computePositionSignature(this.board, this.currentTurn);
     this.incrementPositionCount(this.currentPositionSignature);
   }
 
@@ -84,7 +83,7 @@ export class ChessGame implements IGameEngine {
       cols: this.board.cols,
       grid: Object.freeze(grid),
       currentTurn: this.currentTurn,
-      stateKind: this.currentState.kind,
+      stateKind: this.currentState.type,
       winner: this.currentState.getWinner(this.currentTurn),
       canUndo: this.history.canUndo,
       canRedo: this.history.canRedo,
@@ -101,128 +100,34 @@ export class ChessGame implements IGameEngine {
       return [];
     }
 
-    const pseudoLegalMoves = piece.getPseudoLegalMoves(position, this.board);
-    const strictlyLegalMoves: Position[] = [];
-
-    for (const target of pseudoLegalMoves) {
-      const simulation = new MoveCommand(this.board, position, target);
-      simulation.execute();
-
-      let leavesKingInCheck = false;
-      try {
-        leavesKingInCheck = this.checkDetector.isKingInCheck(this.board, piece.color);
-      } finally {
-        simulation.undo();
-      }
-
-      if (!leavesKingInCheck) {
-        strictlyLegalMoves.push(target);
-      }
-    }
-
-    return strictlyLegalMoves;
+    return piece
+      .getPseudoLegalMoves(position, this.board)
+      .filter((target) => !this.wouldMoveExposeKingToCheck(piece, position, target));
   }
 
   makeMove(from: Position, to: Position, promotionPiece?: PieceType): MoveResult {
-    if (!this.currentState.canAcceptMoves()) {
-      return { success: false, reason: 'GAME_OVER' };
+    const validation = this.validateMove(from, to, promotionPiece);
+    if ('errorReason' in validation) {
+      return { success: false, reason: validation.errorReason };
     }
-
-    const piece = this.board.getPieceAt(from);
-    if (!piece) {
-      return { success: false, reason: 'EMPTY_ORIGIN' };
-    }
-
-    if (piece.color !== this.currentTurn) {
-      return { success: false, reason: 'WRONG_TURN' };
-    }
-
-    const pseudoLegalMoves = piece.getPseudoLegalMoves(from, this.board);
-    const isPseudoLegal = pseudoLegalMoves.some((candidate) => candidate.equals(to));
-    if (!isPseudoLegal) {
-      return { success: false, reason: 'ILLEGAL_MOVE' };
-    }
-
-    const simulation = new MoveCommand(this.board, from, to, promotionPiece);
-    simulation.execute();
-
-    let leavesKingInCheck = false;
-    try {
-      leavesKingInCheck = this.checkDetector.isKingInCheck(this.board, piece.color);
-    } finally {
-      simulation.undo();
-    }
-
-    if (leavesKingInCheck) {
-      return { success: false, reason: 'KING_LEFT_IN_CHECK' };
-    }
-
-    const pieceType = piece.type;
-    const pieceColor = piece.color;
-    const isCastling = pieceType === 'KING' && Math.abs(to.col - from.col) === 2;
-    const isPromotion = pieceType === 'PAWN' && (to.row === this.board.rows - 1 || to.row === 0);
+    const { piece } = validation;
 
     const command = new MoveCommand(this.board, from, to, promotionPiece);
     this.history.executeCommand(command);
 
-    const capturedPiece = command.getCapturedPiece()?.type;
-    const record: MoveRecord = Object.freeze({
-      moveIndex: this.appliedMoveCount,
-      turn: pieceColor,
-      piece: pieceType,
-      from: from.toAlgebraic(),
-      to: to.toAlgebraic(),
-      capturedPiece,
-      isCastling,
-      isPromotion,
-      promotionPiece: isPromotion ? (promotionPiece ?? 'QUEEN') : undefined,
-    });
+    this.recordMove(piece, from, to, command, promotionPiece);
+    this.addSnapshotToTurnHistory();
+    this.updateHalfMoveClock(piece.type, command.getCapturedPiece() !== null);
+    this.switchTurn();
 
-    this.recordedMoves.length = this.appliedMoveCount;
-    this.recordedMoves.push(record);
-    this.appliedMoveCount += 1;
-
-    this.turnHistory.push({
-      state: this.currentState,
-      halfMoveClock: this.halfMoveClock,
-      positionSignature: this.currentPositionSignature,
-    });
-    this.redoHistory.length = 0;
-
-    const isPawnMove = piece.type === 'PAWN';
-    const isCapture = command.getCapturedPiece() !== null;
-    if (isPawnMove || isCapture) {
-      this.halfMoveClock = 0;
-    } else {
-      this.halfMoveClock += 1;
-    }
-
-    this.currentTurn = OPPOSITE_COLOR[this.currentTurn];
-
-    const currentSignature = PositionHasher.computeSignature(this.board, this.currentTurn);
-    this.currentPositionSignature = currentSignature;
-    this.incrementPositionCount(currentSignature);
-
-    const isKingInCheck = this.checkDetector.isKingInCheck(this.board, this.currentTurn);
-    const hasLegalMoves = this.hasAnyLegalMove(this.currentTurn);
-    const isFiftyMoveRuleReached = this.halfMoveClock >= 100;
-    const isInsufficientMaterial = InsufficientMaterialEvaluator.isInsufficient(this.board);
-    const isThreefoldRepetition = (this.positionCounts.get(currentSignature) ?? 0) >= 3;
-
-    this.currentState = this.currentState.evaluateNextState({
-      isKingInCheck,
-      hasLegalMoves,
-      isFiftyMoveRuleReached,
-      isInsufficientMaterial,
-      isThreefoldRepetition,
-    });
-
+    const currentSignature = this.trackPositionRepetition();
+    this.updateGameState(currentSignature);
     this.notifyObservers();
 
     return {
       success: true,
       capturedPiece: command.getCapturedPiece(),
-      nextState: this.currentState.kind,
+      nextState: this.currentState.type,
     };
   }
 
@@ -232,7 +137,6 @@ export class ChessGame implements IGameEngine {
     }
 
     this.currentState = new TimeoutState(timedOutColor);
-    this.cachedSnapshot = null;
     this.notifyObservers();
     return this.getSnapshot();
   }
@@ -248,18 +152,11 @@ export class ChessGame implements IGameEngine {
     const previousTurn = this.turnHistory.pop();
     if (previousTurn) {
       this.decrementPositionCount(this.currentPositionSignature);
-      this.redoHistory.push({
-        state: this.currentState,
-        halfMoveClock: this.halfMoveClock,
-        positionSignature: this.currentPositionSignature,
-      });
-
-      this.currentState = previousTurn.state;
-      this.halfMoveClock = previousTurn.halfMoveClock;
-      this.currentPositionSignature = previousTurn.positionSignature;
+      this.redoHistory.push(this.createCurrentTurnRecord());
+      this.restoreTurnRecord(previousTurn);
     }
 
-    this.currentTurn = OPPOSITE_COLOR[this.currentTurn];
+    this.switchTurn();
     this.notifyObservers();
     return true;
   }
@@ -274,19 +171,12 @@ export class ChessGame implements IGameEngine {
 
     const nextTurn = this.redoHistory.pop();
     if (nextTurn) {
-      this.turnHistory.push({
-        state: this.currentState,
-        halfMoveClock: this.halfMoveClock,
-        positionSignature: this.currentPositionSignature,
-      });
-
+      this.turnHistory.push(this.createCurrentTurnRecord());
       this.incrementPositionCount(nextTurn.positionSignature);
-      this.currentState = nextTurn.state;
-      this.halfMoveClock = nextTurn.halfMoveClock;
-      this.currentPositionSignature = nextTurn.positionSignature;
+      this.restoreTurnRecord(nextTurn);
     }
 
-    this.currentTurn = OPPOSITE_COLOR[this.currentTurn];
+    this.switchTurn();
     this.notifyObservers();
     return true;
   }
@@ -300,8 +190,156 @@ export class ChessGame implements IGameEngine {
     this.observers.delete(observer);
   }
 
-  private hasAnyLegalMove(color: Color): boolean {
-    const placements = this.board.getPiecesByColor(color);
+  private validateMove(
+    from: Position,
+    to: Position,
+    promotionPiece?: PieceType
+  ): { piece: IPiece } | { errorReason: MoveRejectionReason } {
+    if (!this.currentState.canAcceptMoves()) {
+      return { errorReason: 'GAME_OVER' };
+    }
+
+    const piece = this.board.getPieceAt(from);
+    if (!piece) {
+      return { errorReason: 'EMPTY_ORIGIN' };
+    }
+
+    if (piece.color !== this.currentTurn) {
+      return { errorReason: 'WRONG_TURN' };
+    }
+
+    const pseudoLegalMoves = piece.getPseudoLegalMoves(from, this.board);
+    const isPseudoLegal = pseudoLegalMoves.some((candidate) => candidate.equals(to));
+    if (!isPseudoLegal) {
+      return { errorReason: 'ILLEGAL_MOVE' };
+    }
+
+    if (this.wouldMoveExposeKingToCheck(piece, from, to, promotionPiece)) {
+      return { errorReason: 'KING_LEFT_IN_CHECK' };
+    }
+
+    return { piece };
+  }
+
+  private recordMove(
+    piece: IPiece,
+    from: Position,
+    to: Position,
+    command: MoveCommand,
+    promotionPiece?: PieceType
+  ): void {
+    const isCastling = piece.type === 'KING' && Math.abs(to.col - from.col) === 2;
+    const isPromotion = piece.type === 'PAWN' && (to.row === this.board.rows - 1 || to.row === 0);
+
+    const record: MoveRecord = Object.freeze({
+      moveIndex: this.appliedMoveCount,
+      turn: piece.color,
+      piece: piece.type,
+      from: from.toAlgebraic(),
+      to: to.toAlgebraic(),
+      capturedPiece: command.getCapturedPiece()?.type,
+      isCastling,
+      isPromotion,
+      promotionPiece: isPromotion ? (promotionPiece ?? 'QUEEN') : undefined,
+    });
+
+    this.recordedMoves.length = this.appliedMoveCount;
+    this.recordedMoves.push(record);
+    this.appliedMoveCount += 1;
+  }
+
+  private addSnapshotToTurnHistory(): void {
+    this.turnHistory.push(this.createCurrentTurnRecord());
+    this.redoHistory.length = 0;
+  }
+
+  private createCurrentTurnRecord(): TurnRecord {
+    return {
+      state: this.currentState,
+      halfMoveClock: this.halfMoveClock,
+      positionSignature: this.currentPositionSignature,
+    };
+  }
+
+  private restoreTurnRecord(record: TurnRecord): void {
+    this.currentState = record.state;
+    this.halfMoveClock = record.halfMoveClock;
+    this.currentPositionSignature = record.positionSignature;
+  }
+
+  private updateHalfMoveClock(pieceType: PieceType, hasCaptured: boolean): void {
+    if (pieceType === 'PAWN' || hasCaptured) {
+      this.halfMoveClock = 0;
+    } else {
+      this.halfMoveClock += 1;
+    }
+  }
+
+  private switchTurn(): void {
+    this.currentTurn = OPPOSITE_COLOR[this.currentTurn];
+  }
+
+  private trackPositionRepetition(): string {
+    const currentSignature = computePositionSignature(this.board, this.currentTurn);
+    this.currentPositionSignature = currentSignature;
+    this.incrementPositionCount(currentSignature);
+    return currentSignature;
+  }
+
+  private updateGameState(currentSignature: string): void {
+    const isKingInCheck = this.checkDetector.isKingInCheck(this.board, this.currentTurn);
+    const hasLegalMoves = this.hasAnyLegalMove();
+    const isFiftyMoveRuleReached = this.halfMoveClock >= 100;
+    const isInsufficient = isInsufficientMaterial(this.board);
+    const isThreefoldRepetition = (this.positionCounts.get(currentSignature) ?? 0) >= 3;
+
+    this.currentState = this.currentState.evaluateNextState({
+      isKingInCheck,
+      hasLegalMoves,
+      isFiftyMoveRuleReached,
+      isInsufficientMaterial: isInsufficient,
+      isThreefoldRepetition,
+    });
+  }
+
+  private wouldMoveExposeKingToCheck(
+    piece: IPiece,
+    from: Position,
+    to: Position,
+    promotionPiece?: PieceType
+  ): boolean {
+    const isCastling = piece.type === 'KING' && Math.abs(to.col - from.col) === 2;
+    if (isCastling && this.isCastlingOriginOrTransitAttacked(from, to, piece.color)) {
+      return true;
+    }
+
+    const simulation = new MoveCommand(this.board, from, to, promotionPiece);
+    simulation.execute();
+
+    try {
+      return this.checkDetector.isKingInCheck(this.board, piece.color);
+    } finally {
+      simulation.undo();
+    }
+  }
+
+  private isCastlingOriginOrTransitAttacked(
+    from: Position,
+    to: Position,
+    kingColor: Color
+  ): boolean {
+    const opponentColor = OPPOSITE_COLOR[kingColor];
+    const direction = Math.sign(to.col - from.col);
+    const transitSquare = from.offset(0, direction);
+
+    return (
+      this.checkDetector.isSquareAttacked(this.board, from, opponentColor) ||
+      this.checkDetector.isSquareAttacked(this.board, transitSquare, opponentColor)
+    );
+  }
+
+  private hasAnyLegalMove(): boolean {
+    const placements = this.board.getPiecesByColor(this.currentTurn);
     for (const placement of placements) {
       const legalMoves = this.getLegalMoves(placement.position);
       if (legalMoves.length > 0) {
