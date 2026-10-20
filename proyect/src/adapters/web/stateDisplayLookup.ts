@@ -1,5 +1,5 @@
 import { Color } from '../../core/pieces/types';
-import { GameStateKind } from '../../core/ports/MoveResult';
+import { GameStateKind, isTerminalState } from '../../core/ports/MoveResult';
 
 export const STATE_LABELS: Record<GameStateKind, string> = {
   IN_PROGRESS: 'Partida en Curso',
@@ -35,7 +35,5 @@ export function getStateBadgeClass(stateKind: GameStateKind): string {
   return STATE_BADGE_CLASSES[stateKind] ?? 'bg-zinc-800 text-zinc-200 border-zinc-700';
 }
 
-export function isTerminalState(stateKind: GameStateKind): boolean {
-  return stateKind === 'CHECKMATE' || stateKind === 'STALEMATE' || stateKind === 'DRAW' || stateKind === 'TIMEOUT';
-}
+export { isTerminalState };
 

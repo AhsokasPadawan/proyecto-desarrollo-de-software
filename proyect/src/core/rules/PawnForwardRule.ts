@@ -11,29 +11,46 @@ export const PAWN_FORWARD_DELTAS: Record<Color, number> = {
 
 export class PawnForwardRule implements IMovementRule {
   getPseudoLegalMoves(from: Position, piece: IPiece, board: IBoardQuery): Position[] {
-    const legalMoves: Position[] = [];
     const forwardDelta = PAWN_FORWARD_DELTAS[piece.color];
+    const singleStepMove = this.getSingleStepMove(from, forwardDelta, board);
 
-    const singleStepPosition = from.offset(forwardDelta, 0);
-    if (!board.isWithinBounds(singleStepPosition) || !board.isEmpty(singleStepPosition)) {
-      return legalMoves;
+    if (!singleStepMove) {
+      return [];
     }
 
-    legalMoves.push(singleStepPosition);
+    const doubleStepMove = this.getDoubleStepMove(from, piece.color, forwardDelta, board);
+    return doubleStepMove ? [singleStepMove, doubleStepMove] : [singleStepMove];
+  }
 
+  private getSingleStepMove(
+    from: Position,
+    forwardDelta: number,
+    board: IBoardQuery
+  ): Position | null {
+    const singleStepPosition = from.offset(forwardDelta, 0);
+    const isStepAvailable = board.isSquareEmpty(singleStepPosition);
+
+    return isStepAvailable ? singleStepPosition : null;
+  }
+
+  private getDoubleStepMove(
+    from: Position,
+    color: Color,
+    forwardDelta: number,
+    board: IBoardQuery
+  ): Position | null {
     const initialRowByColor: Record<Color, number> = {
       WHITE: 1,
       BLACK: board.rows - 2,
     };
 
-    const isAtInitialRow = from.row === initialRowByColor[piece.color];
-    if (isAtInitialRow) {
-      const doubleStepPosition = from.offset(forwardDelta * 2, 0);
-      if (board.isWithinBounds(doubleStepPosition) && board.isEmpty(doubleStepPosition)) {
-        legalMoves.push(doubleStepPosition);
-      }
+    if (from.row !== initialRowByColor[color]) {
+      return null;
     }
 
-    return legalMoves;
+    const doubleStepPosition = from.offset(forwardDelta * 2, 0);
+    const isStepAvailable = board.isSquareEmpty(doubleStepPosition);
+
+    return isStepAvailable ? doubleStepPosition : null;
   }
 }

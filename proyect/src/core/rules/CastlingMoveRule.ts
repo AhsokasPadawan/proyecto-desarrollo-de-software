@@ -1,111 +1,91 @@
 import { Position } from '../board/Position';
 import { IPiece } from '../pieces/IPiece';
-import { Color, OPPOSITE_COLOR } from '../pieces/types';
+import { Color } from '../pieces/types';
 import { IBoardQuery } from '../ports/IBoardQuery';
-import { CheckDetector } from './CheckDetector';
 import { IMovementRule } from './IMovementRule';
 
-export interface ISquareAttackDetector {
-  isSquareAttacked(board: IBoardQuery, target: Position, byColor: Color): boolean;
+interface CastlingSideConfig {
+  readonly rookCol: number;
+  readonly direction: 1 | -1;
 }
 
 export class CastlingMoveRule implements IMovementRule {
-  private readonly attackDetector: ISquareAttackDetector;
-  private isEvaluating: boolean = false;
-
-  constructor(attackDetector: ISquareAttackDetector = new CheckDetector()) {
-    this.attackDetector = attackDetector;
-  }
-
   getPseudoLegalMoves(from: Position, piece: IPiece, board: IBoardQuery): Position[] {
-    if (this.isEvaluating || piece.type !== 'KING' || piece.hasMoved) {
+    if (!this.canKingAttemptCastling(from, piece, board)) {
       return [];
     }
 
-    const expectedRow = piece.color === 'WHITE' ? 0 : board.rows - 1;
-    if (from.row !== expectedRow) {
-      return [];
-    }
+    const castlingSides: readonly CastlingSideConfig[] = [
+      { rookCol: board.cols - 1, direction: 1 },
+      { rookCol: 0, direction: -1 },
+    ];
 
-    this.isEvaluating = true;
-    try {
-      const opponentColor = OPPOSITE_COLOR[piece.color];
-      if (this.attackDetector.isSquareAttacked(board, from, opponentColor)) {
-        return [];
-      }
-
-      const targets: Position[] = [];
-
-      const kingsideTarget = this.evaluateCastlingSide(
-        from,
-        piece,
-        board,
-        opponentColor,
-        board.cols - 1,
-        1
-      );
-      if (kingsideTarget) {
-        targets.push(kingsideTarget);
-      }
-
-      const queensideTarget = this.evaluateCastlingSide(
-        from,
-        piece,
-        board,
-        opponentColor,
-        0,
-        -1
-      );
-      if (queensideTarget) {
-        targets.push(queensideTarget);
-      }
-
-      return targets;
-    } finally {
-      this.isEvaluating = false;
-    }
+    return castlingSides
+      .map((side) => this.getCastlingTargetForSide(from, piece.color, board, side))
+      .filter((target): target is Position => target !== null);
   }
 
-  private evaluateCastlingSide(
+  private canKingAttemptCastling(from: Position, piece: IPiece, board: IBoardQuery): boolean {
+    const initialRowByColor: Record<Color, number> = {
+      WHITE: 0,
+      BLACK: board.rows - 1,
+    };
+
+    return (
+      piece.type === 'KING' &&
+      from.row === initialRowByColor[piece.color] &&
+      !board.hasPieceMoved(piece)
+    );
+  }
+
+  private getCastlingTargetForSide(
     from: Position,
-    piece: IPiece,
+    color: Color,
     board: IBoardQuery,
-    opponentColor: Color,
-    rookCol: number,
-    direction: 1 | -1
+    side: CastlingSideConfig
   ): Position | null {
-    const destinationCol = from.col + 2 * direction;
-    const transitCol = from.col + direction;
-
-    if (destinationCol < 0 || destinationCol >= board.cols) {
+    const destinationSquare = from.offset(0, 2 * side.direction);
+    if (!board.isWithinBounds(destinationSquare)) {
       return null;
     }
 
-    const rookPos = new Position(from.row, rookCol);
-    const rook = board.getPieceAt(rookPos);
+    const canCastleOnSide =
+      this.hasUnmovedRookAtCorner(from.row, side.rookCol, color, board) &&
+      this.isPathClearBetween(from.row, from.col, side.rookCol, board);
 
-    if (!rook || rook.type !== 'ROOK' || rook.color !== piece.color || rook.hasMoved) {
-      return null;
-    }
+    return canCastleOnSide ? destinationSquare : null;
+  }
 
-    const minCol = Math.min(from.col, rookCol) + 1;
-    const maxCol = Math.max(from.col, rookCol);
+  private hasUnmovedRookAtCorner(
+    row: number,
+    rookCol: number,
+    color: Color,
+    board: IBoardQuery
+  ): boolean {
+    const rook = board.getPieceAt(new Position(row, rookCol));
+    return (
+      rook !== null &&
+      rook.type === 'ROOK' &&
+      rook.color === color &&
+      !board.hasPieceMoved(rook)
+    );
+  }
+
+  private isPathClearBetween(
+    row: number,
+    firstCol: number,
+    secondCol: number,
+    board: IBoardQuery
+  ): boolean {
+    const minCol = Math.min(firstCol, secondCol) + 1;
+    const maxCol = Math.max(firstCol, secondCol);
+
     for (let col = minCol; col < maxCol; col++) {
-      if (!board.isEmpty(new Position(from.row, col))) {
-        return null;
+      if (!board.isSquareEmpty(new Position(row, col))) {
+        return false;
       }
     }
 
-    const transitSquare = new Position(from.row, transitCol);
-    const destinationSquare = new Position(from.row, destinationCol);
-
-    const isTransitAttacked = this.attackDetector.isSquareAttacked(board, transitSquare, opponentColor);
-    const isDestinationAttacked = this.attackDetector.isSquareAttacked(board, destinationSquare, opponentColor);
-
-    if (isTransitAttacked || isDestinationAttacked) {
-      return null;
-    }
-
-    return destinationSquare;
+    return true;
   }
 }

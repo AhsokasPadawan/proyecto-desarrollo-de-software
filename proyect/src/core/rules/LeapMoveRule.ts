@@ -30,21 +30,12 @@ export class LeapMoveRule implements IMovementRule {
   }
 
   getPseudoLegalMoves(from: Position, piece: IPiece, board: IBoardQuery): Position[] {
-    const legalMoves: Position[] = [];
-
-    for (const [deltaRow, deltaCol] of this.offsets) {
-      const targetPosition = from.offset(deltaRow, deltaCol);
-
-      if (!board.isWithinBounds(targetPosition)) {
-        continue;
-      }
-
-      const pieceAtTarget = board.getPieceAt(targetPosition);
-      if (!pieceAtTarget || pieceAtTarget.color !== piece.color) {
-        legalMoves.push(targetPosition);
-      }
-    }
-
-    return legalMoves;
+    return this.offsets
+      .map(([deltaRow, deltaCol]) => from.offset(deltaRow, deltaCol))
+      .filter(
+        (targetPosition) =>
+          board.isWithinBounds(targetPosition) &&
+          board.getPieceAt(targetPosition)?.color !== piece.color
+      );
   }
 }

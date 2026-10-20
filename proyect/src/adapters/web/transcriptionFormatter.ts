@@ -1,23 +1,17 @@
-import { PieceType } from '../../core/pieces/types';
 import { MoveRecord } from '../../core/ports/GameSnapshot';
+import { AnalyzedMove, FullGameAnalysisResult } from '../services/AnalysisService';
+import { PIECE_NAMES_LOOKUP } from './pieceDisplay';
 
-export const PIECE_NAMES_LOOKUP: Record<PieceType, string> = {
-  PAWN: 'PEÓN',
-  ROOK: 'TORRE',
-  KNIGHT: 'CABALLO',
-  BISHOP: 'ALFIL',
-  QUEEN: 'DAMA',
-  KING: 'REY',
-  CHANCELLOR: 'CANCILLER',
-};
+export { PIECE_NAMES_LOOKUP };
 
 export interface FormatTranscriptionOptions {
   readonly modeLabel: string;
   readonly resultLabel: string;
   readonly moveHistory: readonly MoveRecord[];
+  readonly analysisResult?: FullGameAnalysisResult | null;
 }
 
-export function formatSingleMove(record: MoveRecord): string {
+export function formatSingleMove(record: MoveRecord, analyzedMove?: AnalyzedMove): string {
   const pieceName = PIECE_NAMES_LOOKUP[record.piece] ?? record.piece;
   const baseNotation = `${pieceName} (${record.from} -> ${record.to})`;
   const eventTags: string[] = [];
@@ -35,6 +29,10 @@ export function formatSingleMove(record: MoveRecord): string {
     eventTags.push(`[Coronación: ${promotedName}]`);
   }
 
+  if (analyzedMove) {
+    eventTags.push(`[${analyzedMove.quality.label} | Óptima: ${analyzedMove.bestMoveFrom}->${analyzedMove.bestMoveTo}]`);
+  }
+
   return eventTags.length > 0 ? `${baseNotation} ${eventTags.join(' ')}` : baseNotation;
 }
 
@@ -44,8 +42,15 @@ export function formatMatchTranscription(options: FormatTranscriptionOptions): s
     `Modo de Juego: ${options.modeLabel}`,
     `Resultado: ${options.resultLabel}`,
     `Total de Movimientos: ${options.moveHistory.length}`,
-    '=============================================================',
   ];
+
+  if (options.analysisResult) {
+    headerLines.push(
+      `Precisión Blancas: ${options.analysisResult.whiteAccuracy}% | Precisión Negras: ${options.analysisResult.blackAccuracy}%`
+    );
+  }
+
+  headerLines.push('=============================================================');
 
   const roundLines: string[] = [];
   for (let index = 0; index < options.moveHistory.length; index += 2) {
@@ -53,16 +58,36 @@ export function formatMatchTranscription(options: FormatTranscriptionOptions): s
     const whiteMove = options.moveHistory[index];
     const blackMove = options.moveHistory[index + 1];
 
-    const whiteText = `Blancas: ${formatSingleMove(whiteMove)}`;
+    const whiteAnalysis = options.analysisResult?.analyzedMoves?.[index];
+    const blackAnalysis = options.analysisResult?.analyzedMoves?.[index + 1];
+
+    const whiteText = `Blancas: ${formatSingleMove(whiteMove, whiteAnalysis)}`;
     if (blackMove) {
-      const blackText = `Negras: ${formatSingleMove(blackMove)}`;
+      const blackText = `Negras: ${formatSingleMove(blackMove, blackAnalysis)}`;
       roundLines.push(`${roundNumber}. ${whiteText} | ${blackText}`);
     } else {
       roundLines.push(`${roundNumber}. ${whiteText}`);
     }
+
+    if (whiteAnalysis?.advice) {
+      roundLines.push(`   > Coach (Blancas): ${whiteAnalysis.advice}`);
+    }
+    if (blackAnalysis?.advice) {
+      roundLines.push(`   > Coach (Negras): ${blackAnalysis.advice}`);
+    }
   }
 
-  return [...headerLines, ...roundLines, '============================================================='].join('\n');
+  const resultLines = [...headerLines, ...roundLines];
+
+  if (options.analysisResult?.overallSummary) {
+    resultLines.push('=============================================================');
+    resultLines.push('REPORTE Y CONCLUSIONES DEL COACH DE IA:');
+    resultLines.push(options.analysisResult.overallSummary);
+  }
+
+  resultLines.push('=============================================================');
+
+  return resultLines.join('\n');
 }
 
 export function generateExportFilename(date: Date = new Date()): string {

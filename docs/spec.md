@@ -20,6 +20,7 @@ Construir un motor de dominio puro en TypeScript (**Core**) aislado de cualquier
 * **Épica 4 (Patrón `State` y Condiciones de Fin):** Gestión polimórfica de fases (`IGameState`: `NormalPlayState`, `CheckState`, `CheckmateState`, `StalemateState`, `DrawState`) incluyendo reglas de 50 movimientos, material insuficiente y triple repetición.
 * **Épica 5 (Movimientos Especiales y Patrón `Strategy` para IA):** Coronación de peón, enroque y captura al paso reversibles con `MoveCommand`, más el contrato `IAiStrategy` (`RandomAiStrategy` y `GreedyMaterialAiStrategy`).
 * **Épica 6 (Adaptador Web y Defensa):** Interfaz en React + TypeScript + Tailwind CSS conectada vía `useSyncExternalStore`, con interacción en 2 clics, grilla dinámica $N \times M$, *fallback* visual para piezas nuevas y sincronización final del Diagrama UML y documento de justificación (*What / Why / When to Break*).
+* **Épica 9 (Análisis Híbrido con Stockfish y Gemini Coach):** Serialización FEN en el dominio (`FenSerializer`), evaluación táctica objetiva (`ChessApiService`), explicación pedagógica motivacional (`GeminiCoachService`), clasificador de calidad de jugada (`moveQualityEvaluator`), coordinador (`AnalysisService`) y experiencia de usuario integrada con sugerencias en vivo, revisión post-partida, insignias y exportación enriquecida ([`docs/specs/09-analisis-hibrido-ia.md`](specs/09-analisis-hibrido-ia.md)).
 
 ---
 
@@ -60,6 +61,12 @@ Construir un motor de dominio puro en TypeScript (**Core**) aislado de cualquier
 22. Como jugador en el navegador, quiero ver una pantalla estilizada con Tailwind CSS conectada a `IGameEngine` vía `useSyncExternalStore` que renderice dinámicamente una grilla de `snapshot.rows` $\times$ `snapshot.cols` casillas y muestre las piezas mediante una *lookup table* con *fallback* automático para piezas de *Fairy Chess*.
 23. Como jugador en el navegador, quiero seleccionar una pieza propia con un primer clic (`onClick`) para ver resaltados sus `Legal Move`s, ejecutar la jugada con un segundo clic (eligiendo pieza en caso de coronación) y ver alertas descriptivas cuando `MoveResult` devuelve un `MoveRejectionReason`.
 24. Como jugador en el navegador, quiero disponer de un panel lateral con indicador de turno, banner de fase (`IGameState`), botones `Undo`, `Redo` y `Reiniciar`, y selector de modo (`Humano vs Humano` o `Humano vs IA` eligiendo la `IAiStrategy`), y contar con el Diagrama UML y documento de justificación 100% sincronizados para la defensa.
+
+### Épica 9: Análisis Híbrido con Motor y Coach de IA (`09-analisis-hibrido-stockfish-y-gemini`)
+25. Como jugador durante una partida activa, quiero presionar "Pedir sugerencia" para obtener la mejor jugada técnica calculada por el motor y un consejo didáctico en lenguaje natural generado por Gemini, resaltando las casillas origen y destino recomendadas en el tablero.
+26. Como jugador al terminar una partida, quiero presionar "Analizar Partida (IA)" para evaluar exhaustivamente cada posición jugada mediante el motor táctico con visualización de barra de progreso.
+27. Como jugador en la revisión post-partida, quiero navegar por las jugadas en modo repetición y disponer de tarjetas interactivas e insignias de calidad (*Mejor jugada*, *Excelente*, *Buena*, *Imprecisión*, *Error*, *Blunder*) que contrasten la jugada realizada frente a la óptima y muestren las explicaciones del Coach de IA.
+28. Como jugador o evaluador, quiero configurar y persistir mi clave de API de Gemini desde un modal accesible en la barra superior y contar con la exportación del análisis completo (precisiones, insignias y consejos) en el archivo de texto (.txt) de la transcripción.
 
 ---
 

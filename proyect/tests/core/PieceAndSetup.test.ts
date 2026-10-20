@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { Board } from '../../src/core/board/Board';
-import { BoardSetupFactory, PieceConstructor } from '../../src/core/board/BoardSetupFactory';
+import {
+  createStandardBoard,
+  PieceConstructor,
+  populateStandardBoard,
+} from '../../src/core/board/boardSetup';
 import { Position } from '../../src/core/board/Position';
 import { Bishop } from '../../src/core/pieces/Bishop';
 import { King } from '../../src/core/pieces/King';
@@ -29,7 +33,7 @@ class TestHybridPiece extends Piece {
   }
 }
 
-describe('Piece & BoardSetupFactory', () => {
+describe('Piece & boardSetup', () => {
   it('combines and deduplicates positions across multiple composed movement rules', () => {
     const board = new Board(8, 8);
     const origin = new Position(3, 3);
@@ -46,7 +50,7 @@ describe('Piece & BoardSetupFactory', () => {
   });
 
   it('populates standard 8x8 board with 32 pieces in correct positions using defaults', () => {
-    const board = BoardSetupFactory.createStandardBoard();
+    const board = createStandardBoard();
 
     expect(board.rows).toBe(8);
     expect(board.cols).toBe(8);
@@ -86,7 +90,7 @@ describe('Piece & BoardSetupFactory', () => {
 
     for (let row = 2; row <= 5; row++) {
       for (let col = 0; col < 8; col++) {
-        expect(board.isEmpty(new Position(row, col))).toBe(true);
+        expect(board.isSquareEmpty(new Position(row, col))).toBe(true);
       }
     }
 
@@ -97,7 +101,8 @@ describe('Piece & BoardSetupFactory', () => {
   });
 
   it('populates board with custom row dimensions placing black pieces at dynamic offsets', () => {
-    const board = BoardSetupFactory.createStandardBoard(10, 8);
+    const board = new Board(10, 8);
+    populateStandardBoard(board);
 
     expect(board.rows).toBe(10);
     expect(board.cols).toBe(8);
@@ -109,13 +114,14 @@ describe('Piece & BoardSetupFactory', () => {
     expect(board.getPieceAt(new Position(9, 4))).toBeInstanceOf(King);
 
     for (let row = 2; row <= 7; row++) {
-      expect(board.isEmpty(new Position(row, 4))).toBe(true);
+      expect(board.isSquareEmpty(new Position(row, 4))).toBe(true);
     }
   });
 
   it('populates board with custom column dimensions and custom back rank pieces', () => {
     const customBackRank: readonly PieceConstructor[] = [Rook, Knight, Queen, King, Knight, Rook];
-    const board = BoardSetupFactory.createStandardBoard(6, 6, customBackRank);
+    const board = new Board(6, 6);
+    populateStandardBoard(board, customBackRank);
 
     expect(board.rows).toBe(6);
     expect(board.cols).toBe(6);
@@ -132,12 +138,12 @@ describe('Piece & BoardSetupFactory', () => {
   it('rejects boards with fewer than 4 rows', () => {
     const shallowBoard = new Board(3, 8);
 
-    expect(() => BoardSetupFactory.populateStandardBoard(shallowBoard)).toThrow();
+    expect(() => populateStandardBoard(shallowBoard)).toThrow();
   });
 
   it('rejects boards where column count does not match back rank pieces length', () => {
     const mismatchedBoard = new Board(8, 10);
 
-    expect(() => BoardSetupFactory.populateStandardBoard(mismatchedBoard)).toThrow();
+    expect(() => populateStandardBoard(mismatchedBoard)).toThrow();
   });
 });

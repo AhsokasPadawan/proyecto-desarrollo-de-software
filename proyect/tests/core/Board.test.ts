@@ -60,7 +60,7 @@ describe('Board', () => {
 
     expect(displaced).toBeNull();
     expect(board.getPieceAt(position)).toBe(piece);
-    expect(board.isEmpty(position)).toBe(false);
+    expect(board.isSquareEmpty(position)).toBe(false);
   });
 
   it('displaces and returns previous piece when placing on an occupied square', () => {
@@ -94,7 +94,7 @@ describe('Board', () => {
 
     expect(removed).toBe(piece);
     expect(board.getPieceAt(position)).toBeNull();
-    expect(board.isEmpty(position)).toBe(true);
+    expect(board.isSquareEmpty(position)).toBe(true);
   });
 
   it('returns null when removing a piece from an empty square', () => {

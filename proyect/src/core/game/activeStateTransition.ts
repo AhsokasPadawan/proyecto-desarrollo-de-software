@@ -5,20 +5,25 @@ import { GameStateContext, IGameState } from './IGameState';
 import { NormalPlayState } from './NormalPlayState';
 import { StalemateState } from './StalemateState';
 
-type MoveAvailability = 'hasMoves' | 'noMoves';
-type CheckStatus = 'inCheck' | 'safe';
+const HAS_MOVES = 'hasMoves';
+const NO_MOVES = 'noMoves';
+const IN_CHECK = 'inCheck';
+const SAFE = 'safe';
+
+type MoveAvailability = typeof HAS_MOVES | typeof NO_MOVES;
+type CheckStatus = typeof IN_CHECK | typeof SAFE;
 
 const NEXT_STATE_FACTORIES: Record<
   MoveAvailability,
   Record<CheckStatus, () => IGameState>
 > = {
-  hasMoves: {
-    inCheck: () => new CheckState(),
-    safe: () => new NormalPlayState(),
+  [HAS_MOVES]: {
+    [IN_CHECK]: () => new CheckState(),
+    [SAFE]: () => new NormalPlayState(),
   },
-  noMoves: {
-    inCheck: () => new CheckmateState(),
-    safe: () => new StalemateState(),
+  [NO_MOVES]: {
+    [IN_CHECK]: () => new CheckmateState(),
+    [SAFE]: () => new StalemateState(),
   },
 };
 
@@ -36,8 +41,8 @@ export function evaluateActiveStateTransition(context: GameStateContext): IGameS
     return new DrawState();
   }
 
-  const moveKey: MoveAvailability = context.hasLegalMoves ? 'hasMoves' : 'noMoves';
-  const checkKey: CheckStatus = context.isKingInCheck ? 'inCheck' : 'safe';
+  const moveKey: MoveAvailability = context.hasLegalMoves ? HAS_MOVES : NO_MOVES;
+  const checkKey: CheckStatus = context.isKingInCheck ? IN_CHECK : SAFE;
 
   return NEXT_STATE_FACTORIES[moveKey][checkKey]();
 }

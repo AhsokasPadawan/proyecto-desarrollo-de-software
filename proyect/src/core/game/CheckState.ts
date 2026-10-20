@@ -1,10 +1,10 @@
 import { Color } from '../pieces/types';
-import { GameStateKind } from '../ports/MoveResult';
+import { GameStateType } from '../ports/MoveResult';
 import { evaluateActiveStateTransition } from './activeStateTransition';
 import { GameStateContext, IGameState } from './IGameState';
 
 export class CheckState implements IGameState {
-  readonly kind: GameStateKind = 'CHECK';
+  readonly type: GameStateType = 'CHECK';
 
   canAcceptMoves(): boolean {
     return true;

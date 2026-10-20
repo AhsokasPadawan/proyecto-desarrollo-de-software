@@ -3,7 +3,6 @@ import { Board } from '../../src/core/board/Board';
 import { Position } from '../../src/core/board/Position';
 import { ChessGame } from '../../src/core/game/ChessGame';
 import { Bishop } from '../../src/core/pieces/Bishop';
-import { Chancellor } from '../../src/core/pieces/Chancellor';
 import { King } from '../../src/core/pieces/King';
 import { Pawn } from '../../src/core/pieces/Pawn';
 import { Queen } from '../../src/core/pieces/Queen';
@@ -71,27 +70,6 @@ describe('GreedyMaterialAiStrategy', () => {
       throw new Error('Expected move to succeed');
     }
     expect(mateResult.nextState).toBe('CHECKMATE');
-  });
-
-  it('evaluates capturing fairy chess piece using default fallback score', () => {
-    const board = new Board(8, 8);
-    const whiteKing = new King('WHITE');
-    const blackKing = new King('BLACK');
-    const whiteRook = new Rook('WHITE');
-    const blackBishop = new Bishop('BLACK');
-    const blackChancellor = new Chancellor('BLACK');
-    board.placePiece(new Position(0, 0), whiteKing);
-    board.placePiece(new Position(7, 7), blackKing);
-    board.placePiece(new Position(4, 4), whiteRook);
-    board.placePiece(new Position(4, 1), blackBishop);
-    board.placePiece(new Position(4, 7), blackChancellor);
-    const game = new ChessGame(board, 'WHITE');
-    const strategy = new GreedyMaterialAiStrategy();
-
-    const chosenMove = strategy.chooseMove(game);
-
-    expect(chosenMove).not.toBeNull();
-    expect(chosenMove?.to.equals(new Position(4, 1))).toBe(true);
   });
 
   it('leaves engine observers and redo history untouched during evaluation', () => {

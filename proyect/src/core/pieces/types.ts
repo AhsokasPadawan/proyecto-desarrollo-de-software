@@ -9,9 +9,7 @@ export const PIECE_TYPES = {
   KING: 'KING',
 } as const;
 
-export type StandardPieceType = (typeof PIECE_TYPES)[keyof typeof PIECE_TYPES];
-
-export type PieceType = StandardPieceType | (string & {});
+export type PieceType = (typeof PIECE_TYPES)[keyof typeof PIECE_TYPES];
 
 export const OPPOSITE_COLOR: Record<Color, Color> = {
   WHITE: 'BLACK',

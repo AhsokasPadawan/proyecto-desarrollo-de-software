@@ -8,20 +8,11 @@ export abstract class Piece implements IPiece {
   readonly color: Color;
   readonly type: PieceType;
   protected readonly rules: readonly IMovementRule[];
-  private moved: boolean = false;
 
   constructor(color: Color, type: PieceType, rules: readonly IMovementRule[] = []) {
     this.color = color;
     this.type = type;
     this.rules = rules;
-  }
-
-  get hasMoved(): boolean {
-    return this.moved;
-  }
-
-  setHasMoved(value: boolean): void {
-    this.moved = value;
   }
 
   getPseudoLegalMoves(from: Position, board: IBoardQuery): Position[] {

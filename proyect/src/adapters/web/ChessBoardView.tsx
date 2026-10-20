@@ -1,6 +1,6 @@
 import { Position } from '../../core/board/Position';
 import { GameSnapshot } from '../../core/ports/GameSnapshot';
-import { ChessSquare } from './components/ChessSquare';
+import { ChessSquare, SquareHighlightRole } from './components/ChessSquare';
 
 export interface ChessBoardViewProps {
   readonly snapshot: GameSnapshot;
@@ -8,6 +8,7 @@ export interface ChessBoardViewProps {
   readonly legalMoves: readonly Position[];
   readonly onSquareClick: (position: Position) => void;
   readonly activeMoveSquares?: { readonly from: string; readonly to: string } | null;
+  readonly suggestedMoveSquares?: { readonly from: string; readonly to: string } | null;
   readonly readOnly?: boolean;
 }
 
@@ -19,21 +20,46 @@ export function getRankLabel(rowIndex: number): string {
   return (rowIndex + 1).toString();
 }
 
+export function resolveSquareHighlightRole(
+  squareAlgebraic: string,
+  activeMoveSquares: { readonly from: string; readonly to: string } | null,
+  suggestedMoveSquares: { readonly from: string; readonly to: string } | null
+): SquareHighlightRole | null {
+  const isPlayedOrigin = activeMoveSquares?.from === squareAlgebraic;
+  const isPlayedDest = activeMoveSquares?.to === squareAlgebraic;
+  const isSuggestedOrigin = suggestedMoveSquares?.from === squareAlgebraic;
+  const isSuggestedDest = suggestedMoveSquares?.to === squareAlgebraic;
+
+  if (isPlayedDest && isSuggestedDest) {
+    return 'destination-optimal';
+  }
+  if (isSuggestedDest) {
+    return 'suggestion-destination';
+  }
+  if (isPlayedDest) {
+    return 'destination';
+  }
+  if (isPlayedOrigin) {
+    return 'origin';
+  }
+  if (isSuggestedOrigin) {
+    return 'suggestion-origin';
+  }
+  return null;
+}
+
 export function ChessBoardView({
   snapshot,
   selectedPosition,
   legalMoves,
   onSquareClick,
   activeMoveSquares = null,
+  suggestedMoveSquares = null,
   readOnly = false,
 }: ChessBoardViewProps): JSX.Element {
   const rowIndices = Array.from({ length: snapshot.rows }, (_, i) => snapshot.rows - 1 - i);
   const colIndices = Array.from({ length: snapshot.cols }, (_, i) => i);
-
-  const legalTargetsMap = new Map<string, Position>();
-  for (const move of legalMoves) {
-    legalTargetsMap.set(`${move.row},${move.col}`, move);
-  }
+  const legalTargetKeys = new Set(legalMoves.map((move) => `${move.row},${move.col}`));
 
   const selectedPiece = selectedPosition
     ? snapshot.grid[selectedPosition.row][selectedPosition.col]
@@ -53,10 +79,10 @@ export function ChessBoardView({
           {rowIndices.map((row) =>
             colIndices.map((col) => {
               const piece = snapshot.grid[row][col];
-              const isSelected = selectedPosition
-                ? selectedPosition.row === row && selectedPosition.col === col
-                : false;
-              const isLegalTarget = legalTargetsMap.has(`${row},${col}`);
+              const isSelected = Boolean(
+                selectedPosition && selectedPosition.row === row && selectedPosition.col === col
+              );
+              const isLegalTarget = legalTargetKeys.has(`${row},${col}`);
               const isEnPassantCapture = Boolean(
                 selectedPiece &&
                   selectedPiece.type === 'PAWN' &&
@@ -65,16 +91,11 @@ export function ChessBoardView({
               );
               const isCaptureTarget = piece !== null || isEnPassantCapture;
               const squarePosition = new Position(row, col);
-              const squareAlgebraic = squarePosition.toAlgebraic();
-
-              let highlightRole: 'origin' | 'destination' | null = null;
-              if (activeMoveSquares) {
-                if (activeMoveSquares.from === squareAlgebraic) {
-                  highlightRole = 'origin';
-                } else if (activeMoveSquares.to === squareAlgebraic) {
-                  highlightRole = 'destination';
-                }
-              }
+              const highlightRole = resolveSquareHighlightRole(
+                squarePosition.toAlgebraic(),
+                activeMoveSquares,
+                suggestedMoveSquares
+              );
 
               return (
                 <ChessSquare

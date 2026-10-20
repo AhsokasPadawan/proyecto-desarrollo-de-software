@@ -62,7 +62,7 @@ En este proyecto grupal, además de las skills principales del ciclo de vida (`g
 ---
 
 ### 5. `teach`
-* **Propósito:** Actuar como tutor pedagógico interactivo para explicar cómo funciona una porción de código, qué patrones de diseño se aplicaron y cómo justificar técnicamente las decisiones tomadas.
+* **Propósito:** Actuar como tutor pedagógico interactivo para explicar cómo funciona una porción de código, qué patrones de diseño se aplicaron y cómo justificar técnicamente las decisiones tomadas, tomando e incrementando la base documental en `docs/teachings/` (mapa de archivos, discusiones y explicaciones por módulo).
 * **Cuándo debe usarla el desarrollador:**
   * Para comprender a fondo el código que generó con ayuda del agente antes de defenderlo o darlo por cerrado.
   * Para revisar y entender el código que un compañero de equipo escribió con su respectivo agente durante la etapa de Code Review.

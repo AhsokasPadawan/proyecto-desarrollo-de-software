@@ -1,9 +1,9 @@
 import { Color, OPPOSITE_COLOR } from '../pieces/types';
-import { GameStateKind } from '../ports/MoveResult';
+import { GameStateType } from '../ports/MoveResult';
 import { GameStateContext, IGameState } from './IGameState';
 
 export class CheckmateState implements IGameState {
-  readonly kind: GameStateKind = 'CHECKMATE';
+  readonly type: GameStateType = 'CHECKMATE';
 
   canAcceptMoves(): boolean {
     return false;
