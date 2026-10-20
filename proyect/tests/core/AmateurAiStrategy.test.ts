@@ -176,7 +176,7 @@ describe('AmateurAiStrategy - Custom Criteria & Minimax Search', () => {
       castledHistory
     );
 
-    whiteKing.setHasMoved?.(true);
+    board.setPieceMoved(whiteKing, true);
     const scoreMovedKing = evaluateBoardPosition(
       board,
       'WHITE',

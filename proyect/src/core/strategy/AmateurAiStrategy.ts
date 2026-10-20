@@ -1,7 +1,6 @@
 import { Board } from '../board/Board';
 import { Position } from '../board/Position';
 import { Bishop } from '../pieces/Bishop';
-import { Chancellor } from '../pieces/Chancellor';
 import { King } from '../pieces/King';
 import { Knight } from '../pieces/Knight';
 import { Pawn } from '../pieces/Pawn';
@@ -23,7 +22,6 @@ const PIECE_FACTORIES: Record<PieceType, (color: Color) => IPiece> = {
   BISHOP: (color) => new Bishop(color),
   KNIGHT: (color) => new Knight(color),
   PAWN: (color) => new Pawn(color),
-  CHANCELLOR: (color) => new Chancellor(color),
 };
 
 const CHECKMATE_SCORE = 100000;
@@ -49,30 +47,34 @@ export function createSimulationBoard(snapshot: GameSnapshot): Board {
           const pos = new Position(row, col);
           const algebraic = pos.toAlgebraic();
 
+          let isMoved = false;
           if (piece.type === 'KING') {
             if (piece.color === 'WHITE' && (whiteKingMoved || algebraic !== 'e1')) {
-              piece.setHasMoved?.(true);
+              isMoved = true;
             } else if (piece.color === 'BLACK' && (blackKingMoved || algebraic !== 'e8')) {
-              piece.setHasMoved?.(true);
+              isMoved = true;
             }
           } else if (piece.type === 'ROOK') {
             if (piece.color === 'WHITE') {
-              if (algebraic === 'a1' && whiteRookA1Moved) piece.setHasMoved?.(true);
-              else if (algebraic === 'h1' && whiteRookH1Moved) piece.setHasMoved?.(true);
-              else if (algebraic !== 'a1' && algebraic !== 'h1') piece.setHasMoved?.(true);
+              if (algebraic === 'a1' && whiteRookA1Moved) isMoved = true;
+              else if (algebraic === 'h1' && whiteRookH1Moved) isMoved = true;
+              else if (algebraic !== 'a1' && algebraic !== 'h1') isMoved = true;
             } else {
-              if (algebraic === 'a8' && blackRookA8Moved) piece.setHasMoved?.(true);
-              else if (algebraic === 'h8' && blackRookH8Moved) piece.setHasMoved?.(true);
-              else if (algebraic !== 'a8' && algebraic !== 'h8') piece.setHasMoved?.(true);
+              if (algebraic === 'a8' && blackRookA8Moved) isMoved = true;
+              else if (algebraic === 'h8' && blackRookH8Moved) isMoved = true;
+              else if (algebraic !== 'a8' && algebraic !== 'h8') isMoved = true;
             }
           } else if (piece.type === 'PAWN') {
             const initialRow = piece.color === 'WHITE' ? 1 : snapshot.rows - 2;
             if (row !== initialRow) {
-              piece.setHasMoved?.(true);
+              isMoved = true;
             }
           }
 
           board.placePiece(pos, piece);
+          if (isMoved) {
+            board.setPieceMoved(piece, true);
+          }
         }
       }
     }
@@ -246,7 +248,7 @@ export function evaluateBoardPosition(
   } else {
     const aiKing = board.findKingPosition(aiColor);
     const aiKingPiece = aiKing ? board.getPieceAt(aiKing) : null;
-    if (aiKingPiece?.hasMoved) {
+    if (aiKingPiece && board.hasPieceMoved(aiKingPiece)) {
       score -= config.kingMovedWithoutCastlingPenalty;
     }
   }
@@ -257,7 +259,7 @@ export function evaluateBoardPosition(
   } else {
     const oppKing = board.findKingPosition(opponentColor);
     const oppKingPiece = oppKing ? board.getPieceAt(oppKing) : null;
-    if (oppKingPiece?.hasMoved) {
+    if (oppKingPiece && board.hasPieceMoved(oppKingPiece)) {
       score += config.kingMovedWithoutCastlingPenalty;
     }
   }
@@ -430,7 +432,7 @@ export class AmateurAiStrategy implements IAiStrategy {
         movedPiece.type === 'PAWN' &&
         board.getEnPassantTarget()?.equals(move.to) &&
         move.from.col !== move.to.col &&
-        board.isEmpty(move.to);
+        board.isSquareEmpty(move.to);
 
       let isRetreatAfterAdvance = false;
       if (lastAiMoveRecord) {
