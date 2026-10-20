@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Position } from '../../core/board/Position';
 import { ChessGame } from '../../core/game/ChessGame';
 import { Color, PieceType } from '../../core/pieces/types';
@@ -40,7 +40,17 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
   const [isClockEnabled, setIsClockEnabled] = useState(false);
   const [whiteMinutes, setWhiteMinutes] = useState(10);
   const [blackMinutes, setBlackMinutes] = useState(10);
+  const [isAiThinking, setIsAiThinking] = useState(false);
   const playbackTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const aiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (aiTimerRef.current) {
+        clearTimeout(aiTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleTimeout = useCallback(
     (timedOutColor: Color) => {
@@ -125,10 +135,26 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
         return;
       }
 
-      const strategy = modeConfig.strategyFactory();
-      const aiMove = strategy.chooseMove(currentEngine);
-      if (aiMove) {
-        currentEngine.makeMove(aiMove.from, aiMove.to);
+      if (aiTimerRef.current) {
+        clearTimeout(aiTimerRef.current);
+        aiTimerRef.current = null;
+      }
+
+      const executeAiMove = () => {
+        setIsAiThinking(false);
+        const strategy = modeConfig.strategyFactory!();
+        const aiMove = strategy.chooseMove(currentEngine);
+        if (aiMove) {
+          currentEngine.makeMove(aiMove.from, aiMove.to);
+        }
+      };
+
+      const delay = modeConfig.delayMs ?? 0;
+      if (delay > 0) {
+        setIsAiThinking(true);
+        aiTimerRef.current = setTimeout(executeAiMove, delay);
+      } else {
+        executeAiMove();
       }
     },
     []
@@ -155,6 +181,7 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
   );
 
   const isBoardLocked =
+    isAiThinking ||
     isReplaying ||
     (isClockEnabled && clock.clockStatus !== 'RUNNING') ||
     isTerminalState(snapshot.stateKind);
@@ -335,6 +362,11 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
   );
 
   const handleReset = useCallback(() => {
+    if (aiTimerRef.current) {
+      clearTimeout(aiTimerRef.current);
+      aiTimerRef.current = null;
+    }
+    setIsAiThinking(false);
     stopPlayback();
     setIsReplaying(false);
     clock.resetClock();
@@ -346,6 +378,11 @@ export function ChessApp({ engineFactory = () => new ChessGame() }: ChessAppProp
 
   const handleModeChange = useCallback(
     (newMode: GameMode) => {
+      if (aiTimerRef.current) {
+        clearTimeout(aiTimerRef.current);
+        aiTimerRef.current = null;
+      }
+      setIsAiThinking(false);
       setGameMode(newMode);
       setFeedbackMessage(null);
       if (newMode !== 'HUMAN_VS_HUMAN') {
