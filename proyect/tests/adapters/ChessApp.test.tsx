@@ -182,17 +182,26 @@ describe('Web Adapter - ChessApp Integration', () => {
     expect(screen.getByTestId('undo-button')).toBeEnabled();
   });
 
-  it('automatically triggers AI response move when playing in random AI game mode', () => {
-    render(<ChessApp />);
+  it('automatically triggers AI response move after thinking delay in Amateur AI game mode', () => {
+    vi.useFakeTimers();
+    try {
+      render(<ChessApp />);
 
-    const randomModeButton = screen.getByTestId('mode-selector-human_vs_random_ai');
-    fireEvent.click(randomModeButton);
+      const amateurModeButton = screen.getByTestId('mode-selector-human_vs_amateur_ai');
+      fireEvent.click(amateurModeButton);
 
-    fireEvent.click(screen.getByTestId('square-1-4'));
-    fireEvent.click(screen.getByTestId('square-3-4'));
+      fireEvent.click(screen.getByTestId('square-1-4'));
+      fireEvent.click(screen.getByTestId('square-3-4'));
 
-    expect(screen.getByTestId('turn-indicator')).toHaveTextContent('Blancas');
-    expect(screen.getByTestId('undo-button')).toBeEnabled();
+      act(() => {
+        vi.advanceTimersByTime(400);
+      });
+
+      expect(screen.getByTestId('turn-indicator')).toHaveTextContent('Blancas');
+      expect(screen.getByTestId('undo-button')).toBeEnabled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('enters replay mode upon checkmate and allows manual navigation', () => {

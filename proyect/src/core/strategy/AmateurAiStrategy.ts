@@ -512,31 +512,43 @@ export class AmateurAiStrategy implements IAiStrategy {
       return candidateMoves[0];
     }
 
-    const highestScore = Math.max(...scoredMoves.map((sm) => sm.score));
+    scoredMoves.sort((a, b) => b.score - a.score);
+    const highestScore = scoredMoves[0].score;
 
     // If an immediate checkmate is available, take it!
     if (highestScore >= CHECKMATE_SCORE - 100) {
-      const mateMove = scoredMoves.find((sm) => sm.score >= CHECKMATE_SCORE - 100);
-      if (mateMove) return mateMove.move;
+      return scoredMoves[0].move;
     }
 
-    // Rule 7: 10% Blunder rate (amateur imprecision)
+    // Rule 7: Blunder rate with bounded suboptimality ("Techo de Error")
     const isBlunder = this.rng() < this.config.blunderRate;
     if (isBlunder) {
-      const blunderPool = scoredMoves.filter(
+      let blunderPool = scoredMoves.filter(
         (sm) =>
           sm.score < highestScore - this.config.candidateScoreTolerance &&
-          sm.score >= highestScore - 150
+          sm.score >= highestScore - this.config.maxBlunderDrop
       );
+
+      // If all safe moves are within candidateScoreTolerance, pick among the 2nd–4th best safe options
+      if (blunderPool.length === 0) {
+        blunderPool = scoredMoves
+          .slice(1, 4)
+          .filter((sm) => sm.score >= highestScore - this.config.maxBlunderDrop);
+      }
+
       if (blunderPool.length > 0) {
         const selectedIndex = Math.floor(this.rng() * blunderPool.length);
         return blunderPool[selectedIndex].move;
       }
     }
 
-    // Rule 7: Score tolerance (choose randomly among top moves within tolerance)
+    // Rule 7: Score tolerance (choose randomly among top moves within tolerance, capped by maxBlunderDrop)
+    const effectiveTolerance = Math.min(
+      this.config.candidateScoreTolerance,
+      this.config.maxBlunderDrop
+    );
     const topCandidates = scoredMoves.filter(
-      (sm) => sm.score >= highestScore - this.config.candidateScoreTolerance
+      (sm) => sm.score >= highestScore - effectiveTolerance
     );
 
     const selectedIndex = Math.floor(this.rng() * topCandidates.length);

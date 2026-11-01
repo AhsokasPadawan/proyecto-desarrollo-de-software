@@ -63,8 +63,16 @@ describe('Web Adapter - ControlPanelView', () => {
     );
 
     expect(screen.getByTestId('mode-selector-human_vs_human')).toBeInTheDocument();
-    expect(screen.getByTestId('mode-selector-human_vs_random_ai')).toBeInTheDocument();
-    expect(screen.getByTestId('mode-selector-human_vs_greedy_ai')).toBeInTheDocument();
+    expect(screen.getByTestId('mode-selector-human_vs_greedy_ai')).toHaveTextContent(
+      'Humano vs IA (Principiante)'
+    );
+    expect(screen.getByTestId('mode-selector-human_vs_amateur_ai')).toHaveTextContent(
+      'Humano vs IA (Amateur)'
+    );
+    expect(screen.getByTestId('mode-selector-human_vs_pro_ai')).toHaveTextContent(
+      'Humano vs IA (Pro)'
+    );
+    expect(screen.queryByTestId('mode-selector-human_vs_random_ai')).toBeNull();
     expect(screen.queryByTestId('replay-move-list')).toBeNull();
   });
 

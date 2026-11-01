@@ -13,7 +13,11 @@ import {
   evaluateBoardPosition,
   createSimulationBoard,
 } from '../../src/core/strategy/AmateurAiStrategy';
-import { DEFAULT_AMATEUR_CONFIG } from '../../src/core/strategy/AmateurAiConfig';
+import {
+  AMATEUR_LEVEL_CONFIG,
+  DEFAULT_AMATEUR_CONFIG,
+  PRO_AI_CONFIG,
+} from '../../src/core/strategy/AmateurAiConfig';
 import { CheckDetector } from '../../src/core/rules/CheckDetector';
 
 describe('AmateurAiStrategy - Custom Criteria & Minimax Search', () => {
@@ -379,5 +383,30 @@ describe('AmateurAiStrategy - Custom Criteria & Minimax Search', () => {
 
     // It should NOT retreat back to e2 (1, 4) immediately
     expect(chosenMove?.to.equals(new Position(1, 4))).toBe(false);
+  });
+
+  it('11. intermediate AMATEUR_LEVEL_CONFIG (depth 2) avoids hanging major pieces even when blunder triggers ("Techo de Error")', () => {
+    // White Queen at (3, 3) is undefended; Black Rook at (3, 7) attacks it, and only capturing the Rook at (3, 7) saves the Queen
+    // or moving out of the way. Capturing a defended pawn at (4, 4) would lose the Queen (-800 net), exceeding maxBlunderDrop (120).
+    const board = new Board(8, 8);
+    board.placePiece(new Position(0, 4), new King('WHITE'));
+    board.placePiece(new Position(7, 4), new King('BLACK'));
+    board.placePiece(new Position(3, 3), new Queen('WHITE'));
+    board.placePiece(new Position(4, 4), new Pawn('BLACK'));
+    board.placePiece(new Position(6, 2), new Bishop('BLACK')); // Defends (4, 4)
+
+    const game = new ChessGame(board, 'WHITE');
+    const amateurStrategy = new AmateurAiStrategy(
+      { ...AMATEUR_LEVEL_CONFIG, blunderRate: 1.0 },
+      () => 0.0
+    );
+
+    expect(amateurStrategy.getConfig().searchDepth).toBe(2);
+    expect(PRO_AI_CONFIG.searchDepth).toBe(3);
+
+    const move = amateurStrategy.chooseMove(game);
+    expect(move).not.toBeNull();
+    // Even with 100% blunder trigger, maxBlunderDrop (120) prevents capturing the defended pawn and losing the Queen
+    expect(move?.to.equals(new Position(4, 4))).toBe(false);
   });
 });
