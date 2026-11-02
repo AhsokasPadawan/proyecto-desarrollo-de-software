@@ -74,7 +74,9 @@ describe('Web Adapter - ChessApp Integration', () => {
 
     const alertBanner = screen.getByTestId('rejection-feedback-banner');
     expect(alertBanner).toBeInTheDocument();
-    expect(alertBanner).toHaveTextContent('El movimiento elegido no cumple las reglas de la pieza.');
+    expect(alertBanner).toHaveTextContent(
+      'El movimiento elegido no cumple las reglas de la pieza.'
+    );
   });
 
   it('clears rejection feedback banner upon subsequent square click', () => {
@@ -204,6 +206,55 @@ describe('Web Adapter - ChessApp Integration', () => {
     }
   });
 
+  it('allows playing with Black pieces against AI with rotated board, explicit start button, and informative prompt when switching back to White', () => {
+    render(<ChessApp />);
+
+    expect(screen.getByTestId('white-start-prompt')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('mode-selector-human_vs_greedy_ai'));
+    expect(screen.getByTestId('white-start-prompt')).toBeInTheDocument();
+    expect(screen.getByTestId('chess-grid')).toHaveAttribute('data-board-orientation', 'white');
+
+    fireEvent.click(screen.getByTestId('select-color-black'));
+    expect(screen.getByTestId('chess-grid')).toHaveAttribute('data-board-orientation', 'black');
+    expect(screen.queryByTestId('white-start-prompt')).toBeNull();
+    expect(screen.getByTestId('start-ai-match-button')).toBeInTheDocument();
+
+    const whitePawn = screen.getByTestId('square-1-4');
+    fireEvent.click(whitePawn);
+    expect(whitePawn.className).not.toContain('ring-amber-400');
+
+    fireEvent.click(screen.getByTestId('mode-selector-human_vs_pro_ai'));
+    fireEvent.click(screen.getByTestId('mode-selector-human_vs_greedy_ai'));
+    expect(screen.getByTestId('start-ai-match-button')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('start-ai-match-button'));
+
+    expect(screen.getByTestId('turn-indicator')).toHaveTextContent('Negras');
+    expect(screen.getByTestId('undo-button')).toBeDisabled();
+
+    fireEvent.click(screen.getByTestId('square-6-4'));
+    fireEvent.click(screen.getByTestId('square-4-4'));
+
+    expect(screen.getByTestId('turn-indicator')).toHaveTextContent('Negras');
+    expect(screen.getByTestId('undo-button')).toBeEnabled();
+
+    fireEvent.click(screen.getByTestId('undo-button'));
+    expect(screen.getByTestId('turn-indicator')).toHaveTextContent('Negras');
+    expect(screen.getByTestId('undo-button')).toBeDisabled();
+
+    fireEvent.click(screen.getByTestId('redo-button'));
+    expect(screen.getByTestId('turn-indicator')).toHaveTextContent('Negras');
+    expect(screen.getByTestId('undo-button')).toBeEnabled();
+
+    fireEvent.click(screen.getByTestId('reset-button'));
+    expect(screen.getByTestId('start-ai-match-button')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('select-color-white'));
+    expect(screen.getByTestId('white-start-prompt')).toBeInTheDocument();
+    expect(screen.getByTestId('chess-grid')).toHaveAttribute('data-board-orientation', 'white');
+  });
+
   it('enters replay mode upon checkmate and allows manual navigation', () => {
     render(<ChessApp />);
 
@@ -310,7 +361,9 @@ describe('Web Adapter - ChessApp Integration', () => {
         vi.advanceTimersByTime(60000);
       });
 
-      expect(screen.getByTestId('game-state-banner')).toHaveTextContent('Victoria de Negras por Tiempo Agotado');
+      expect(screen.getByTestId('game-state-banner')).toHaveTextContent(
+        'Victoria de Negras por Tiempo Agotado'
+      );
       expect(screen.getByTestId('review-match-button')).toBeInTheDocument();
       expect(screen.getByTestId('export-match-button')).toBeInTheDocument();
 
@@ -324,4 +377,3 @@ describe('Web Adapter - ChessApp Integration', () => {
     }
   });
 });
-

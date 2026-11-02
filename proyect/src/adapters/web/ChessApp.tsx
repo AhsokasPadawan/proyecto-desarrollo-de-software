@@ -20,7 +20,11 @@ import { PlaybackSpeed, ReplayControlSection } from './components/ReplayControlS
 import { useChessClock } from './clock/useChessClock';
 import { getRejectionMessage } from './rejectionMessages';
 import { getStateLabel, isTerminalState } from './stateDisplayLookup';
-import { downloadTranscriptionFile, formatMatchTranscription, generateExportFilename } from './transcriptionFormatter';
+import {
+  downloadTranscriptionFile,
+  formatMatchTranscription,
+  generateExportFilename,
+} from './transcriptionFormatter';
 import { GAME_MODES, GameMode } from './types';
 
 export interface ChessAppProps {
@@ -194,6 +198,8 @@ function BoardColumnArea({
   activeMoveSquares,
   suggestedMoveSquares,
   isBoardLocked,
+  boardOrientation,
+  canUndo,
   isReplaying,
   isClockEnabled,
   clock,
@@ -215,6 +221,8 @@ function BoardColumnArea({
   readonly activeMoveSquares: { readonly from: string; readonly to: string } | null;
   readonly suggestedMoveSquares: { readonly from: string; readonly to: string } | null;
   readonly isBoardLocked: boolean;
+  readonly boardOrientation: Color;
+  readonly canUndo: boolean;
   readonly isReplaying: boolean;
   readonly isClockEnabled: boolean;
   readonly clock: ReturnType<typeof useChessClock>;
@@ -229,7 +237,8 @@ function BoardColumnArea({
   readonly onAnalyzeGame: () => void;
   readonly isAnalyzingGame: boolean;
 }): JSX.Element {
-  const isClockActive = !isReplaying && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED');
+  const isClockActive =
+    !isReplaying && (clock.clockStatus === 'RUNNING' || clock.clockStatus === 'PAUSED');
   const isClockPaused = !isReplaying && clock.clockStatus === 'PAUSED';
 
   return (
@@ -252,6 +261,7 @@ function BoardColumnArea({
         activeMoveSquares={activeMoveSquares}
         suggestedMoveSquares={suggestedMoveSquares}
         readOnly={isBoardLocked}
+        boardOrientation={boardOrientation}
       />
 
       {isClockEnabled && (
@@ -266,7 +276,7 @@ function BoardColumnArea({
 
       {!isReplaying && (
         <GameActionBar
-          canUndo={snapshot.canUndo}
+          canUndo={canUndo}
           canRedo={snapshot.canRedo}
           isTerminalState={isTerminalState(snapshot.stateKind)}
           onUndo={onUndo}
@@ -297,6 +307,7 @@ export function ChessApp({
   const [legalMoves, setLegalMoves] = useState<readonly Position[]>([]);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>('HUMAN_VS_HUMAN');
+  const [playerColor, setPlayerColor] = useState<Color>('WHITE');
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
   const [isClockEnabled, setIsClockEnabled] = useState(false);
   const [whiteMinutes, setWhiteMinutes] = useState(10);
@@ -304,12 +315,17 @@ export function ChessApp({
   const [isAiThinking, setIsAiThinking] = useState(false);
 
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
-  const [hasGeminiApiKey, setHasGeminiApiKey] = useState(() => getStoredGeminiApiKey().length > 0);
+  const [hasGeminiApiKey, setHasGeminiApiKey] = useState(
+    () => getStoredGeminiApiKey().length > 0
+  );
   const [liveHint, setLiveHint] = useState<LiveHintData | null>(null);
   const [isHintLoading, setIsHintLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<FullGameAnalysisResult | null>(null);
   const [isAnalyzingGame, setIsAnalyzingGame] = useState(false);
-  const [analysisProgress, setAnalysisProgress] = useState<{ current: number; total: number } | null>(null);
+  const [analysisProgress, setAnalysisProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
 
   const analysisServiceRef = useRef<IAnalysisService>(analysisServiceFactory());
   const replay = useMatchReplay(engine);
@@ -400,9 +416,18 @@ export function ChessApp({
   );
 
   const triggerAiMoveIfNeeded = useCallback(
-    (currentEngine: IGameEngine, activeMode: GameMode) => {
+    (
+      currentEngine: IGameEngine,
+      activeMode: GameMode,
+      activePlayerColor: Color = playerColor
+    ) => {
       const modeConfig = GAME_MODES.find((mode) => mode.id === activeMode);
       if (!modeConfig?.strategyFactory) {
+        return;
+      }
+
+      const currentSnap = currentEngine.getSnapshot();
+      if (isTerminalState(currentSnap.stateKind) || currentSnap.currentTurn === activePlayerColor) {
         return;
       }
 
@@ -428,7 +453,7 @@ export function ChessApp({
         executeAiMove();
       }
     },
-    []
+    [playerColor]
   );
 
   const processMoveOutcome = useCallback(
@@ -446,14 +471,21 @@ export function ChessApp({
         } else if (isClockEnabled && clock.clockStatus === 'RUNNING') {
           clock.switchClockTurn(nextSnapshot.currentTurn);
         }
-        triggerAiMoveIfNeeded(engine, gameMode);
+        triggerAiMoveIfNeeded(engine, gameMode, playerColor);
       }
     },
-    [clearSelection, clock, engine, gameMode, isClockEnabled, triggerAiMoveIfNeeded]
+    [clearSelection, clock, engine, gameMode, isClockEnabled, playerColor, triggerAiMoveIfNeeded]
   );
+
+  const isAiMode = gameMode !== 'HUMAN_VS_HUMAN';
+  const isAiTurn = isAiMode && snapshot.currentTurn !== playerColor;
+  const boardOrientation: Color = isAiMode ? playerColor : 'WHITE';
+  const canUndo =
+    isAiMode && playerColor === 'BLACK' ? snapshot.currentMoveIndex >= 2 : snapshot.canUndo;
 
   const isBoardLocked =
     isAiThinking ||
+    isAiTurn ||
     replay.isReplaying ||
     (isClockEnabled && clock.clockStatus !== 'RUNNING') ||
     isTerminalState(snapshot.stateKind);
@@ -535,18 +567,37 @@ export function ChessApp({
   }, [clearSelection]);
 
   const handleUndo = useCallback(() => {
+    if (aiTimerRef.current) {
+      clearTimeout(aiTimerRef.current);
+      aiTimerRef.current = null;
+    }
+    setIsAiThinking(false);
     engine.undo();
+    if (gameMode !== 'HUMAN_VS_HUMAN' && engine.getSnapshot().currentTurn !== playerColor) {
+      engine.undo();
+    }
     clearSelection();
     setLiveHint(null);
     setFeedbackMessage(null);
-  }, [clearSelection, engine]);
+  }, [clearSelection, engine, gameMode, playerColor]);
 
   const handleRedo = useCallback(() => {
+    if (aiTimerRef.current) {
+      clearTimeout(aiTimerRef.current);
+      aiTimerRef.current = null;
+    }
+    setIsAiThinking(false);
     engine.redo();
+    if (gameMode !== 'HUMAN_VS_HUMAN' && engine.getSnapshot().currentTurn !== playerColor) {
+      const redone = engine.redo();
+      if (!redone && engine.getSnapshot().currentTurn !== playerColor) {
+        triggerAiMoveIfNeeded(engine, gameMode, playerColor);
+      }
+    }
     clearSelection();
     setLiveHint(null);
     setFeedbackMessage(null);
-  }, [clearSelection, engine]);
+  }, [clearSelection, engine, gameMode, playerColor, triggerAiMoveIfNeeded]);
 
   const handleStartReplay = useCallback(() => {
     clearSelection();
@@ -580,19 +631,42 @@ export function ChessApp({
       }
       setIsAiThinking(false);
       setGameMode(newMode);
+      clearSelection();
       setFeedbackMessage(null);
       setLiveHint(null);
       if (newMode !== 'HUMAN_VS_HUMAN') {
         clock.resetClock();
         setIsClockEnabled(false);
         const currentSnap = engine.getSnapshot();
-        if (currentSnap.currentTurn === 'BLACK') {
-          triggerAiMoveIfNeeded(engine, newMode);
+        if (currentSnap.moveHistory.length > 0 && currentSnap.currentTurn !== playerColor) {
+          triggerAiMoveIfNeeded(engine, newMode, playerColor);
         }
       }
     },
-    [clock, engine, triggerAiMoveIfNeeded]
+    [clearSelection, clock, engine, playerColor, triggerAiMoveIfNeeded]
   );
+
+  const handlePlayerColorChange = useCallback(
+    (newColor: Color) => {
+      if (aiTimerRef.current) {
+        clearTimeout(aiTimerRef.current);
+        aiTimerRef.current = null;
+      }
+      setIsAiThinking(false);
+      setPlayerColor(newColor);
+      clearSelection();
+      setFeedbackMessage(null);
+      setLiveHint(null);
+    },
+    [clearSelection]
+  );
+
+  const handleStartAiMatch = useCallback(() => {
+    clearSelection();
+    setFeedbackMessage(null);
+    setLiveHint(null);
+    triggerAiMoveIfNeeded(engine, gameMode, playerColor);
+  }, [clearSelection, engine, gameMode, playerColor, triggerAiMoveIfNeeded]);
 
   const handleAskHint = useCallback(async () => {
     setIsHintLoading(true);
@@ -676,8 +750,8 @@ export function ChessApp({
   const suggestedMoveSquares = liveHint
     ? { from: liveHint.from, to: liveHint.to }
     : currentAnalyzedMove && currentAnalyzedMove.bestMoveFrom && currentAnalyzedMove.bestMoveTo
-    ? { from: currentAnalyzedMove.bestMoveFrom, to: currentAnalyzedMove.bestMoveTo }
-    : null;
+      ? { from: currentAnalyzedMove.bestMoveFrom, to: currentAnalyzedMove.bestMoveTo }
+      : null;
 
   const { boardMaxWidth, boardColumnHeight } = resolveBoardLayoutDimensions(
     replay.isReplaying,
@@ -702,6 +776,8 @@ export function ChessApp({
             activeMoveSquares={activeMoveSquares}
             suggestedMoveSquares={suggestedMoveSquares}
             isBoardLocked={isBoardLocked}
+            boardOrientation={boardOrientation}
+            canUndo={canUndo}
             isReplaying={replay.isReplaying}
             isClockEnabled={isClockEnabled}
             clock={clock}
@@ -743,6 +819,12 @@ export function ChessApp({
               onWhiteMinutesChange: handleWhiteMinutesChange,
               onBlackMinutesChange: handleBlackMinutesChange,
               onStartMatch: handleStartClockMatch,
+            }}
+            playerColorConfig={{
+              playerColor,
+              isAiThinking,
+              onPlayerColorChange: handlePlayerColorChange,
+              onStartMatch: handleStartAiMatch,
             }}
           />
         }

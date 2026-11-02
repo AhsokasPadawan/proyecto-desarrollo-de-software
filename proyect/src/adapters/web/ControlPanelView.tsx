@@ -7,6 +7,10 @@ import { FeedbackBanner } from './components/FeedbackBanner';
 import { MoveHistoryTable } from './components/MoveHistoryTable';
 import { PlaybackSpeed, ReplayControlSection } from './components/ReplayControlSection';
 import { ClockConfigSection, ClockConfigSectionProps } from './components/ClockConfigSection';
+import {
+  PlayerColorConfigSection,
+  PlayerColorConfigSectionProps,
+} from './components/PlayerColorConfigSection';
 import { CoachFeedbackCard, LiveHintData } from './components/CoachFeedbackCard';
 import { PLAYER_DISPLAY_CONFIG } from './pieceDisplay';
 import { AnalyzedMove, FullGameAnalysisResult } from '../services/AnalysisService';
@@ -29,6 +33,7 @@ export interface ControlPanelViewProps {
   readonly onSpeedChange?: (speed: PlaybackSpeed) => void;
   readonly onJumpToMove?: (targetIndex: number) => void;
   readonly clockConfig?: ClockConfigSectionProps;
+  readonly playerColorConfig?: PlayerColorConfigSectionProps;
   readonly analysisResult?: FullGameAnalysisResult | null;
   readonly currentAnalyzedMove?: AnalyzedMove;
   readonly liveHint?: LiveHintData | null;
@@ -79,10 +84,12 @@ function GameModeSelectionSection({
   currentGameMode,
   onModeChange,
   clockConfig,
+  playerColorConfig,
 }: {
   readonly currentGameMode: GameMode;
   readonly onModeChange: (newMode: GameMode) => void;
   readonly clockConfig?: ClockConfigSectionProps;
+  readonly playerColorConfig?: PlayerColorConfigSectionProps;
 }): JSX.Element {
   return (
     <ControlSection title="Modo de Juego" hasDivider>
@@ -100,6 +107,10 @@ function GameModeSelectionSection({
 
       {currentGameMode === 'HUMAN_VS_HUMAN' && clockConfig && (
         <ClockConfigSection {...clockConfig} />
+      )}
+
+      {currentGameMode !== 'HUMAN_VS_HUMAN' && playerColorConfig && (
+        <PlayerColorConfigSection {...playerColorConfig} />
       )}
     </ControlSection>
   );
@@ -122,6 +133,7 @@ export function ControlPanelView({
   onSpeedChange,
   onJumpToMove,
   clockConfig,
+  playerColorConfig,
   analysisResult,
   currentAnalyzedMove,
   liveHint,
@@ -169,6 +181,7 @@ export function ControlPanelView({
             currentGameMode={currentGameMode}
             onModeChange={onModeChange}
             clockConfig={clockConfig}
+            playerColorConfig={playerColorConfig}
           />
         ) : (
           <ControlSection

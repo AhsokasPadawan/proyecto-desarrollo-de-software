@@ -239,4 +239,28 @@ describe('Web Adapter - ControlPanelView', () => {
     expect(screen.getByTestId('clock-enable-toggle')).toBeChecked();
     expect(screen.getByTestId('start-clock-match-button')).toBeInTheDocument();
   });
+
+  it('renders player color configuration section in AI modes when handlers are provided', () => {
+    const game = new ChessGame();
+    const snapshot = game.getSnapshot();
+    const handleColorChange = vi.fn();
+    const handleStartMatch = vi.fn();
+
+    render(
+      <ControlPanelView
+        snapshot={snapshot}
+        currentGameMode="HUMAN_VS_GREEDY_AI"
+        feedbackMessage={null}
+        onModeChange={() => {}}
+        playerColorConfig={{
+          playerColor: 'BLACK',
+          onPlayerColorChange: handleColorChange,
+          onStartMatch: handleStartMatch,
+        }}
+      />
+    );
+
+    expect(screen.getByTestId('player-color-config-section')).toBeInTheDocument();
+    expect(screen.getByTestId('start-ai-match-button')).toBeInTheDocument();
+  });
 });
