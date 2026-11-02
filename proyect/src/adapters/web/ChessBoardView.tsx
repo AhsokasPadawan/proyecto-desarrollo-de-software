@@ -1,4 +1,5 @@
 import { Position } from '../../core/board/Position';
+import { Color } from '../../core/pieces/types';
 import { GameSnapshot } from '../../core/ports/GameSnapshot';
 import { ChessSquare, SquareHighlightRole } from './components/ChessSquare';
 
@@ -10,6 +11,7 @@ export interface ChessBoardViewProps {
   readonly activeMoveSquares?: { readonly from: string; readonly to: string } | null;
   readonly suggestedMoveSquares?: { readonly from: string; readonly to: string } | null;
   readonly readOnly?: boolean;
+  readonly boardOrientation?: Color;
 }
 
 export function getFileLabel(colIndex: number): string {
@@ -56,9 +58,17 @@ export function ChessBoardView({
   activeMoveSquares = null,
   suggestedMoveSquares = null,
   readOnly = false,
+  boardOrientation = 'WHITE',
 }: ChessBoardViewProps): JSX.Element {
-  const rowIndices = Array.from({ length: snapshot.rows }, (_, i) => snapshot.rows - 1 - i);
-  const colIndices = Array.from({ length: snapshot.cols }, (_, i) => i);
+  const isFlipped = boardOrientation === 'BLACK';
+  const rowIndices = Array.from({ length: snapshot.rows }, (_, i) =>
+    isFlipped ? i : snapshot.rows - 1 - i
+  );
+  const colIndices = Array.from({ length: snapshot.cols }, (_, i) =>
+    isFlipped ? snapshot.cols - 1 - i : i
+  );
+  const leftEdgeCol = colIndices[0];
+  const bottomEdgeRow = rowIndices[rowIndices.length - 1];
   const legalTargetKeys = new Set(legalMoves.map((move) => `${move.row},${move.col}`));
 
   const selectedPiece = selectedPosition
@@ -75,6 +85,7 @@ export function ChessBoardView({
             gridTemplateRows: `repeat(${snapshot.rows}, minmax(0, 1fr))`,
           }}
           data-testid="chess-grid"
+          data-board-orientation={boardOrientation.toLowerCase()}
         >
           {rowIndices.map((row) =>
             colIndices.map((col) => {
@@ -105,8 +116,8 @@ export function ChessBoardView({
                   isSelected={isSelected}
                   isLegalTarget={isLegalTarget}
                   isCaptureTarget={isCaptureTarget}
-                  rankLabel={col === 0 ? getRankLabel(row) : null}
-                  fileLabel={row === 0 ? getFileLabel(col) : null}
+                  rankLabel={col === leftEdgeCol ? getRankLabel(row) : null}
+                  fileLabel={row === bottomEdgeRow ? getFileLabel(col) : null}
                   ariaLabel={`Casilla ${getFileLabel(col)}${getRankLabel(row)}`}
                   onClick={readOnly ? () => {} : onSquareClick}
                   highlightRole={highlightRole}

@@ -63,8 +63,16 @@ describe('Web Adapter - ControlPanelView', () => {
     );
 
     expect(screen.getByTestId('mode-selector-human_vs_human')).toBeInTheDocument();
-    expect(screen.getByTestId('mode-selector-human_vs_random_ai')).toBeInTheDocument();
-    expect(screen.getByTestId('mode-selector-human_vs_greedy_ai')).toBeInTheDocument();
+    expect(screen.getByTestId('mode-selector-human_vs_greedy_ai')).toHaveTextContent(
+      'Humano vs IA (Principiante)'
+    );
+    expect(screen.getByTestId('mode-selector-human_vs_amateur_ai')).toHaveTextContent(
+      'Humano vs IA (Amateur)'
+    );
+    expect(screen.getByTestId('mode-selector-human_vs_pro_ai')).toHaveTextContent(
+      'Humano vs IA (Pro)'
+    );
+    expect(screen.queryByTestId('mode-selector-human_vs_random_ai')).toBeNull();
     expect(screen.queryByTestId('replay-move-list')).toBeNull();
   });
 
@@ -230,5 +238,29 @@ describe('Web Adapter - ControlPanelView', () => {
 
     expect(screen.getByTestId('clock-enable-toggle')).toBeChecked();
     expect(screen.getByTestId('start-clock-match-button')).toBeInTheDocument();
+  });
+
+  it('renders player color configuration section in AI modes when handlers are provided', () => {
+    const game = new ChessGame();
+    const snapshot = game.getSnapshot();
+    const handleColorChange = vi.fn();
+    const handleStartMatch = vi.fn();
+
+    render(
+      <ControlPanelView
+        snapshot={snapshot}
+        currentGameMode="HUMAN_VS_GREEDY_AI"
+        feedbackMessage={null}
+        onModeChange={() => {}}
+        playerColorConfig={{
+          playerColor: 'BLACK',
+          onPlayerColorChange: handleColorChange,
+          onStartMatch: handleStartMatch,
+        }}
+      />
+    );
+
+    expect(screen.getByTestId('player-color-config-section')).toBeInTheDocument();
+    expect(screen.getByTestId('start-ai-match-button')).toBeInTheDocument();
   });
 });

@@ -25,6 +25,30 @@ describe('Web Adapter - ChessBoardView', () => {
 
     const squares = screen.getAllByRole('button');
     expect(squares).toHaveLength(64);
+    expect(screen.getByTestId('chess-grid')).toHaveAttribute('data-board-orientation', 'white');
+    expect(squares[0]).toHaveAttribute('data-testid', 'square-7-0');
+    expect(squares[63]).toHaveAttribute('data-testid', 'square-0-7');
+  });
+
+  it('rotates board 180 degrees when boardOrientation is BLACK', () => {
+    const game = new ChessGame();
+    const snapshot = game.getSnapshot();
+
+    render(
+      <ChessBoardView
+        snapshot={snapshot}
+        selectedPosition={null}
+        legalMoves={[]}
+        onSquareClick={() => {}}
+        boardOrientation="BLACK"
+      />
+    );
+
+    const squares = screen.getAllByRole('button');
+    expect(squares).toHaveLength(64);
+    expect(screen.getByTestId('chess-grid')).toHaveAttribute('data-board-orientation', 'black');
+    expect(squares[0]).toHaveAttribute('data-testid', 'square-0-7');
+    expect(squares[63]).toHaveAttribute('data-testid', 'square-7-0');
   });
 
   it('renders standard piece glyphs on initial placement squares', () => {
@@ -134,7 +158,7 @@ describe('Web Adapter - ChessBoardView', () => {
     render(
       <ChessBoardView
         snapshot={snapshot}
-        selectedPosition={selectedPosition}
+        selectedPosition={snapshot && selectedPosition}
         legalMoves={legalMoves}
         onSquareClick={() => {}}
       />

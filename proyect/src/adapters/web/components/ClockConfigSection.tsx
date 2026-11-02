@@ -1,4 +1,5 @@
 import { ActionButton } from './ActionButton';
+import { WhiteMoveStartPrompt } from './PlayerColorConfigSection';
 import { PlayerTimePicker } from './PlayerTimePicker';
 
 export interface ClockConfigSectionProps {
@@ -36,7 +37,7 @@ export function ClockConfigSection({
         />
       </label>
 
-      {isClockEnabled && (
+      {isClockEnabled ? (
         <div className="flex flex-col gap-2 p-2.5 rounded-lg bg-zinc-950/60 border border-zinc-800/80">
           <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
             Configuración de Reloj
@@ -68,6 +69,8 @@ export function ClockConfigSection({
             {isClockRunning ? 'Partida en Curso' : 'Iniciar Partida con Reloj'}
           </ActionButton>
         </div>
+      ) : (
+        <WhiteMoveStartPrompt />
       )}
     </div>
   );
