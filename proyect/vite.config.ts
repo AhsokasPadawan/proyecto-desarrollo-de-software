@@ -47,6 +47,7 @@ function chessLibraryJsonPlugin(): Plugin {
 }
 
 export default defineConfig({
+  base: './',
   plugins: [react(), chessLibraryJsonPlugin()],
   test: {
     globals: true,

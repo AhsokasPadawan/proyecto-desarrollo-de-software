@@ -1,4 +1,4 @@
-name: Deploy Presentacion to GitHub Pages
+name: Deploy Presentacion and Proyect to GitHub Pages
 
 on:
   push:
@@ -17,9 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./presentacion
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,11 +26,23 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install and Build Presentacion
+        working-directory: ./presentacion
+        run: |
+          npm install
+          npm run build
 
-      - name: Build Presentacion with Vite
-        run: npm run build
+      - name: Install and Build Proyect (Chess Game)
+        working-directory: ./proyect
+        run: |
+          npm install
+          npm run build
+
+      - name: Combine Presentacion (/) and Proyect (/juego) into _site
+        run: |
+          mkdir -p _site/juego
+          cp -r presentacion/dist/* _site/
+          cp -r proyect/dist/* _site/juego/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -41,7 +50,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./presentacion/dist
+          path: ./_site
 
   deploy:
     environment:

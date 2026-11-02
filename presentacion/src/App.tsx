@@ -202,6 +202,16 @@ export function App(): JSX.Element {
               >
                 📖
               </button>
+              <a
+                href="./juego/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Abrir Juego en Vivo"
+                aria-label="Abrir Juego en Vivo"
+                className={`w-6 h-6 rounded-md text-xs flex items-center justify-center transition-all ${theme.modeSwitchInactive}`}
+              >
+                🎮
+              </a>
             </div>
           </div>
 
