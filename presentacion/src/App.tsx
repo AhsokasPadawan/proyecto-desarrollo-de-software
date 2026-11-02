@@ -30,6 +30,9 @@ export function App(): JSX.Element {
       const cardEl = stepCardElementsRef.current[targetStepIndex];
       if (cardEl) {
         cardEl.focus({ preventScroll: true });
+        if (window.innerWidth < 1024) {
+          cardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       } else {
         rootContainerRef.current?.focus({ preventScroll: true });
       }
@@ -51,6 +54,9 @@ export function App(): JSX.Element {
     setActiveModal(null);
     setActivePageId(targetPageId);
     setActiveStepIndex(initialStep);
+    if (window.innerWidth < 1024) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     focusStepCardOrContainer(initialStep);
   };
 
@@ -159,7 +165,7 @@ export function App(): JSX.Element {
       tabIndex={0}
       onKeyDown={handleKeyDown}
       className={`${
-        isProjectionMode ? 'h-dvh overflow-hidden' : 'min-h-screen'
+        isProjectionMode ? 'min-h-dvh overflow-y-auto lg:h-dvh lg:overflow-hidden' : 'min-h-screen'
       } w-full ${theme.appBackground} flex flex-col justify-between transition-colors duration-200 focus:outline-none`}
     >
       <header className={`sticky top-0 z-30 w-full px-4 sm:px-6 py-2 ${theme.topBarContainer}`}>
