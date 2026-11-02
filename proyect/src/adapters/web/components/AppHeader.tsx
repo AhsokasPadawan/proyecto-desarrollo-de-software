@@ -1,6 +1,10 @@
+import { ACTIVITY_MODES, ActivityMode } from '../types';
+
 export interface AppHeaderProps {
   readonly onOpenApiKeyModal?: () => void;
   readonly hasApiKey?: boolean;
+  readonly activeActivity?: ActivityMode;
+  readonly onSelectActivity?: (activity: ActivityMode) => void;
 }
 
 const ARCHITECTURE_BADGES: readonly string[] = [
@@ -23,6 +27,43 @@ function HeaderBrand(): JSX.Element {
         <p className="text-[11px] font-medium text-zinc-400">
           Domain Driven Engine
         </p>
+      </div>
+    </div>
+  );
+}
+
+function ActivityNavigationList({
+  activeActivity,
+  onSelectActivity,
+}: {
+  readonly activeActivity: ActivityMode;
+  readonly onSelectActivity: (activity: ActivityMode) => void;
+}): JSX.Element {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+        Modo de Actividad
+      </span>
+      <div className="flex flex-col gap-1">
+        {ACTIVITY_MODES.map((item) => {
+          const isSelected = activeActivity === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onSelectActivity(item.id)}
+              data-testid={`activity-selector-${item.id.toLowerCase()}`}
+              className={`w-full px-2.5 py-1.5 rounded-lg border text-left text-xs flex items-center gap-2 transition-colors ${
+                isSelected
+                  ? 'bg-emerald-950/80 border-emerald-500/60 text-emerald-300 font-semibold shadow-sm'
+                  : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-300 hover:bg-zinc-800/80'
+              }`}
+            >
+              <span>{item.icon}</span>
+              <span className="truncate">{item.label}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -75,12 +116,26 @@ function GeminiCoachStatusButton({
   );
 }
 
-export function AppHeader({ onOpenApiKeyModal, hasApiKey = false }: AppHeaderProps): JSX.Element {
+export function AppHeader({
+  onOpenApiKeyModal,
+  hasApiKey = false,
+  activeActivity = 'CLASSIC_MATCH',
+  onSelectActivity,
+}: AppHeaderProps): JSX.Element {
   return (
     <header className="w-full lg:w-56 xl:w-60 flex flex-col justify-between p-4 bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md select-none">
       <div className="flex flex-col gap-3">
         <HeaderBrand />
         <div className="h-px bg-zinc-800 my-1" />
+        {onSelectActivity && (
+          <>
+            <ActivityNavigationList
+              activeActivity={activeActivity}
+              onSelectActivity={onSelectActivity}
+            />
+            <div className="h-px bg-zinc-800 my-1" />
+          </>
+        )}
         <ArchitectureBadgeList />
         {onOpenApiKeyModal && (
           <GeminiCoachStatusButton onClick={onOpenApiKeyModal} hasApiKey={hasApiKey} />

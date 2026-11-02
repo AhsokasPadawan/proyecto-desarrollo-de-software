@@ -76,3 +76,22 @@ export function createBoardFromSnapshot(snapshot: GameSnapshot): Board {
   }
   return board;
 }
+
+export interface AlgebraicPiecePlacement {
+  readonly square: string;
+  readonly type: import('../pieces/types').PieceType;
+  readonly color: Color;
+}
+
+export function createBoardFromPlacements(
+  placements: readonly AlgebraicPiecePlacement[],
+  rows: number = 8,
+  cols: number = 8
+): Board {
+  const board = new Board(rows, cols);
+  for (const item of placements) {
+    board.placePiece(Position.fromAlgebraic(item.square), createPiece(item.type, item.color));
+  }
+  return board;
+}
+

@@ -5,6 +5,11 @@ import { GameStateContext, IGameState } from './IGameState';
 
 export class CheckState implements IGameState {
   readonly type: GameStateType = 'CHECK';
+  private readonly originState?: IGameState;
+
+  constructor(originState?: IGameState) {
+    this.originState = originState;
+  }
 
   canAcceptMoves(): boolean {
     return true;
@@ -14,7 +19,14 @@ export class CheckState implements IGameState {
     return null;
   }
 
+  retainsTurnWhenSingleColor(): boolean {
+    return this.originState?.retainsTurnWhenSingleColor?.() === true;
+  }
+
   evaluateNextState(context: GameStateContext): IGameState {
+    if (this.originState) {
+      return this.originState.evaluateNextState(context);
+    }
     return evaluateActiveStateTransition(context);
   }
 }

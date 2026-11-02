@@ -100,10 +100,25 @@ _Avoid_: Tablero interactivo secundario, motor duplicado
 Procedimiento del adaptador web que formatea el historial `moveHistory` en una transcripción estructurada letra-número (`e2 -> e4`) con cabecera de partida y genera un archivo descargable `.txt` nombrado con marca temporal (`partida-ajedrez-YYYYMMDD-HHmm.txt`).
 _Avoid_: Guardado en disco en el Core, formato binario propietario
 
+## Estudio, Ejercicios Tácticos y Biblioteca Persistente
 
+**ChessLibraryRepository (`IChessLibraryRepository` / `JsonFileLibraryAdapter`)**:
+Puerto de salida asíncrono (*Driven Port*) que abstrae la lectura y persistencia de colecciones de estudio, ejercicios tácticos y partidas comentadas, implementado en producción por `JsonFileLibraryAdapter` sobre `chess-library.json` y sustituible por adaptadores en memoria (en tests) o motores SQL (como MySQL) sin modificar el dominio ni la interfaz.
+_Avoid_: Llamadas directas a `fs` o `fetch` dentro de componentes React, acoplamiento al formato de almacenamiento
 
+**StudyPlayState (Estado de Partida de Estudio)**:
+Implementación polimórfica de `IGameState` (`type: 'STUDY_IN_PROGRESS'`) que permite jugar o enseñar desde cualquier disposición libre de piezas sin validaciones restrictivas de apertura, conservando el turno si solo hay piezas de un color, omitiendo tablas automáticas (material insuficiente, 50 movimientos, triple repetición) y detectando jaque y jaque mate cuando existe un Rey defensor.
+_Avoid_: Bandera booleana `isStudyMode` dispersa en condicionales dentro de `ChessGame`
 
+**StudyPositionRecord (Registro de Posición de Estudio)**:
+Estructura inmutable almacenada en la biblioteca que describe una disposición personalizada de piezas en el tablero, el turno inicial, el título y la nota pedagógica asociada, como si se copiara un diagrama de un libro de ajedrez.
+_Avoid_: Tablero suelto sin metadatos didácticos
 
+**MatePuzzleRecord (Registro de Ejercicio Mate en $X$)**:
+Estructura inmutable de un problema táctico que define una disposición inicial de piezas, el bando que resuelve, la cantidad máxima de movimientos permitidos (`maxMoves: X`) y las respuestas defensivas del oponente para evaluar si el jugador logra `CHECKMATE` en $\le X$ jugadas.
+_Avoid_: Partida libre sin contador de jugadas objetivo
 
-
+**SavedAnnotatedMatchRecord (Registro de Partida Comentada Pre-guardada)**:
+Estructura inmutable que encapsula una partida completa (disposición inicial y secuencia `MoveRecord[]`) junto con su análisis didáctico de IA (`FullGameAnalysisResult`), lista para reproducirse mediante la animación de `ReplayMode` mostrando en cada turno la explicación de Gemini en `CoachFeedbackCard`.
+_Avoid_: Historial sin explicaciones vinculadas o recálculo forzado de IA en cada paso de la animación
 

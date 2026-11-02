@@ -1,6 +1,6 @@
 # Backlog Maestro Centralizado — Chess TPO
 
-Índice maestro de las **7 Épicas** y **28 Tickets** (incluyendo la épica de extensión de Replay, Animación y Exportación).
+Índice maestro de las **12 Épicas** y **46 Tickets** del proyecto.
 
 > [!IMPORTANT]
 > **Disciplina On-Commit (`how-we-work.md`):** Al trabajar en una rama `ticket/<NN>-<slug>`, el autor debe mantener sincronizados los checkboxes del archivo del ticket y el estado en esta tabla (`ready-for-agent` $\rightarrow$ `In Progress` $\rightarrow$ `In Review` $\rightarrow$ `Done`).
@@ -82,3 +82,55 @@
 | **27** | [`27-reproductor-replay-y-controles-transporte`](tickets/07-replay-animacion-y-exportacion/27-reproductor-replay-y-controles-transporte.md) | `25` | `ticket/27-reproductor-replay-y-controles-transporte` | `Done` |
 | **28** | [`28-lista-interactiva-y-resaltado-tablero`](tickets/07-replay-animacion-y-exportacion/28-lista-interactiva-y-resaltado-tablero.md) | `27` | `ticket/28-lista-interactiva-y-resaltado-tablero` | `Done` |
 
+---
+
+## Épica 8: `08-reloj-ajedrez-humano-vs-humano`
+
+| ID | Ticket | Blocked By | Rama Git | Estado |
+| :---: | :--- | :--- | :--- | :---: |
+| **29** | [`29-estado-dominio-timeout-y-transicion-core`](tickets/08-reloj-ajedrez-humano-vs-humano/29-estado-dominio-timeout-y-transicion-core.md) | `13`, `14` | `ticket/29-estado-dominio-timeout-y-transicion-core` | `Done` |
+| **30** | [`30-controlador-temporizador-reloj-ajedrez`](tickets/08-reloj-ajedrez-humano-vs-humano/30-controlador-temporizador-reloj-ajedrez.md) | `29` | `ticket/30-controlador-temporizador-reloj-ajedrez` | `Done` |
+| **31** | [`31-componentes-visuales-reloj-e-integracion-tablero`](tickets/08-reloj-ajedrez-humano-vs-humano/31-componentes-visuales-reloj-e-integracion-tablero.md) | `23`, `30` | `ticket/31-componentes-visuales-reloj-e-integracion-tablero` | `Done` |
+| **32** | [`32-integracion-timeout-replay-y-transcripcion`](tickets/08-reloj-ajedrez-humano-vs-humano/32-integracion-timeout-replay-y-transcripcion.md) | `26`, `27`, `31` | `ticket/32-integracion-timeout-replay-y-transcripcion` | `Done` |
+
+---
+
+## Épica 9: `09-analisis-hibrido-stockfish-y-gemini`
+
+| ID | Ticket | Blocked By | Rama Git | Estado |
+| :---: | :--- | :--- | :--- | :---: |
+| **33** | [`33-serializador-fen-y-servicio-motor-stockfish`](tickets/09-analisis-hibrido-stockfish-y-gemini/33-serializador-fen-y-servicio-motor-stockfish.md) | `12`, `25` | `ticket/33-serializador-fen-y-servicio-motor-stockfish` | `Done` |
+| **34** | [`34-servicio-gemini-coach-y-evaluador-calidad-jugada`](tickets/09-analisis-hibrido-stockfish-y-gemini/34-servicio-gemini-coach-y-evaluador-calidad-jugada.md) | `33` | `ticket/34-servicio-gemini-coach-y-evaluador-calidad-jugada` | `Done` |
+| **35** | [`35-coordinador-analisis-y-modal-configuracion-api`](tickets/09-analisis-hibrido-stockfish-y-gemini/35-coordinador-analisis-y-modal-configuracion-api.md) | `33`, `34` | `ticket/35-coordinador-analisis-y-modal-configuracion-api` | `Done` |
+| **36** | [`36-integracion-ui-tarjetas-feedback-replay-y-exportacion`](tickets/09-analisis-hibrido-stockfish-y-gemini/36-integracion-ui-tarjetas-feedback-replay-y-exportacion.md) | `26`, `28`, `35` | `ticket/36-integracion-ui-tarjetas-feedback-replay-y-exportacion` | `Done` |
+
+---
+
+## Épica 10: `10-estudio-libro-editor-y-persistencia-json`
+
+| ID | Ticket | Blocked By | Rama Git | Estado |
+| :---: | :--- | :--- | :--- | :---: |
+| **37** | [`37-puerto-biblioteca-y-adaptador-json`](tickets/10-estudio-libro-editor-y-persistencia-json/37-puerto-biblioteca-y-adaptador-json.md) | `12`, `25` | `ticket/37-puerto-biblioteca-y-adaptador-json` | `Done` |
+| **38** | [`38-estado-estudio-study-play-state-en-core`](tickets/10-estudio-libro-editor-y-persistencia-json/38-estado-estudio-study-play-state-en-core.md) | `13`, `14` | `ticket/38-estado-estudio-study-play-state-en-core` | `Done` |
+| **39** | [`39-editor-visual-tablero-y-paleta-piezas`](tickets/10-estudio-libro-editor-y-persistencia-json/39-editor-visual-tablero-y-paleta-piezas.md) | `38` | `ticket/39-editor-visual-tablero-y-paleta-piezas` | `Done` |
+| **40** | [`40-guardado-y-carga-posiciones-estudio-json`](tickets/10-estudio-libro-editor-y-persistencia-json/40-guardado-y-carga-posiciones-estudio-json.md) | `37`, `39` | `ticket/40-guardado-y-carga-posiciones-estudio-json` | `Done` |
+
+---
+
+## Épica 11: `11-ejercicios-tacticos-mate-en-x`
+
+| ID | Ticket | Blocked By | Rama Git | Estado |
+| :---: | :--- | :--- | :--- | :---: |
+| **41** | [`41-motor-resolucion-ejercicios-mate-en-x`](tickets/11-ejercicios-tacticos-mate-en-x/41-motor-resolucion-ejercicios-mate-en-x.md) | `37`, `38` | `ticket/41-motor-resolucion-ejercicios-mate-en-x` | `Done` |
+| **42** | [`42-catalogo-ui-ejercicios-y-feedback-resolucion`](tickets/11-ejercicios-tacticos-mate-en-x/42-catalogo-ui-ejercicios-y-feedback-resolucion.md) | `39`, `41` | `ticket/42-catalogo-ui-ejercicios-y-feedback-resolucion` | `Done` |
+| **43** | [`43-creacion-y-guardado-nuevos-ejercicios-json`](tickets/11-ejercicios-tacticos-mate-en-x/43-creacion-y-guardado-nuevos-ejercicios-json.md) | `40`, `42` | `ticket/43-creacion-y-guardado-nuevos-ejercicios-json` | `Done` |
+
+---
+
+## Épica 12: `12-partidas-preguardadas-animadas-con-gemini`
+
+| ID | Ticket | Blocked By | Rama Git | Estado |
+| :---: | :--- | :--- | :--- | :---: |
+| **44** | [`44-hidratacion-partidas-guardadas-en-motor-replay`](tickets/12-partidas-preguardadas-animadas-con-gemini/44-hidratacion-partidas-guardadas-en-motor-replay.md) | `27`, `37` | `ticket/44-hidratacion-partidas-guardadas-en-motor-replay` | `Done` |
+| **45** | [`45-catalogo-ui-partidas-comentadas-y-reproduccion-gemini`](tickets/12-partidas-preguardadas-animadas-con-gemini/45-catalogo-ui-partidas-comentadas-y-reproduccion-gemini.md) | `36`, `39`, `44` | `ticket/45-catalogo-ui-partidas-comentadas-y-reproduccion-gemini` | `Done` |
+| **46** | [`46-guardado-partidas-jugadas-con-explicaciones-gemini-en-json`](tickets/12-partidas-preguardadas-animadas-con-gemini/46-guardado-partidas-jugadas-con-explicaciones-gemini-en-json.md) | `45` | `ticket/46-guardado-partidas-jugadas-con-explicaciones-gemini-en-json` | `Done` |

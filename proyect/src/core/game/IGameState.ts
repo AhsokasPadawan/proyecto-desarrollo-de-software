@@ -14,4 +14,5 @@ export interface IGameState {
   canAcceptMoves(): boolean;
   getWinner(currentTurn: Color): Color | null;
   evaluateNextState(context: GameStateContext): IGameState;
+  retainsTurnWhenSingleColor?(): boolean;
 }

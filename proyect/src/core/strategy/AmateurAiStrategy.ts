@@ -91,7 +91,7 @@ export function createSimulationBoard(snapshot: GameSnapshot): Board {
           board.setEnPassantTarget(new Position(skippedRow, fromPos.col));
         }
       } catch {
-        // Ignored if notation parsing fails in edge conditions
+        return board;
       }
     }
   }
@@ -159,7 +159,6 @@ export function evaluateBoardPosition(
 ): number {
   let score = 0;
 
-  // 1. Material Evaluation
   const aiPieces = board.getPiecesByColor(aiColor);
   const opponentPieces = board.getPiecesByColor(opponentColor);
 
@@ -170,7 +169,6 @@ export function evaluateBoardPosition(
     score -= config.pieceValues[p.piece.type] ?? 100;
   }
 
-  // 2. Center Control Evaluation
   const midRow = Math.floor(board.rows / 2);
   const midCol = Math.floor(board.cols / 2);
   const coreCenterRows = [midRow - 1, midRow];
@@ -206,7 +204,6 @@ export function evaluateBoardPosition(
     }
   }
 
-  // 3. Opening Development & Early Queen Evaluation (First 10 moves / 20 half-moves)
   const isOpeningPhase = moveHistory.length <= 20;
   if (isOpeningPhase) {
     const aiHomeRow = aiColor === 'WHITE' ? 0 : board.rows - 1;
@@ -241,7 +238,6 @@ export function evaluateBoardPosition(
     }
   }
 
-  // 4. King Safety & Castling Evaluation
   const aiHasCastled = moveHistory.some((m) => m.turn === aiColor && m.isCastling);
   if (aiHasCastled) {
     score += config.castlingBonus;
@@ -264,7 +260,6 @@ export function evaluateBoardPosition(
     }
   }
 
-  // 5. Check Bonus
   if (checkDetector.isKingInCheck(board, opponentColor)) {
     score += config.checkBonus;
   }
@@ -272,7 +267,6 @@ export function evaluateBoardPosition(
     score -= config.checkBonus;
   }
 
-  // 6. Doubled Pawns Penalty (-20 per extra pawn in the same file)
   const aiPawnsPerCol: number[] = Array(board.cols).fill(0);
   for (const p of aiPieces) {
     if (p.piece.type === 'PAWN') {
@@ -320,7 +314,7 @@ export function runMinimax(
     if (inCheck) {
       return currentTurn === aiColor ? -CHECKMATE_SCORE - depth : CHECKMATE_SCORE + depth;
     }
-    return 0; // Stalemate
+    return 0;
   }
 
   if (depth === 0) {
@@ -446,7 +440,7 @@ export class AmateurAiStrategy implements IAiStrategy {
             isRetreatAfterAdvance = true;
           }
         } catch {
-          // ignore notation parsing
+          isRetreatAfterAdvance = false;
         }
       }
 
@@ -490,17 +484,14 @@ export class AmateurAiStrategy implements IAiStrategy {
 
       command.undo();
 
-      // Rule 9: Human temptation - En passant capture bonus (+15)
       if (isEnPassant) {
         moveScore += this.config.enPassantBonus;
       }
 
-      // Rule 10: Penalty for retreating immediately after advancing in offense (-25)
       if (isRetreatAfterAdvance) {
         moveScore -= this.config.retreatAfterAdvancePenalty;
       }
 
-      // Rule 8b: Prefer using other pieces unless putting them in risk (+10 for non-pawns)
       if (movedPiece.type !== 'PAWN') {
         moveScore += this.config.preferOtherPiecesBonus;
       }
@@ -515,12 +506,10 @@ export class AmateurAiStrategy implements IAiStrategy {
     scoredMoves.sort((a, b) => b.score - a.score);
     const highestScore = scoredMoves[0].score;
 
-    // If an immediate checkmate is available, take it!
     if (highestScore >= CHECKMATE_SCORE - 100) {
       return scoredMoves[0].move;
     }
 
-    // Rule 7: Blunder rate with bounded suboptimality ("Techo de Error")
     const isBlunder = this.rng() < this.config.blunderRate;
     if (isBlunder) {
       let blunderPool = scoredMoves.filter(
@@ -529,7 +518,6 @@ export class AmateurAiStrategy implements IAiStrategy {
           sm.score >= highestScore - this.config.maxBlunderDrop
       );
 
-      // If all safe moves are within candidateScoreTolerance, pick among the 2nd–4th best safe options
       if (blunderPool.length === 0) {
         blunderPool = scoredMoves
           .slice(1, 4)
@@ -542,7 +530,6 @@ export class AmateurAiStrategy implements IAiStrategy {
       }
     }
 
-    // Rule 7: Score tolerance (choose randomly among top moves within tolerance, capped by maxBlunderDrop)
     const effectiveTolerance = Math.min(
       this.config.candidateScoreTolerance,
       this.config.maxBlunderDrop
