@@ -1,6 +1,7 @@
+import { ReactNode } from 'react';
 import { GameSnapshot } from '../../core/ports/GameSnapshot';
 import { getStateBadgeClass, getStateLabel, isTerminalState } from './stateDisplayLookup';
-import { GAME_MODES, GameMode } from './types';
+import { ActivityMode, GAME_MODES, GameMode } from './types';
 import { ModeSelectorButton } from './components/ModeSelectorButton';
 import { ControlSection } from './components/ControlSection';
 import { FeedbackBanner } from './components/FeedbackBanner';
@@ -12,6 +13,13 @@ import {
   PlayerColorConfigSectionProps,
 } from './components/PlayerColorConfigSection';
 import { CoachFeedbackCard, LiveHintData } from './components/CoachFeedbackCard';
+import { StudyEditorSection, StudyEditorSectionProps } from './components/StudyEditorSection';
+import { MatePuzzlesSection, MatePuzzlesSectionProps } from './components/MatePuzzlesSection';
+import {
+  AnnotatedMatchesSection,
+  AnnotatedMatchesSectionProps,
+  SaveAnnotatedMatchForm,
+} from './components/AnnotatedMatchesSection';
 import { PLAYER_DISPLAY_CONFIG } from './pieceDisplay';
 import { AnalyzedMove, FullGameAnalysisResult } from '../services/AnalysisService';
 
@@ -20,6 +28,10 @@ export interface ControlPanelViewProps {
   readonly currentGameMode: GameMode;
   readonly feedbackMessage: string | null;
   readonly onModeChange: (newMode: GameMode) => void;
+  readonly activeActivity?: ActivityMode;
+  readonly studyEditorProps?: StudyEditorSectionProps;
+  readonly matePuzzlesProps?: MatePuzzlesSectionProps;
+  readonly annotatedMatchesProps?: AnnotatedMatchesSectionProps;
   readonly isReplaying?: boolean;
   readonly isPlaying?: boolean;
   readonly playbackSpeed?: PlaybackSpeed;
@@ -121,6 +133,10 @@ export function ControlPanelView({
   currentGameMode,
   feedbackMessage,
   onModeChange,
+  activeActivity = 'CLASSIC_MATCH',
+  studyEditorProps,
+  matePuzzlesProps,
+  annotatedMatchesProps,
   isReplaying = false,
   isPlaying = false,
   playbackSpeed = 1000,
@@ -155,6 +171,62 @@ export function ControlPanelView({
       onSpeedChange
   );
 
+  const historySection = (
+    <ControlSection
+      title={`Historial de Jugadas (${snapshot.moveHistory.length})`}
+      hasDivider
+      className="flex-1 flex flex-col min-h-[160px]"
+    >
+      <MoveHistoryTable
+        moveHistory={snapshot.moveHistory}
+        currentMoveIndex={snapshot.currentMoveIndex}
+        onJumpToMove={onJumpToMove}
+        analyzedMoves={analysisResult?.analyzedMoves}
+      />
+    </ControlSection>
+  );
+
+  const inlineSaveMatchForm =
+    annotatedMatchesProps?.canSaveCurrentMatch && (isMatchFinished || Boolean(analysisResult)) ? (
+      <SaveAnnotatedMatchForm onSaveCurrentMatch={annotatedMatchesProps.onSaveCurrentMatch} />
+    ) : null;
+
+  const activityContentLookup: Record<ActivityMode, () => ReactNode> = {
+    CLASSIC_MATCH: () =>
+      !hasGameStarted && !isReplaying ? (
+        <GameModeSelectionSection
+          currentGameMode={currentGameMode}
+          onModeChange={onModeChange}
+          clockConfig={clockConfig}
+          playerColorConfig={playerColorConfig}
+        />
+      ) : (
+        <>
+          {inlineSaveMatchForm}
+          {historySection}
+        </>
+      ),
+    STUDY_EDITOR: () => (
+      <>
+        {studyEditorProps && <StudyEditorSection {...studyEditorProps} />}
+        {inlineSaveMatchForm}
+        {hasGameStarted && historySection}
+      </>
+    ),
+    MATE_PUZZLES: () => (
+      <>
+        {matePuzzlesProps && <MatePuzzlesSection {...matePuzzlesProps} />}
+        {hasGameStarted && historySection}
+      </>
+    ),
+    ANNOTATED_MATCHES: () => (
+      <>
+        {annotatedMatchesProps && <AnnotatedMatchesSection {...annotatedMatchesProps} />}
+        {hasGameStarted && historySection}
+      </>
+    ),
+  };
+
   return (
     <aside className="w-full lg:w-96 xl:w-[420px] h-full max-h-full flex flex-col gap-3 p-4 bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-md overflow-y-auto">
       <div className="flex flex-col gap-2.5 flex-1 min-h-0">
@@ -176,27 +248,7 @@ export function ControlPanelView({
           onAnalyzeGame={isMatchFinished && !analysisResult ? onAnalyzeGame : undefined}
         />
 
-        {!hasGameStarted && !isReplaying ? (
-          <GameModeSelectionSection
-            currentGameMode={currentGameMode}
-            onModeChange={onModeChange}
-            clockConfig={clockConfig}
-            playerColorConfig={playerColorConfig}
-          />
-        ) : (
-          <ControlSection
-            title={`Historial de Jugadas (${snapshot.moveHistory.length})`}
-            hasDivider
-            className="flex-1 flex flex-col min-h-[160px]"
-          >
-            <MoveHistoryTable
-              moveHistory={snapshot.moveHistory}
-              currentMoveIndex={snapshot.currentMoveIndex}
-              onJumpToMove={onJumpToMove}
-              analyzedMoves={analysisResult?.analyzedMoves}
-            />
-          </ControlSection>
-        )}
+        {activityContentLookup[activeActivity]()}
       </div>
 
       {canRenderInlineReplayControls && (

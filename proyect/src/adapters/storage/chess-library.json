@@ -1,0 +1,643 @@
+{
+  "studyPositions": [
+    {
+      "id": "study-knight-outpost",
+      "title": "El Caballo Centralizado (Octopus Knight)",
+      "description": "Un caballo en el centro (d4 o e5) controla 8 casillas simultáneamente, mientras que en una esquina solo controla 2. Practica sus saltos libremente sin reyes en el tablero.",
+      "initialTurn": "WHITE",
+      "pieces": [
+        {
+          "square": "d4",
+          "type": "KNIGHT",
+          "color": "WHITE"
+        }
+      ]
+    },
+    {
+      "id": "study-king-pawn-opposition",
+      "title": "Final de Peones: La Oposición Directa",
+      "description": "Capítulo clásico de finales: las Blancas avanzan con su Rey delante del peón para ganar la oposición y asegurar la coronación en e8.",
+      "initialTurn": "WHITE",
+      "pieces": [
+        {
+          "square": "e4",
+          "type": "KING",
+          "color": "WHITE"
+        },
+        {
+          "square": "e5",
+          "type": "PAWN",
+          "color": "WHITE"
+        },
+        {
+          "square": "e6",
+          "type": "KING",
+          "color": "BLACK"
+        }
+      ]
+    },
+    {
+      "id": "study-lucena-bridge",
+      "title": "Posición de Lucena: Construyendo el Puente",
+      "description": "El final de torres más famoso de la literatura ajedrecística. Libera al Rey blanco de d8 y utiliza la torre en cuarta fila para bloquear los jaques verticales.",
+      "initialTurn": "WHITE",
+      "pieces": [
+        {
+          "square": "d8",
+          "type": "KING",
+          "color": "WHITE"
+        },
+        {
+          "square": "d7",
+          "type": "PAWN",
+          "color": "WHITE"
+        },
+        {
+          "square": "e1",
+          "type": "ROOK",
+          "color": "WHITE"
+        },
+        {
+          "square": "f7",
+          "type": "KING",
+          "color": "BLACK"
+        },
+        {
+          "square": "a2",
+          "type": "ROOK",
+          "color": "BLACK"
+        }
+      ]
+    }
+  ],
+  "matePuzzles": [
+    {
+      "id": "puzzle-kiss-of-death-mate-1",
+      "title": "Mate en 1: El Beso de la Muerte",
+      "description": "Blancas dan mate en 1 movimiento apoyando a la Dama con el Rey en la séptima fila.",
+      "initialTurn": "WHITE",
+      "maxMoves": 1,
+      "pieces": [
+        {
+          "square": "f6",
+          "type": "KING",
+          "color": "WHITE"
+        },
+        {
+          "square": "h6",
+          "type": "QUEEN",
+          "color": "WHITE"
+        },
+        {
+          "square": "g8",
+          "type": "KING",
+          "color": "BLACK"
+        }
+      ],
+      "opponentResponses": []
+    },
+    {
+      "id": "puzzle-back-rank-sacrifice-mate-2",
+      "title": "Mate en 2: Doble Batería en Octava Fila",
+      "description": "Blancas dan mate en 2 movimientos explotando la debilidad del pasillo tras el sacrificio de la primera torre.",
+      "initialTurn": "WHITE",
+      "maxMoves": 2,
+      "pieces": [
+        {
+          "square": "g1",
+          "type": "KING",
+          "color": "WHITE"
+        },
+        {
+          "square": "d1",
+          "type": "ROOK",
+          "color": "WHITE"
+        },
+        {
+          "square": "d2",
+          "type": "ROOK",
+          "color": "WHITE"
+        },
+        {
+          "square": "g8",
+          "type": "KING",
+          "color": "BLACK"
+        },
+        {
+          "square": "f8",
+          "type": "ROOK",
+          "color": "BLACK"
+        },
+        {
+          "square": "f7",
+          "type": "PAWN",
+          "color": "BLACK"
+        },
+        {
+          "square": "g7",
+          "type": "PAWN",
+          "color": "BLACK"
+        },
+        {
+          "square": "h7",
+          "type": "PAWN",
+          "color": "BLACK"
+        }
+      ],
+      "opponentResponses": [
+        {
+          "from": "f8",
+          "to": "d8"
+        }
+      ]
+    },
+    {
+      "id": "puzzle-morphy-opera-mate-2",
+      "title": "Mate en 2: El Remate de la Ópera de Morphy",
+      "description": "Blancas dan mate en 2 movimientos. Sacrifica la Dama en b8 para desviar al caballo negro de d7 y remata con la torre en d8 protegida por el alfil de g5.",
+      "initialTurn": "WHITE",
+      "maxMoves": 2,
+      "pieces": [
+        {
+          "square": "c1",
+          "type": "KING",
+          "color": "WHITE"
+        },
+        {
+          "square": "d1",
+          "type": "ROOK",
+          "color": "WHITE"
+        },
+        {
+          "square": "g5",
+          "type": "BISHOP",
+          "color": "WHITE"
+        },
+        {
+          "square": "b3",
+          "type": "QUEEN",
+          "color": "WHITE"
+        },
+        {
+          "square": "e8",
+          "type": "KING",
+          "color": "BLACK"
+        },
+        {
+          "square": "d7",
+          "type": "KNIGHT",
+          "color": "BLACK"
+        },
+        {
+          "square": "f8",
+          "type": "BISHOP",
+          "color": "BLACK"
+        },
+        {
+          "square": "e6",
+          "type": "QUEEN",
+          "color": "BLACK"
+        },
+        {
+          "square": "e5",
+          "type": "PAWN",
+          "color": "BLACK"
+        },
+        {
+          "square": "f7",
+          "type": "PAWN",
+          "color": "BLACK"
+        }
+      ],
+      "opponentResponses": [
+        {
+          "from": "d7",
+          "to": "b8"
+        }
+      ]
+    },
+    {
+      "id": "puzzle-triple-battery-mate-3",
+      "title": "Mate en 3: Triple Batería en la Octava Fila",
+      "description": "Blancas dan mate en 3 movimientos. Sacrifica la Dama en e8 y luego la primera Torre en e8 para eliminar a los dos defensores negros y rematar con la última Torre.",
+      "initialTurn": "WHITE",
+      "maxMoves": 3,
+      "pieces": [
+        {
+          "square": "g1",
+          "type": "KING",
+          "color": "WHITE"
+        },
+        {
+          "square": "e3",
+          "type": "QUEEN",
+          "color": "WHITE"
+        },
+        {
+          "square": "e2",
+          "type": "ROOK",
+          "color": "WHITE"
+        },
+        {
+          "square": "e1",
+          "type": "ROOK",
+          "color": "WHITE"
+        },
+        {
+          "square": "f2",
+          "type": "PAWN",
+          "color": "WHITE"
+        },
+        {
+          "square": "g2",
+          "type": "PAWN",
+          "color": "WHITE"
+        },
+        {
+          "square": "h2",
+          "type": "PAWN",
+          "color": "WHITE"
+        },
+        {
+          "square": "h8",
+          "type": "KING",
+          "color": "BLACK"
+        },
+        {
+          "square": "d8",
+          "type": "ROOK",
+          "color": "BLACK"
+        },
+        {
+          "square": "b8",
+          "type": "ROOK",
+          "color": "BLACK"
+        },
+        {
+          "square": "f7",
+          "type": "PAWN",
+          "color": "BLACK"
+        },
+        {
+          "square": "g7",
+          "type": "PAWN",
+          "color": "BLACK"
+        },
+        {
+          "square": "h7",
+          "type": "PAWN",
+          "color": "BLACK"
+        }
+      ],
+      "opponentResponses": [
+        {
+          "from": "d8",
+          "to": "e8"
+        },
+        {
+          "from": "b8",
+          "to": "e8"
+        }
+      ]
+    }
+  ],
+  "annotatedMatches": [
+    {
+      "id": "match-scholars-mate",
+      "title": "El Mate del Pastor (Explicado Paso a Paso)",
+      "description": "Partida didáctica clásica donde las Blancas apuntan con Alfil y Dama sobre el punto más débil del inicio: el peón de f7.",
+      "moves": [
+        {
+          "moveIndex": 0,
+          "turn": "WHITE",
+          "piece": "PAWN",
+          "from": "e2",
+          "to": "e4",
+          "isCastling": false,
+          "isPromotion": false
+        },
+        {
+          "moveIndex": 1,
+          "turn": "BLACK",
+          "piece": "PAWN",
+          "from": "e7",
+          "to": "e5",
+          "isCastling": false,
+          "isPromotion": false
+        },
+        {
+          "moveIndex": 2,
+          "turn": "WHITE",
+          "piece": "BISHOP",
+          "from": "f1",
+          "to": "c4",
+          "isCastling": false,
+          "isPromotion": false
+        },
+        {
+          "moveIndex": 3,
+          "turn": "BLACK",
+          "piece": "KNIGHT",
+          "from": "b8",
+          "to": "c6",
+          "isCastling": false,
+          "isPromotion": false
+        },
+        {
+          "moveIndex": 4,
+          "turn": "WHITE",
+          "piece": "QUEEN",
+          "from": "d1",
+          "to": "h5",
+          "isCastling": false,
+          "isPromotion": false
+        },
+        {
+          "moveIndex": 5,
+          "turn": "BLACK",
+          "piece": "KNIGHT",
+          "from": "g8",
+          "to": "f6",
+          "isCastling": false,
+          "isPromotion": false
+        },
+        {
+          "moveIndex": 6,
+          "turn": "WHITE",
+          "piece": "QUEEN",
+          "from": "h5",
+          "to": "f7",
+          "capturedPiece": "PAWN",
+          "isCastling": false,
+          "isPromotion": false
+        }
+      ],
+      "analysisResult": {
+        "overallSummary": "Esta miniatura clásica ilustra por qué la casilla f7 (y f2 para las Blancas) es el punto más vulnerable en la apertura: solo está defendida por el Rey. Las Negras desarrollan el caballo a f6 atacando a la dama sin advertir la amenaza directa de mate en f7.",
+        "whiteAccuracy": 98,
+        "blackAccuracy": 62,
+        "analyzedMoves": [
+          {
+            "moveIndex": 0,
+            "turn": "WHITE",
+            "piece": "PAWN",
+            "from": "e2",
+            "to": "e4",
+            "bestMoveFrom": "e2",
+            "bestMoveTo": "e4",
+            "evalBefore": 0.2,
+            "evalAfter": 0.25,
+            "evalLoss": 0,
+            "quality": {
+              "quality": "BEST",
+              "label": "Mejor jugada",
+              "symbol": "★",
+              "badgeClass": "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+            },
+            "advice": "Controla el centro de inmediato y abre las diagonales para el alfil de f1 y la dama."
+          },
+          {
+            "moveIndex": 1,
+            "turn": "BLACK",
+            "piece": "PAWN",
+            "from": "e7",
+            "to": "e5",
+            "bestMoveFrom": "e7",
+            "bestMoveTo": "e5",
+            "evalBefore": 0.25,
+            "evalAfter": 0.2,
+            "evalLoss": 0,
+            "quality": {
+              "quality": "BEST",
+              "label": "Mejor jugada",
+              "symbol": "★",
+              "badgeClass": "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+            },
+            "advice": "Respuesta clásica y simétrica que disputa el espacio central e impide que las Blancas avancen d4 sin oposición."
+          },
+          {
+            "moveIndex": 2,
+            "turn": "WHITE",
+            "piece": "BISHOP",
+            "from": "f1",
+            "to": "c4",
+            "bestMoveFrom": "g1",
+            "bestMoveTo": "f3",
+            "evalBefore": 0.2,
+            "evalAfter": 0.15,
+            "evalLoss": 0.05,
+            "quality": {
+              "quality": "EXCELLENT",
+              "label": "Excelente",
+              "symbol": "!",
+              "badgeClass": "bg-teal-500/20 text-teal-300 border-teal-500/40"
+            },
+            "advice": "Desarrolla el alfil hacia su diagonal más activa apuntando directamente al peón débil de f7."
+          },
+          {
+            "moveIndex": 3,
+            "turn": "BLACK",
+            "piece": "KNIGHT",
+            "from": "b8",
+            "to": "c6",
+            "bestMoveFrom": "g8",
+            "bestMoveTo": "f6",
+            "evalBefore": 0.15,
+            "evalAfter": 0.2,
+            "evalLoss": 0.05,
+            "quality": {
+              "quality": "EXCELLENT",
+              "label": "Excelente",
+              "symbol": "!",
+              "badgeClass": "bg-teal-500/20 text-teal-300 border-teal-500/40"
+            },
+            "advice": "Desarrolla una pieza menor hacia el centro y defiende el peón de e5."
+          },
+          {
+            "moveIndex": 4,
+            "turn": "WHITE",
+            "piece": "QUEEN",
+            "from": "d1",
+            "to": "h5",
+            "bestMoveFrom": "g1",
+            "bestMoveTo": "f3",
+            "evalBefore": 0.2,
+            "evalAfter": -0.2,
+            "evalLoss": 0.4,
+            "quality": {
+              "quality": "GOOD",
+              "label": "Buena",
+              "symbol": "✓",
+              "badgeClass": "bg-sky-500/20 text-sky-300 border-sky-500/40"
+            },
+            "advice": "Plantea una batería directa con el alfil sobre f7 amenazando jaque mate en una jugada, aunque expone prematuramente a la dama."
+          },
+          {
+            "moveIndex": 5,
+            "turn": "BLACK",
+            "piece": "KNIGHT",
+            "from": "g8",
+            "to": "f6",
+            "bestMoveFrom": "d8",
+            "bestMoveTo": "e7",
+            "evalBefore": -0.2,
+            "evalAfter": 10,
+            "evalLoss": 10.2,
+            "quality": {
+              "quality": "BLUNDER",
+              "label": "Error grave",
+              "symbol": "??",
+              "badgeClass": "bg-rose-500/20 text-rose-300 border-rose-500/40"
+            },
+            "advice": "Error fatal: ataca a la dama blanca pero ignora la amenaza de mate inmediato sobre f7 (debía defenderse con De7 o g6)."
+          },
+          {
+            "moveIndex": 6,
+            "turn": "WHITE",
+            "piece": "QUEEN",
+            "from": "h5",
+            "to": "f7",
+            "bestMoveFrom": "h5",
+            "bestMoveTo": "f7",
+            "evalBefore": 10,
+            "evalAfter": 10,
+            "evalLoss": 0,
+            "quality": {
+              "quality": "BEST",
+              "label": "Mejor jugada",
+              "symbol": "★",
+              "badgeClass": "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+            },
+            "advice": "¡Jaque mate del Pastor! La dama captura en f7 protegida por el alfil de c4 y el Rey negro no tiene casillas de escape."
+          }
+        ]
+      }
+    },
+    {
+      "id": "match-fools-mate",
+      "title": "El Mate del Loco (Riesgo de debilitar la diagonal del Rey)",
+      "description": "El jaque mate más rápido posible en el ajedrez (2 jugadas), demostrando el peligro de avanzar los peones de f y g sin desarrollo.",
+      "moves": [
+        {
+          "moveIndex": 0,
+          "turn": "WHITE",
+          "piece": "PAWN",
+          "from": "f2",
+          "to": "f3",
+          "isCastling": false,
+          "isPromotion": false
+        },
+        {
+          "moveIndex": 1,
+          "turn": "BLACK",
+          "piece": "PAWN",
+          "from": "e7",
+          "to": "e5",
+          "isCastling": false,
+          "isPromotion": false
+        },
+        {
+          "moveIndex": 2,
+          "turn": "WHITE",
+          "piece": "PAWN",
+          "from": "g2",
+          "to": "g4",
+          "isCastling": false,
+          "isPromotion": false
+        },
+        {
+          "moveIndex": 3,
+          "turn": "BLACK",
+          "piece": "QUEEN",
+          "from": "d8",
+          "to": "h4",
+          "isCastling": false,
+          "isPromotion": false
+        }
+      ],
+      "analysisResult": {
+        "overallSummary": "Esta partida enseña una regla de oro para principiantes: nunca debilitar la diagonal e1-h4 (o e8-h5) moviendo los peones f y g en las primeras jugadas mientras el Rey permanece en el centro.",
+        "whiteAccuracy": 25,
+        "blackAccuracy": 100,
+        "analyzedMoves": [
+          {
+            "moveIndex": 0,
+            "turn": "WHITE",
+            "piece": "PAWN",
+            "from": "f2",
+            "to": "f3",
+            "bestMoveFrom": "e2",
+            "bestMoveTo": "e4",
+            "evalBefore": 0.2,
+            "evalAfter": -0.5,
+            "evalLoss": 0.7,
+            "quality": {
+              "quality": "INACCURACY",
+              "label": "Imprecisión",
+              "symbol": "?!",
+              "badgeClass": "bg-amber-500/20 text-amber-300 border-amber-500/40"
+            },
+            "advice": "Debilita la diagonal del Rey blanco y quita la casilla natural de desarrollo f3 al caballo."
+          },
+          {
+            "moveIndex": 1,
+            "turn": "BLACK",
+            "piece": "PAWN",
+            "from": "e7",
+            "to": "e5",
+            "bestMoveFrom": "e7",
+            "bestMoveTo": "e5",
+            "evalBefore": -0.5,
+            "evalAfter": -0.6,
+            "evalLoss": 0,
+            "quality": {
+              "quality": "BEST",
+              "label": "Mejor jugada",
+              "symbol": "★",
+              "badgeClass": "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+            },
+            "advice": "Toma el centro y abre la diagonal d8-h4 para la dama negra."
+          },
+          {
+            "moveIndex": 2,
+            "turn": "WHITE",
+            "piece": "PAWN",
+            "from": "g2",
+            "to": "g4",
+            "bestMoveFrom": "e2",
+            "bestMoveTo": "e4",
+            "evalBefore": -0.6,
+            "evalAfter": -10,
+            "evalLoss": 9.4,
+            "quality": {
+              "quality": "BLUNDER",
+              "label": "Error grave",
+              "symbol": "??",
+              "badgeClass": "bg-rose-500/20 text-rose-300 border-rose-500/40"
+            },
+            "advice": "Abre por completo la diagonal mortal e1-h4 sin que ninguna pieza blanca pueda bloquear el jaque."
+          },
+          {
+            "moveIndex": 3,
+            "turn": "BLACK",
+            "piece": "QUEEN",
+            "from": "d8",
+            "to": "h4",
+            "bestMoveFrom": "d8",
+            "bestMoveTo": "h4",
+            "evalBefore": -10,
+            "evalAfter": -10,
+            "evalLoss": 0,
+            "quality": {
+              "quality": "BEST",
+              "label": "Mejor jugada",
+              "symbol": "★",
+              "badgeClass": "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+            },
+            "advice": "¡Jaque mate en la jugada 2! La dama entra en h4 y el Rey blanco está atrapado por sus propias piezas."
+          }
+        ]
+      }
+    }
+  ]
+}

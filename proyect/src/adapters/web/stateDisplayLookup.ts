@@ -3,6 +3,7 @@ import { GameStateKind, isTerminalState } from '../../core/ports/MoveResult';
 
 export const STATE_LABELS: Record<GameStateKind, string> = {
   IN_PROGRESS: 'Partida en Curso',
+  STUDY_IN_PROGRESS: 'Partida de Estudio',
   CHECK: '¡Jaque al Rey!',
   CHECKMATE: '¡Jaque Mate! Partida Finalizada',
   STALEMATE: 'Tablas por Ahogado',
@@ -17,6 +18,7 @@ export const TIMEOUT_WINNER_LABELS: Record<Color, string> = {
 
 export const STATE_BADGE_CLASSES: Record<GameStateKind, string> = {
   IN_PROGRESS: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50',
+  STUDY_IN_PROGRESS: 'bg-indigo-950/80 text-indigo-300 border-indigo-500/50',
   CHECK: 'bg-amber-950/90 text-amber-300 border-amber-500 animate-pulse font-semibold',
   CHECKMATE: 'bg-red-950/90 text-red-200 border-red-500 font-bold shadow-lg shadow-red-950/50',
   STALEMATE: 'bg-blue-950/90 text-blue-200 border-blue-500 font-semibold',

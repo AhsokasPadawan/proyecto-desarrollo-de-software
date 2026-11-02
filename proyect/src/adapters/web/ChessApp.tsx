@@ -1,12 +1,28 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import {
+  AlgebraicPiecePlacement,
+  createBoardFromPlacements,
+  createStandardBoard,
+} from '../../core/board/boardSetup';
 import { Position } from '../../core/board/Position';
 import { ChessGame } from '../../core/game/ChessGame';
+import { StudyPlayState } from '../../core/game/StudyPlayState';
 import { Color, PieceType } from '../../core/pieces/types';
+import { GameSnapshot } from '../../core/ports/GameSnapshot';
 import { IGameEngine } from '../../core/ports/IGameEngine';
 import { MoveResult } from '../../core/ports/MoveResult';
 import { AnalysisService } from '../services/AnalysisService';
 import { FullGameAnalysisResult, IAnalysisService } from '../services/IAnalysisService';
 import { getStoredGeminiApiKey } from '../services/GeminiCoachService';
+import seedLibraryData from '../storage/chess-library.json';
+import {
+  BoardPiecePlacement,
+  IChessLibraryRepository,
+  MatePuzzleRecord,
+  SavedAnnotatedMatchRecord,
+  StudyPositionRecord,
+} from '../storage/IChessLibraryRepository';
+import { JsonFileLibraryAdapter } from '../storage/JsonFileLibraryAdapter';
 import { ChessBoardView } from './ChessBoardView';
 import { ControlPanelView } from './ControlPanelView';
 import { PromotionModal } from './PromotionModal';
@@ -18,6 +34,8 @@ import { GameLayout } from './components/GameLayout';
 import { PlayerClockBar } from './components/PlayerClockBar';
 import { PlaybackSpeed, ReplayControlSection } from './components/ReplayControlSection';
 import { useChessClock } from './clock/useChessClock';
+import { hydrateSavedAnnotatedMatch } from './matches/savedMatchHydrator';
+import { MatePuzzleController, PuzzleResolutionStatus } from './puzzles/MatePuzzleController';
 import { getRejectionMessage } from './rejectionMessages';
 import { getStateLabel, isTerminalState } from './stateDisplayLookup';
 import {
@@ -25,11 +43,12 @@ import {
   formatMatchTranscription,
   generateExportFilename,
 } from './transcriptionFormatter';
-import { GAME_MODES, GameMode } from './types';
+import { ActivityMode, EditorPaletteTool, GAME_MODES, GameMode } from './types';
 
 export interface ChessAppProps {
   readonly engineFactory?: () => IGameEngine;
   readonly analysisServiceFactory?: () => IAnalysisService;
+  readonly libraryRepositoryFactory?: () => IChessLibraryRepository;
 }
 
 interface PendingPromotion {
@@ -73,6 +92,23 @@ function resolveBoardLayoutDimensions(
   };
 }
 
+function extractPlacementsFromSnapshot(snapshot: GameSnapshot): BoardPiecePlacement[] {
+  const placements: BoardPiecePlacement[] = [];
+  for (let row = 0; row < snapshot.rows; row++) {
+    for (let col = 0; col < snapshot.cols; col++) {
+      const piece = snapshot.grid[row][col];
+      if (piece) {
+        placements.push({
+          square: new Position(row, col).toAlgebraic(),
+          type: piece.type,
+          color: piece.color,
+        });
+      }
+    }
+  }
+  return placements;
+}
+
 function useMatchReplay(engine: IGameEngine) {
   const [isReplaying, setIsReplaying] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -92,10 +128,10 @@ function useMatchReplay(engine: IGameEngine) {
   }, [clearPlaybackTimer]);
 
   const startPlaybackInterval = useCallback(
-    (speed: PlaybackSpeed) => {
+    (speed: PlaybackSpeed, targetEngine: IGameEngine = engine) => {
       clearPlaybackTimer();
       playbackTimerRef.current = setInterval(() => {
-        const canAdvance = engine.redo();
+        const canAdvance = targetEngine.redo();
         if (!canAdvance) {
           stopPlayback();
         }
@@ -143,11 +179,14 @@ function useMatchReplay(engine: IGameEngine) {
     while (engine.redo()) {}
   }, [engine, stopPlayback]);
 
-  const enterReplayFromStart = useCallback(() => {
-    stopPlayback();
-    setIsReplaying(true);
-    while (engine.undo()) {}
-  }, [engine, stopPlayback]);
+  const enterReplayFromStart = useCallback(
+    (targetEngine: IGameEngine = engine) => {
+      stopPlayback();
+      setIsReplaying(true);
+      while (targetEngine.undo()) {}
+    },
+    [engine, stopPlayback]
+  );
 
   const handleExitReplay = useCallback(() => {
     stopPlayback();
@@ -301,6 +340,7 @@ function BoardColumnArea({
 export function ChessApp({
   engineFactory = () => new ChessGame(),
   analysisServiceFactory = () => new AnalysisService(),
+  libraryRepositoryFactory = () => new JsonFileLibraryAdapter(),
 }: ChessAppProps): JSX.Element {
   const [engine, setEngine] = useState<IGameEngine>(() => engineFactory());
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
@@ -308,11 +348,37 @@ export function ChessApp({
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>('HUMAN_VS_HUMAN');
   const [playerColor, setPlayerColor] = useState<Color>('WHITE');
+  const [activeActivity, setActiveActivity] = useState<ActivityMode>('CLASSIC_MATCH');
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
   const [isClockEnabled, setIsClockEnabled] = useState(false);
   const [whiteMinutes, setWhiteMinutes] = useState(10);
   const [blackMinutes, setBlackMinutes] = useState(10);
   const [isAiThinking, setIsAiThinking] = useState(false);
+
+  const [isEditorActive, setIsEditorActive] = useState(false);
+  const [editorTool, setEditorTool] = useState<EditorPaletteTool | null>({
+    kind: 'PIECE',
+    color: 'WHITE',
+    type: 'KNIGHT',
+  });
+  const [editorInitialTurn, setEditorInitialTurn] = useState<Color>('WHITE');
+  const [editorPlacements, setEditorPlacements] = useState<BoardPiecePlacement[]>([]);
+
+  const [studyPositions, setStudyPositions] = useState<readonly StudyPositionRecord[]>(
+    () => seedLibraryData.studyPositions as unknown as StudyPositionRecord[]
+  );
+  const [matePuzzles, setMatePuzzles] = useState<readonly MatePuzzleRecord[]>(
+    () => seedLibraryData.matePuzzles as unknown as MatePuzzleRecord[]
+  );
+  const [annotatedMatches, setAnnotatedMatches] = useState<readonly SavedAnnotatedMatchRecord[]>(
+    () => seedLibraryData.annotatedMatches as unknown as SavedAnnotatedMatchRecord[]
+  );
+
+  const puzzleControllerRef = useRef<MatePuzzleController | null>(null);
+  const [activePuzzle, setActivePuzzle] = useState<MatePuzzleRecord | null>(null);
+  const [puzzleStatus, setPuzzleStatus] = useState<PuzzleResolutionStatus>('IN_PROGRESS');
+  const [puzzleRemainingMoves, setPuzzleRemainingMoves] = useState<number>(0);
+  const [activeAnnotatedMatchId, setActiveAnnotatedMatchId] = useState<string | null>(null);
 
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [hasGeminiApiKey, setHasGeminiApiKey] = useState(
@@ -328,6 +394,7 @@ export function ChessApp({
   } | null>(null);
 
   const analysisServiceRef = useRef<IAnalysisService>(analysisServiceFactory());
+  const libraryRepositoryRef = useRef<IChessLibraryRepository>(libraryRepositoryFactory());
   const replay = useMatchReplay(engine);
   const aiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -337,6 +404,18 @@ export function ChessApp({
         clearTimeout(aiTimerRef.current);
       }
     };
+  }, []);
+
+  const refreshLibraryCatalog = useCallback(async () => {
+    const repo = libraryRepositoryRef.current;
+    const [loadedStudies, loadedPuzzles, loadedMatches] = await Promise.all([
+      repo.getStudyPositions(),
+      repo.getMatePuzzles(),
+      repo.getAnnotatedMatches(),
+    ]);
+    setStudyPositions(loadedStudies);
+    setMatePuzzles(loadedPuzzles);
+    setAnnotatedMatches(loadedMatches);
   }, []);
 
   const handleTimeout = useCallback(
@@ -456,6 +535,286 @@ export function ChessApp({
     [playerColor]
   );
 
+  const applyEditorPlacementsToEngine = useCallback(
+    (placements: readonly AlgebraicPiecePlacement[], turn: Color) => {
+      const board = createBoardFromPlacements(placements);
+      const studyEngine = new ChessGame(board, turn, undefined, undefined, new StudyPlayState());
+      setEngine(studyEngine);
+      return studyEngine;
+    },
+    []
+  );
+
+  const handleSelectActivity = useCallback(
+    (nextActivity: ActivityMode) => {
+      replay.stopPlayback();
+      replay.setIsReplaying(false);
+      clock.resetClock();
+      setIsClockEnabled(false);
+      clearSelection();
+      setPendingPromotion(null);
+      setFeedbackMessage(null);
+      setLiveHint(null);
+      setAnalysisResult(null);
+      setActiveAnnotatedMatchId(null);
+      puzzleControllerRef.current = null;
+      setActivePuzzle(null);
+      setPuzzleStatus('IN_PROGRESS');
+      setPuzzleRemainingMoves(0);
+      setActiveActivity(nextActivity);
+      void refreshLibraryCatalog();
+
+      const activitySetupLookup: Record<ActivityMode, () => void> = {
+        CLASSIC_MATCH: () => {
+          setIsEditorActive(false);
+          setEngine(engineFactory());
+        },
+        STUDY_EDITOR: () => {
+          setIsEditorActive(true);
+          setEditorPlacements([]);
+          setEditorInitialTurn('WHITE');
+          applyEditorPlacementsToEngine([], 'WHITE');
+        },
+        MATE_PUZZLES: () => {
+          setIsEditorActive(false);
+          setEngine(engineFactory());
+        },
+        ANNOTATED_MATCHES: () => {
+          setIsEditorActive(false);
+          setEngine(engineFactory());
+        },
+      };
+
+      activitySetupLookup[nextActivity]();
+    },
+    [
+      applyEditorPlacementsToEngine,
+      clearSelection,
+      clock,
+      engineFactory,
+      refreshLibraryCatalog,
+      replay,
+    ]
+  );
+
+  const handleClearEditorBoard = useCallback(() => {
+    setEditorPlacements([]);
+    applyEditorPlacementsToEngine([], editorInitialTurn);
+  }, [applyEditorPlacementsToEngine, editorInitialTurn]);
+
+  const handleRestoreStandardEditorBoard = useCallback(() => {
+    const standardSnap = new ChessGame(createStandardBoard()).getSnapshot();
+    const placements = extractPlacementsFromSnapshot(standardSnap);
+    setEditorPlacements(placements);
+    applyEditorPlacementsToEngine(placements, editorInitialTurn);
+  }, [applyEditorPlacementsToEngine, editorInitialTurn]);
+
+  const handleChangeEditorTurn = useCallback(
+    (turn: Color) => {
+      setEditorInitialTurn(turn);
+      applyEditorPlacementsToEngine(editorPlacements, turn);
+    },
+    [applyEditorPlacementsToEngine, editorPlacements]
+  );
+
+  const handleStartStudyMatch = useCallback(() => {
+    setIsEditorActive(false);
+    clearSelection();
+    setFeedbackMessage(null);
+    applyEditorPlacementsToEngine(editorPlacements, editorInitialTurn);
+  }, [applyEditorPlacementsToEngine, clearSelection, editorInitialTurn, editorPlacements]);
+
+  const handleReturnToEditor = useCallback(() => {
+    const currentPlacements = extractPlacementsFromSnapshot(engine.getSnapshot());
+    setEditorPlacements(currentPlacements);
+    setIsEditorActive(true);
+    clearSelection();
+  }, [clearSelection, engine]);
+
+  const handleLoadStudyPosition = useCallback(
+    (study: StudyPositionRecord) => {
+      setEditorPlacements([...study.pieces]);
+      setEditorInitialTurn(study.initialTurn);
+      setIsEditorActive(false);
+      clearSelection();
+      setFeedbackMessage(null);
+      applyEditorPlacementsToEngine(study.pieces, study.initialTurn);
+    },
+    [applyEditorPlacementsToEngine, clearSelection]
+  );
+
+  const handleSaveStudyPosition = useCallback(
+    async (title: string, description: string) => {
+      const currentPieces = isEditorActive
+        ? editorPlacements
+        : extractPlacementsFromSnapshot(engine.getSnapshot());
+      const newStudy: StudyPositionRecord = {
+        id: `study-${Date.now()}`,
+        title,
+        description,
+        initialTurn: editorInitialTurn,
+        pieces: currentPieces,
+      };
+      await libraryRepositoryRef.current.saveStudyPosition(newStudy);
+      await refreshLibraryCatalog();
+      setFeedbackMessage('Posición de estudio guardada en la biblioteca JSON.');
+    },
+    [editorInitialTurn, editorPlacements, engine, isEditorActive, refreshLibraryCatalog]
+  );
+
+  const handleSaveMatePuzzle = useCallback(
+    async (title: string, description: string, maxMoves: number) => {
+      const currentPieces = isEditorActive
+        ? editorPlacements
+        : extractPlacementsFromSnapshot(engine.getSnapshot());
+      const newPuzzle: MatePuzzleRecord = {
+        id: `puzzle-${Date.now()}`,
+        title,
+        description,
+        initialTurn: editorInitialTurn,
+        maxMoves,
+        pieces: currentPieces,
+        opponentResponses: [],
+      };
+      await libraryRepositoryRef.current.saveMatePuzzle(newPuzzle);
+      await refreshLibraryCatalog();
+      setFeedbackMessage(`Ejercicio "${title}" guardado en la biblioteca JSON.`);
+    },
+    [editorInitialTurn, editorPlacements, engine, isEditorActive, refreshLibraryCatalog]
+  );
+
+  const handleSelectPuzzle = useCallback(
+    (puzzle: MatePuzzleRecord) => {
+      replay.stopPlayback();
+      replay.setIsReplaying(false);
+      clearSelection();
+      setFeedbackMessage(null);
+      setLiveHint(null);
+      const controller = new MatePuzzleController(puzzle);
+      puzzleControllerRef.current = controller;
+      setActivePuzzle(puzzle);
+      setPuzzleStatus(controller.getStatus());
+      setPuzzleRemainingMoves(controller.getRemainingMoves());
+      setEngine(controller.getEngine());
+    },
+    [clearSelection, replay]
+  );
+
+  const handleRetryPuzzle = useCallback(() => {
+    const controller = puzzleControllerRef.current;
+    if (!controller) {
+      return;
+    }
+    clearSelection();
+    setFeedbackMessage(null);
+    setLiveHint(null);
+    const freshEngine = controller.resetPuzzle();
+    setPuzzleStatus(controller.getStatus());
+    setPuzzleRemainingMoves(controller.getRemainingMoves());
+    setEngine(freshEngine);
+  }, [clearSelection]);
+
+  const handleSelectAnnotatedMatch = useCallback(
+    (match: SavedAnnotatedMatchRecord) => {
+      clearSelection();
+      setFeedbackMessage(null);
+      setLiveHint(null);
+      const hydratedEngine = hydrateSavedAnnotatedMatch(match);
+      setEngine(hydratedEngine);
+      setAnalysisResult(match.analysisResult);
+      setActiveAnnotatedMatchId(match.id);
+      replay.enterReplayFromStart(hydratedEngine);
+    },
+    [clearSelection, replay]
+  );
+
+  const handleDeleteAnnotatedMatch = useCallback(
+    async (matchId: string) => {
+      await libraryRepositoryRef.current.deleteAnnotatedMatch(matchId);
+      if (activeAnnotatedMatchId === matchId) {
+        replay.stopPlayback();
+        replay.setIsReplaying(false);
+        setActiveAnnotatedMatchId(null);
+        setAnalysisResult(null);
+        setEngine(engineFactory());
+      }
+      await refreshLibraryCatalog();
+    },
+    [activeAnnotatedMatchId, engineFactory, refreshLibraryCatalog, replay]
+  );
+
+  const resolveAnalysisEngineFactory = useCallback((): (() => IGameEngine) => {
+    if (activeActivity === 'STUDY_EDITOR') {
+      return () =>
+        new ChessGame(
+          createBoardFromPlacements(editorPlacements),
+          editorInitialTurn,
+          undefined,
+          undefined,
+          new StudyPlayState()
+        );
+    }
+    return engineFactory;
+  }, [activeActivity, editorInitialTurn, editorPlacements, engineFactory]);
+
+  const handleSaveCurrentMatch = useCallback(
+    async (title: string, description: string): Promise<boolean> => {
+      const currentSnap = engine.getSnapshot();
+      if (currentSnap.moveHistory.length === 0) {
+        return false;
+      }
+      try {
+        let resolvedAnalysis: FullGameAnalysisResult | null = analysisResult;
+        if (!resolvedAnalysis) {
+          try {
+            resolvedAnalysis = await analysisServiceRef.current.analyzeFullGame(
+              currentSnap,
+              undefined,
+              resolveAnalysisEngineFactory()
+            );
+            setAnalysisResult(resolvedAnalysis);
+          } catch {
+            resolvedAnalysis = {
+              overallSummary: description,
+              whiteAccuracy: 100,
+              blackAccuracy: 100,
+              analyzedMoves: [],
+            };
+          }
+        }
+        const isCustomStudy = activeActivity === 'STUDY_EDITOR';
+        const newMatch: SavedAnnotatedMatchRecord = {
+          id: `match-${Date.now()}`,
+          title,
+          description,
+          ...(isCustomStudy
+            ? {
+                initialPieces: editorPlacements,
+                initialTurn: editorInitialTurn,
+              }
+            : {}),
+          moves: currentSnap.moveHistory,
+          analysisResult: resolvedAnalysis,
+        };
+        await libraryRepositoryRef.current.saveAnnotatedMatch(newMatch);
+        await refreshLibraryCatalog();
+        return true;
+      } catch {
+        setFeedbackMessage('No se pudo guardar la partida en la biblioteca JSON.');
+        return false;
+      }
+    },
+    [
+      activeActivity,
+      analysisResult,
+      editorInitialTurn,
+      editorPlacements,
+      engine,
+      refreshLibraryCatalog,
+      resolveAnalysisEngineFactory,
+    ]
+  );
+
   const processMoveOutcome = useCallback(
     (result: MoveResult) => {
       clearSelection();
@@ -471,13 +830,24 @@ export function ChessApp({
         } else if (isClockEnabled && clock.clockStatus === 'RUNNING') {
           clock.switchClockTurn(nextSnapshot.currentTurn);
         }
-        triggerAiMoveIfNeeded(engine, gameMode, playerColor);
+        if (activeActivity === 'CLASSIC_MATCH') {
+          triggerAiMoveIfNeeded(engine, gameMode);
+        }
       }
     },
-    [clearSelection, clock, engine, gameMode, isClockEnabled, playerColor, triggerAiMoveIfNeeded]
+    [
+      activeActivity,
+      clearSelection,
+      clock,
+      engine,
+      gameMode,
+      isClockEnabled,
+      playerColor,
+      triggerAiMoveIfNeeded,
+    ]
   );
 
-  const isAiMode = gameMode !== 'HUMAN_VS_HUMAN';
+  const isAiMode = activeActivity === 'CLASSIC_MATCH' && gameMode !== 'HUMAN_VS_HUMAN';
   const isAiTurn = isAiMode && snapshot.currentTurn !== playerColor;
   const boardOrientation: Color = isAiMode ? playerColor : 'WHITE';
   const canUndo =
@@ -486,12 +856,61 @@ export function ChessApp({
   const isBoardLocked =
     isAiThinking ||
     isAiTurn ||
-    replay.isReplaying ||
-    (isClockEnabled && clock.clockStatus !== 'RUNNING') ||
-    isTerminalState(snapshot.stateKind);
+    (!isEditorActive &&
+      (replay.isReplaying ||
+        (isClockEnabled && clock.clockStatus !== 'RUNNING') ||
+        (activeActivity === 'MATE_PUZZLES' && puzzleStatus !== 'IN_PROGRESS') ||
+        isTerminalState(snapshot.stateKind)));
+
+  const handleEditorSquareClick = useCallback(
+    (targetPosition: Position) => {
+      if (!editorTool) {
+        return;
+      }
+      const targetSquare = targetPosition.toAlgebraic();
+      const withoutSquare = editorPlacements.filter((item) => item.square !== targetSquare);
+      const nextPlacements =
+        editorTool.kind === 'ERASE'
+          ? withoutSquare
+          : [
+              ...withoutSquare,
+              {
+                square: targetSquare,
+                type: editorTool.type,
+                color: editorTool.color,
+              },
+            ];
+      setEditorPlacements(nextPlacements);
+      applyEditorPlacementsToEngine(nextPlacements, editorInitialTurn);
+    },
+    [applyEditorPlacementsToEngine, editorInitialTurn, editorPlacements, editorTool]
+  );
+
+  const executePuzzleMove = useCallback(
+    (from: Position, to: Position, promotionPiece?: PieceType): boolean => {
+      if (activeActivity !== 'MATE_PUZZLES' || !puzzleControllerRef.current) {
+        return false;
+      }
+      const controller = puzzleControllerRef.current;
+      const puzzleOutcome = controller.makePlayerMove(from, to, promotionPiece);
+      setPuzzleStatus(controller.getStatus());
+      setPuzzleRemainingMoves(controller.getRemainingMoves());
+      clearSelection();
+      if (!puzzleOutcome.success) {
+        setFeedbackMessage(getRejectionMessage(puzzleOutcome.reason));
+      }
+      return true;
+    },
+    [activeActivity, clearSelection]
+  );
 
   const handleSquareClick = useCallback(
     (targetPosition: Position) => {
+      if (activeActivity === 'STUDY_EDITOR' && isEditorActive) {
+        handleEditorSquareClick(targetPosition);
+        return;
+      }
+
       if (isBoardLocked) {
         return;
       }
@@ -524,20 +943,30 @@ export function ChessApp({
         (movingPiece?.color === 'BLACK' && targetPosition.row === 0);
 
       if (isPawn && isReachingLastRank) {
-        const isLegalCandidate = legalMoves.some((candidate) => candidate.equals(targetPosition));
+        const isLegalCandidate = legalMoves.some((candidate) =>
+          candidate.equals(targetPosition)
+        );
         if (isLegalCandidate) {
           setPendingPromotion({ from: selectedPosition, to: targetPosition });
           return;
         }
       }
 
+      if (executePuzzleMove(selectedPosition, targetPosition)) {
+        return;
+      }
+
       const result = engine.makeMove(selectedPosition, targetPosition);
       processMoveOutcome(result);
     },
     [
+      activeActivity,
       clearSelection,
       engine,
+      executePuzzleMove,
+      handleEditorSquareClick,
       isBoardLocked,
+      isEditorActive,
       legalMoves,
       processMoveOutcome,
       selectedPosition,
@@ -555,10 +984,15 @@ export function ChessApp({
       }
       const { from, to } = pendingPromotion;
       setPendingPromotion(null);
+
+      if (executePuzzleMove(from, to, pieceType)) {
+        return;
+      }
+
       const result = engine.makeMove(from, to, pieceType);
       processMoveOutcome(result);
     },
-    [engine, pendingPromotion, processMoveOutcome]
+    [engine, executePuzzleMove, pendingPromotion, processMoveOutcome]
   );
 
   const handleCancelPromotion = useCallback(() => {
@@ -572,14 +1006,21 @@ export function ChessApp({
       aiTimerRef.current = null;
     }
     setIsAiThinking(false);
-    engine.undo();
-    if (gameMode !== 'HUMAN_VS_HUMAN' && engine.getSnapshot().currentTurn !== playerColor) {
+    if (activeActivity === 'MATE_PUZZLES' && puzzleControllerRef.current) {
+      const controller = puzzleControllerRef.current;
+      controller.undoPlayerMove();
+      setPuzzleStatus(controller.getStatus());
+      setPuzzleRemainingMoves(controller.getRemainingMoves());
+    } else {
+      engine.undo();
+    }
+    if (isAiMode && engine.getSnapshot().currentTurn !== playerColor) {
       engine.undo();
     }
     clearSelection();
     setLiveHint(null);
     setFeedbackMessage(null);
-  }, [clearSelection, engine, gameMode, playerColor]);
+  }, [activeActivity, clearSelection, engine, isAiMode, playerColor]);
 
   const handleRedo = useCallback(() => {
     if (aiTimerRef.current) {
@@ -588,7 +1029,7 @@ export function ChessApp({
     }
     setIsAiThinking(false);
     engine.redo();
-    if (gameMode !== 'HUMAN_VS_HUMAN' && engine.getSnapshot().currentTurn !== playerColor) {
+    if (isAiMode && engine.getSnapshot().currentTurn !== playerColor) {
       const redone = engine.redo();
       if (!redone && engine.getSnapshot().currentTurn !== playerColor) {
         triggerAiMoveIfNeeded(engine, gameMode, playerColor);
@@ -597,7 +1038,7 @@ export function ChessApp({
     clearSelection();
     setLiveHint(null);
     setFeedbackMessage(null);
-  }, [clearSelection, engine, gameMode, playerColor, triggerAiMoveIfNeeded]);
+  }, [clearSelection, engine, gameMode, isAiMode, playerColor, triggerAiMoveIfNeeded]);
 
   const handleStartReplay = useCallback(() => {
     clearSelection();
@@ -691,7 +1132,7 @@ export function ChessApp({
       const result = await analysisServiceRef.current.analyzeFullGame(
         snapshot,
         (current, total) => setAnalysisProgress({ current, total }),
-        engineFactory
+        resolveAnalysisEngineFactory()
       );
       setAnalysisResult(result);
       replay.enterReplayFromStart();
@@ -704,7 +1145,7 @@ export function ChessApp({
       setIsAnalyzingGame(false);
       setAnalysisProgress(null);
     }
-  }, [engine, engineFactory, replay, snapshot]);
+  }, [engine, replay, resolveAnalysisEngineFactory, snapshot]);
 
   const handleKeySaved = useCallback(() => {
     analysisServiceRef.current = analysisServiceFactory();
@@ -765,6 +1206,8 @@ export function ChessApp({
           <AppHeader
             onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
             hasApiKey={hasGeminiApiKey}
+            activeActivity={activeActivity}
+            onSelectActivity={handleSelectActivity}
           />
         }
         boardArea={
@@ -799,6 +1242,38 @@ export function ChessApp({
             currentGameMode={gameMode}
             feedbackMessage={feedbackMessage}
             onModeChange={handleModeChange}
+            activeActivity={activeActivity}
+            studyEditorProps={{
+              isEditorActive,
+              selectedTool: editorTool,
+              initialTurn: editorInitialTurn,
+              studyPositions,
+              onSelectTool: setEditorTool,
+              onChangeInitialTurn: handleChangeEditorTurn,
+              onClearBoard: handleClearEditorBoard,
+              onRestoreStandardBoard: handleRestoreStandardEditorBoard,
+              onStartStudyMatch: handleStartStudyMatch,
+              onReturnToEditor: handleReturnToEditor,
+              onLoadStudyPosition: handleLoadStudyPosition,
+              onSaveStudyPosition: handleSaveStudyPosition,
+              onSaveMatePuzzle: handleSaveMatePuzzle,
+            }}
+            matePuzzlesProps={{
+              puzzles: matePuzzles,
+              activePuzzle,
+              puzzleStatus,
+              remainingMoves: puzzleRemainingMoves,
+              onSelectPuzzle: handleSelectPuzzle,
+              onRetryPuzzle: handleRetryPuzzle,
+            }}
+            annotatedMatchesProps={{
+              annotatedMatches,
+              activeMatchId: activeAnnotatedMatchId,
+              canSaveCurrentMatch: snapshot.moveHistory.length > 0,
+              onSelectMatch: handleSelectAnnotatedMatch,
+              onSaveCurrentMatch: handleSaveCurrentMatch,
+              onDeleteMatch: handleDeleteAnnotatedMatch,
+            }}
             isReplaying={replay.isReplaying}
             isPlaying={replay.isPlaying}
             playbackSpeed={replay.playbackSpeed}

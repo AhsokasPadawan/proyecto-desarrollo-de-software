@@ -18,6 +18,7 @@ import { TimeoutState } from './TimeoutState';
 
 interface TurnRecord {
   readonly state: IGameState;
+  readonly turn: Color;
   readonly halfMoveClock: number;
   readonly positionSignature: string;
 }
@@ -44,7 +45,8 @@ export class ChessGame implements IGameEngine {
     board: Board = createStandardBoard(),
     initialTurn: Color = 'WHITE',
     history: CommandHistory = new CommandHistory(),
-    checkDetector: CheckDetector = new CheckDetector()
+    checkDetector: CheckDetector = new CheckDetector(),
+    initialState: IGameState = new NormalPlayState()
   ) {
     this.board = board;
     this.currentTurn = initialTurn;
@@ -52,7 +54,7 @@ export class ChessGame implements IGameEngine {
     this.checkDetector = checkDetector;
     this.observers = new Set<IGameObserver>();
 
-    this.currentState = new NormalPlayState();
+    this.currentState = initialState;
 
     this.currentPositionSignature = computePositionSignature(this.board, this.currentTurn);
     this.incrementPositionCount(this.currentPositionSignature);
@@ -156,7 +158,6 @@ export class ChessGame implements IGameEngine {
       this.restoreTurnRecord(previousTurn);
     }
 
-    this.switchTurn();
     this.notifyObservers();
     return true;
   }
@@ -176,7 +177,6 @@ export class ChessGame implements IGameEngine {
       this.restoreTurnRecord(nextTurn);
     }
 
-    this.switchTurn();
     this.notifyObservers();
     return true;
   }
@@ -256,6 +256,7 @@ export class ChessGame implements IGameEngine {
   private createCurrentTurnRecord(): TurnRecord {
     return {
       state: this.currentState,
+      turn: this.currentTurn,
       halfMoveClock: this.halfMoveClock,
       positionSignature: this.currentPositionSignature,
     };
@@ -263,6 +264,7 @@ export class ChessGame implements IGameEngine {
 
   private restoreTurnRecord(record: TurnRecord): void {
     this.currentState = record.state;
+    this.currentTurn = record.turn;
     this.halfMoveClock = record.halfMoveClock;
     this.currentPositionSignature = record.positionSignature;
   }
@@ -276,7 +278,14 @@ export class ChessGame implements IGameEngine {
   }
 
   private switchTurn(): void {
-    this.currentTurn = OPPOSITE_COLOR[this.currentTurn];
+    const nextTurn = OPPOSITE_COLOR[this.currentTurn];
+    if (
+      this.currentState.retainsTurnWhenSingleColor?.() === true &&
+      this.board.getPiecesByColor(nextTurn).length === 0
+    ) {
+      return;
+    }
+    this.currentTurn = nextTurn;
   }
 
   private trackPositionRepetition(): string {

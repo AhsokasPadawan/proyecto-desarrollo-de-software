@@ -1,3 +1,4 @@
+import { Color, PieceType } from '../../core/pieces/types';
 import { IAiStrategy } from '../../core/strategy/IAiStrategy';
 import { GreedyMaterialAiStrategy } from '../../core/strategy/GreedyMaterialAiStrategy';
 import { AmateurAiStrategy } from '../../core/strategy/AmateurAiStrategy';
@@ -8,6 +9,29 @@ export type GameMode =
   | 'HUMAN_VS_GREEDY_AI'
   | 'HUMAN_VS_AMATEUR_AI'
   | 'HUMAN_VS_PRO_AI';
+
+export type ActivityMode =
+  | 'CLASSIC_MATCH'
+  | 'STUDY_EDITOR'
+  | 'MATE_PUZZLES'
+  | 'ANNOTATED_MATCHES';
+
+export interface ActivityModeConfig {
+  readonly id: ActivityMode;
+  readonly label: string;
+  readonly icon: string;
+}
+
+export const ACTIVITY_MODES: readonly ActivityModeConfig[] = [
+  { id: 'CLASSIC_MATCH', label: 'Partida Clásica', icon: '♟' },
+  { id: 'STUDY_EDITOR', label: 'Estudio / Libro', icon: '📖' },
+  { id: 'MATE_PUZZLES', label: 'Mate en X', icon: '🧩' },
+  { id: 'ANNOTATED_MATCHES', label: 'Partidas Guardadas', icon: '🎬' },
+];
+
+export type EditorPaletteTool =
+  | { readonly kind: 'PIECE'; readonly color: Color; readonly type: PieceType }
+  | { readonly kind: 'ERASE' };
 
 export interface GameModeConfig {
   readonly id: GameMode;

@@ -1,6 +1,13 @@
 import { IPiece } from '../pieces/IPiece';
 
-export type GameStateType = 'IN_PROGRESS' | 'CHECK' | 'CHECKMATE' | 'STALEMATE' | 'DRAW' | 'TIMEOUT';
+export type GameStateType =
+  | 'IN_PROGRESS'
+  | 'STUDY_IN_PROGRESS'
+  | 'CHECK'
+  | 'CHECKMATE'
+  | 'STALEMATE'
+  | 'DRAW'
+  | 'TIMEOUT';
 export type GameStateKind = GameStateType;
 
 export const TERMINAL_GAME_STATES: ReadonlySet<GameStateType> = new Set([
